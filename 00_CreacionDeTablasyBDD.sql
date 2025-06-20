@@ -182,6 +182,7 @@ CREATE TABLE ddbba.pagoFactura (
     Fecha_Pago DATE,
     hora TIME,
     montoTotal DECIMAL(8,2),
+	montoMedioPago DECIMAL(8,2),
     saldoFavorUsado DECIMAL(8,2),
     medioPago VARCHAR(30),
     estadoPago CHAR(1) CHECK(estadoPago IN ('P','R')), --P de pendiente y R de realizado
