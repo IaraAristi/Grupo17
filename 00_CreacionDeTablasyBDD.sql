@@ -13,6 +13,7 @@ BEGIN
     EXEC('CREATE SCHEMA ddbba');
 END
 GO
+--
 
 -- 1. CatSocio
 CREATE TABLE ddbba.catSocio (
@@ -47,7 +48,8 @@ CREATE TABLE ddbba.inscripcion (
     hora TIME
 );
 GO
---socio
+
+
 CREATE TABLE ddbba.socio (
     ID_socio INT IDENTITY(1,1) PRIMARY KEY,
     nroSocio CHAR(7) UNIQUE,
