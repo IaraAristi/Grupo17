@@ -92,7 +92,7 @@ BEGIN
 CREATE TABLE ddbba.socio (
     ID_socio INT IDENTITY(1,1) PRIMARY KEY,
     nroSocio CHAR(7) UNIQUE,
-    dni INT UNIQUE,
+    dni CHAR(8) UNIQUE,
     nombre VARCHAR(50),
     apellido VARCHAR(50),
     telContacto INT,
@@ -126,7 +126,7 @@ CREATE TABLE ddbba.Presentismo (
     socio INT,
     act INT,
     profesor VARCHAR(50),
-	PRIMARY KEY (socio, act),
+	PRIMARY KEY (socio, act, fecha),
     CONSTRAINT FK_Presentismo_socio FOREIGN KEY (socio) REFERENCES ddbba.socio(ID_socio),
     CONSTRAINT FK_Presentismo_actividad FOREIGN KEY (act) REFERENCES ddbba.actDeportiva(codAct)
 );
@@ -353,7 +353,7 @@ GO
 IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE
 TABLE_SCHEMA =
 'ddbba' AND TABLE_NAME =
-'pagCuenta')
+'pagoCuenta')
 BEGIN
 CREATE TABLE ddbba.pagoCuenta (
     codPagoCuenta INT IDENTITY(1,1) PRIMARY KEY,

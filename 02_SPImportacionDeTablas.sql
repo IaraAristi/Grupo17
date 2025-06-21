@@ -13,10 +13,19 @@ BEGIN
     IF OBJECT_ID('tempdb..#cat_temp') IS NOT NULL
         DROP TABLE #cat_temp;
 
-    CREATE TABLE #cat_temp (
-        [Categoria socio] VARCHAR(50),
-        [Valor cuota] VARCHAR(50),     
-        [Vigente hasta] VARCHAR(50)      
+	-- IMPORTANTE SOBRE COLLATE:
+	-- Las tablas temporales se crean en tempdb, y por defecto heredan el COLLATE de ese sistema (generalmente SQL_Latin1_General_CP1_CI_AS).
+	-- Nuestra base de datos usa COLLATE Modern_Spanish_CI_AS.
+	-- Esto puede generar un error al comparar columnas tipo VARCHAR entre una tabla temporal y una tabla de nuestra base:
+	-- SOLUCIÓN:
+	-- En cada tabla cuyo sp tenga comparación entre VARCHAR de tabla temporal y VARCHAR de bdd, usar:
+	-- columnaTemp COLLATE Modern_Spanish_CI_AS
+	-- Solo es necesario en campos tipo VARCHAR/CHAR.
+
+    CREATE TABLE #cat_temp(
+        [Categoria socio] VARCHAR(50) COLLATE Modern_Spanish_CI_AS , --ejemplo agregacion collate
+        [Valor cuota] VARCHAR(50) COLLATE Modern_Spanish_CI_AS ,     
+        [Vigente hasta] VARCHAR(50) COLLATE Modern_Spanish_CI_AS       
     );
 
     DECLARE @sql NVARCHAR(MAX);
@@ -28,8 +37,8 @@ BEGIN
             FIELDTERMINATOR = '','',
             ROWTERMINATOR = ''\n'',
             CODEPAGE = ''65001''
-        );';
-    EXEC (@sql);
+        );
+	'; EXEC (@sql);
 
     INSERT INTO ddbba.catSocio (nombreCat, edad_desde, edad_hasta)
     SELECT DISTINCT
@@ -50,7 +59,7 @@ BEGIN
     WHERE NOT EXISTS (
         SELECT 1
         FROM ddbba.catSocio c
-        WHERE c.nombreCat = LTRIM(RTRIM(t.[Categoria socio]))
+        WHERE c.nombreCat = LTRIM(RTRIM(t.[Categoria socio])) --esta es la comparación en la que, de ser necesario, si no cambiamos la collation nos devuelve error
     );
 
     DROP TABLE #cat_temp;
@@ -196,18 +205,18 @@ BEGIN
         IF OBJECT_ID('tempdb..#socios_importar') IS NOT NULL DROP TABLE #socios_importar;
 
         CREATE TABLE #socios_importar (
-            [Nro de Socio] VARCHAR(50),
-            [Nro de socio RP] VARCHAR(50),
-            [Nombre] VARCHAR(100),
-            [ apellido] VARCHAR(100),
-            [ DNI] VARCHAR(20),
-            [ email personal] VARCHAR(150),
-            [ fecha de nacimiento] VARCHAR(30),
-            [ teléfono de contacto] VARCHAR(30),
-            [ teléfono de contacto emergencia] VARCHAR(30),
-            [ Nombre de la obra social o prepaga] VARCHAR(100),
-            [nro. de socio obra social/prepaga ] VARCHAR(50),
-            [teléfono de contacto de emergencia ] VARCHAR(50)
+            [Nro de Socio] VARCHAR(50) COLLATE Modern_Spanish_CI_AS ,
+            [Nro de socio RP] VARCHAR(50) COLLATE Modern_Spanish_CI_AS ,
+            [Nombre] VARCHAR(100) COLLATE Modern_Spanish_CI_AS ,
+            [ apellido] VARCHAR(100) COLLATE Modern_Spanish_CI_AS ,
+            [ DNI] VARCHAR(20) COLLATE Modern_Spanish_CI_AS ,
+            [ email personal] VARCHAR(150) COLLATE Modern_Spanish_CI_AS ,
+            [ fecha de nacimiento] VARCHAR(30) COLLATE Modern_Spanish_CI_AS ,
+            [ teléfono de contacto] VARCHAR(30) COLLATE Modern_Spanish_CI_AS ,
+            [ teléfono de contacto emergencia] VARCHAR(30) COLLATE Modern_Spanish_CI_AS ,
+            [ Nombre de la obra social o prepaga] VARCHAR(100) COLLATE Modern_Spanish_CI_AS ,
+            [nro. de socio obra social/prepaga ] VARCHAR(50) COLLATE Modern_Spanish_CI_AS ,
+            [teléfono de contacto de emergencia ] VARCHAR(50) COLLATE Modern_Spanish_CI_AS 
         );
 
         DECLARE @SQL NVARCHAR(MAX);
@@ -236,7 +245,7 @@ BEGIN
         )
         SELECT 
             LEFT(LTRIM(RTRIM([Nro de Socio])), 9),
-            TRY_CAST([ DNI] AS INT),
+            LEFT(TRY_CAST([ DNI] AS INT),1),
             LEFT(LTRIM(RTRIM([Nombre])), 50),
             LEFT(LTRIM(RTRIM([ apellido])), 50),
             TRY_CAST([ teléfono de contacto] AS INT),
@@ -268,7 +277,7 @@ BEGIN
         )
         SELECT 
             LEFT(LTRIM(RTRIM(f.[Nro de Socio])), 9),
-            TRY_CAST(f.[ DNI] AS INT),
+            LEFT(TRY_CAST(f.[ DNI] AS INT),8),
             LEFT(LTRIM(RTRIM(f.[Nombre])), 50),
             LEFT(LTRIM(RTRIM(f.[ apellido])), 50),
             TRY_CAST(f.[ teléfono de contacto] AS INT),
@@ -422,9 +431,9 @@ BEGIN
 
     -- Crear tabla temporal con los datos del archivo
     CREATE TABLE #cuotas_cat_temp (
-        [Categoria socio] VARCHAR(50),
-        [Valor cuota] VARCHAR(50),
-        [Vigente hasta] VARCHAR(50)
+        [Categoria socio] VARCHAR(50) COLLATE Modern_Spanish_CI_AS ,
+        [Valor cuota] VARCHAR(50) COLLATE Modern_Spanish_CI_AS ,
+        [Vigente hasta] VARCHAR(50) COLLATE Modern_Spanish_CI_AS 
     );
 
     -- Cargar datos desde el archivo CSV
@@ -508,8 +517,13 @@ BEGIN
 			act,
 			profesor
 		)
+		-- IMPORTANTE SOBRE EL FORMATO DE FECHAS:
+		-- El tercer parámetro de TRY_CONVERT define el formato de la fecha.
+		-- Elegir el número correcto según el formato de fecha en el archivo .CSV:
+		-- 101 = mm/dd/yyyy (ESTILO ESTADOUNIDENSE) -> USAR ESTE si el archivo se generó desde un Excel en idioma inglés.
+		-- 103 = dd/mm/yyyy (ESTILO EUROPEO/LATINO) -> USAR ESTE si el archivo se generó desde un Excel en español.
 		SELECT
-			TRY_CONVERT(DATE, LTRIM(RTRIM(temp.[fecha de asistencia])), 103) AS fechaAsistencia,
+			TRY_CONVERT(DATE, LTRIM(RTRIM(temp.[fecha de asistencia])), 101) AS fechaAsistencia,
 			LEFT(LTRIM(RTRIM(temp.Asistencia)), 1),
 			s.ID_socio,
 			a.codAct,
@@ -520,14 +534,14 @@ BEGIN
 		JOIN ddbba.actDeportiva a
 			ON LTRIM(RTRIM(temp.Actividad)) COLLATE Modern_Spanish_CI_AS = a.nombre
 		WHERE 
-			TRY_CONVERT(DATE, LTRIM(RTRIM(temp.[fecha de asistencia])), 103) IS NOT NULL
-			AND TRY_CONVERT(DATE, LTRIM(RTRIM(temp.[fecha de asistencia])), 103) <= CAST(GETDATE() AS DATE)
+			TRY_CONVERT(DATE, LTRIM(RTRIM(temp.[fecha de asistencia])), 101) IS NOT NULL
+			AND TRY_CONVERT(DATE, LTRIM(RTRIM(temp.[fecha de asistencia])), 101) <= CAST(GETDATE() AS DATE)
 			AND NOT EXISTS (
 				SELECT 1 
 				FROM ddbba.Presentismo p
 				WHERE p.socio = s.ID_socio
 				  AND p.act = a.codAct
-				  AND p.fecha = TRY_CONVERT(DATE, LTRIM(RTRIM(temp.[fecha de asistencia])), 103)
+				  AND p.fecha = TRY_CONVERT(DATE, LTRIM(RTRIM(temp.[fecha de asistencia])), 101)
 			);
 
 
