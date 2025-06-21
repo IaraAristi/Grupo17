@@ -13,10 +13,19 @@ BEGIN
     IF OBJECT_ID('tempdb..#cat_temp') IS NOT NULL
         DROP TABLE #cat_temp;
 
-    CREATE TABLE #cat_temp (
-        [Categoria socio] VARCHAR(50),
-        [Valor cuota] VARCHAR(50),     
-        [Vigente hasta] VARCHAR(50)      
+	-- IMPORTANTE SOBRE COLLATE:
+	-- Las tablas temporales se crean en tempdb, y por defecto heredan el COLLATE de ese sistema (generalmente SQL_Latin1_General_CP1_CI_AS).
+	-- Nuestra base de datos usa COLLATE Modern_Spanish_CI_AS.
+	-- Esto puede generar un error al comparar columnas tipo VARCHAR entre una tabla temporal y una tabla de nuestra base:
+	-- SOLUCIÓN:
+	-- En cada tabla cuyo sp tenga comparación entre VARCHAR de tabla temporal y VARCHAR de bdd, usar:
+	-- columnaTemp COLLATE Modern_Spanish_CI_AS
+	-- Solo es necesario en campos tipo VARCHAR/CHAR.
+
+    CREATE TABLE #cat_temp(
+        [Categoria socio] VARCHAR(50) COLLATE Modern_Spanish_CI_AS , --ejemplo agregacion collate
+        [Valor cuota] VARCHAR(50) COLLATE Modern_Spanish_CI_AS ,     
+        [Vigente hasta] VARCHAR(50) COLLATE Modern_Spanish_CI_AS       
     );
 
     DECLARE @sql NVARCHAR(MAX);
@@ -28,8 +37,8 @@ BEGIN
             FIELDTERMINATOR = '','',
             ROWTERMINATOR = ''\n'',
             CODEPAGE = ''65001''
-        );';
-    EXEC (@sql);
+        );
+	'; EXEC (@sql);
 
     INSERT INTO ddbba.catSocio (nombreCat, edad_desde, edad_hasta)
     SELECT DISTINCT
@@ -50,7 +59,7 @@ BEGIN
     WHERE NOT EXISTS (
         SELECT 1
         FROM ddbba.catSocio c
-        WHERE c.nombreCat = LTRIM(RTRIM(t.[Categoria socio]))
+        WHERE c.nombreCat = LTRIM(RTRIM(t.[Categoria socio])) --esta es la comparación en la que, de ser necesario, si no cambiamos la collation nos devuelve error
     );
 
     DROP TABLE #cat_temp;
@@ -75,32 +84,32 @@ BEGIN
 
         -- Tabla temporal para datos del archivo
         CREATE TABLE #sociorp_temporal (
-            [Nro de Socio] VARCHAR(50),
-            [Nombre] VARCHAR(100),
-            [ apellido] VARCHAR(100),
-            [ DNI] VARCHAR(20),
-            [ email personal] VARCHAR(150),
-            [ fecha de nacimiento] VARCHAR(30),
-            [ teléfono de contacto] VARCHAR(30),
-            [ teléfono de contacto emergencia] VARCHAR(30),
-            [ Nombre de la obra social o prepaga] VARCHAR(100),
-            [nro. de socio obra social/prepaga ] VARCHAR(50),
-            [teléfono de contacto de emergencia ] VARCHAR(30)
+            [Nro de Socio] VARCHAR(50)COLLATE Modern_Spanish_CI_AS,
+            [Nombre] VARCHAR(100)COLLATE Modern_Spanish_CI_AS,
+            [Apellido] VARCHAR(100)COLLATE Modern_Spanish_CI_AS,
+            [DNI] VARCHAR(20)COLLATE Modern_Spanish_CI_AS,
+            [Email] VARCHAR(150)COLLATE Modern_Spanish_CI_AS,
+            [FechaNacimiento] VARCHAR(30)COLLATE Modern_Spanish_CI_AS,
+            [Telefono] VARCHAR(30)COLLATE Modern_Spanish_CI_AS,
+            [TelefonoEmergencia] VARCHAR(30)COLLATE Modern_Spanish_CI_AS,
+            [ObraSocial] VARCHAR(100)COLLATE Modern_Spanish_CI_AS,
+            [NumeroObraSocial] VARCHAR(50)COLLATE Modern_Spanish_CI_AS,
+            [TelefonoObraSocial] VARCHAR(30)COLLATE Modern_Spanish_CI_AS
         );
 
         -- Tabla de duplicados
         CREATE TABLE #socios_duplicados (
-            nroSocio CHAR(7),
-            dni CHAR(8),
-            nombre VARCHAR(50),
-            apellido VARCHAR(50),
+            nroSocio CHAR(7)COLLATE Modern_Spanish_CI_AS,
+            dni VARCHAR(10)COLLATE Modern_Spanish_CI_AS,
+            nombre VARCHAR(50)COLLATE Modern_Spanish_CI_AS,
+            apellido VARCHAR(50)COLLATE Modern_Spanish_CI_AS,
             telContacto INT,
             telEmergencia INT,
             email VARCHAR(50),
             fechaNac DATE,
-            nombreObraSoc VARCHAR(40),
-            numeroObraSoc VARCHAR(20),
-            telObraSoc CHAR(30)
+            nombreObraSoc VARCHAR(40) COLLATE Modern_Spanish_CI_AS,
+            numeroObraSoc VARCHAR(20) COLLATE Modern_Spanish_CI_AS,
+            telObraSoc CHAR(30) COLLATE Modern_Spanish_CI_AS
         );
 
         -- Cargar CSV
@@ -120,33 +129,34 @@ BEGIN
         ;WITH ordenados AS (
             SELECT 
                 LEFT(LTRIM(RTRIM([Nro de Socio])), 7) AS nroSocio,
-                LEFT(LTRIM(RTRIM([ DNI])), 8) AS dni,
+                LEFT(TRY_CAST(LTRIM(RTRIM([DNI])) AS CHAR),8) AS dni,
                 LEFT(LTRIM(RTRIM([Nombre])), 50) AS nombre,
-                LEFT(LTRIM(RTRIM([ apellido])), 50) AS apellido,
-                TRY_CAST(LTRIM(RTRIM([ teléfono de contacto])) AS INT) AS telContacto,
-                TRY_CAST(LTRIM(RTRIM([ teléfono de contacto emergencia])) AS INT) AS telEmergencia,
-                LEFT(LTRIM(RTRIM([ email personal])), 50) AS email,
-                TRY_CAST(LTRIM(RTRIM([ fecha de nacimiento])) AS DATE) AS fechaNac,
-                LEFT(LTRIM(RTRIM([ Nombre de la obra social o prepaga])), 40) AS nombreObraSoc,
-                LEFT(LTRIM(RTRIM([nro. de socio obra social/prepaga ])), 20) AS numeroObraSoc,
-                LEFT(LTRIM(RTRIM([teléfono de contacto de emergencia ])), 30) AS telObraSoc,
-                ROW_NUMBER() OVER (PARTITION BY LEFT(LTRIM(RTRIM([ DNI])), 8) ORDER BY [Nro de Socio]) AS rn
+                LEFT(LTRIM(RTRIM([Apellido])), 50) AS apellido,
+                TRY_CAST(LTRIM(RTRIM([Telefono])) AS INT) AS telContacto,
+                TRY_CAST(LTRIM(RTRIM([TelefonoEmergencia])) AS INT) AS telEmergencia,
+                LEFT(LTRIM(RTRIM([Email])), 50) AS email,
+                TRY_CAST(LTRIM(RTRIM([FechaNacimiento])) AS DATE) AS fechaNac,
+                LEFT(LTRIM(RTRIM([ObraSocial])), 40) AS nombreObraSoc,
+                LEFT(LTRIM(RTRIM([NumeroObraSocial])), 20) AS numeroObraSoc,
+                LEFT(LTRIM(RTRIM([TelefonoObraSocial])), 30) AS telObraSoc,
+                ROW_NUMBER() OVER (PARTITION BY TRY_CAST(LTRIM(RTRIM([DNI])) AS CHAR) ORDER BY [Nro de Socio]) AS rn
             FROM #sociorp_temporal
-            WHERE LEN(LTRIM(RTRIM([ DNI]))) >= 8
+            WHERE TRY_CAST(LTRIM(RTRIM([DNI])) AS CHAR) IS NOT NULL
         )
         SELECT * INTO #ordenados_temp FROM ordenados;
 
         -- Insertar duplicados (los repetidos en el archivo o que ya existen en la base)
         INSERT INTO #socios_duplicados
-        SELECT o.nroSocio, o.dni, o.nombre, o.apellido, o.telContacto, o.telEmergencia,
-               o.email, o.fechaNac, o.nombreObraSoc, o.numeroObraSoc, o.telObraSoc
-        FROM #ordenados_temp o
-        WHERE o.rn > 1
-           OR EXISTS (
-               SELECT 1 
-               FROM ddbba.socio s 
-               WHERE s.dni = o.dni
-           );
+		SELECT o.nroSocio, o.dni, o.nombre, o.apellido, o.telContacto, o.telEmergencia,
+			   o.email, o.fechaNac, o.nombreObraSoc, o.numeroObraSoc, o.telObraSoc
+		FROM #ordenados_temp o
+		WHERE o.rn > 1
+		   OR EXISTS (
+			   SELECT 1 
+			   FROM ddbba.socio s 
+			   WHERE s.dni = o.dni
+		   );
+
 
         -- Insertar registros únicos en la tabla socio
         INSERT INTO ddbba.socio (
@@ -195,18 +205,18 @@ BEGIN
         IF OBJECT_ID('tempdb..#socios_importar') IS NOT NULL DROP TABLE #socios_importar;
 
         CREATE TABLE #socios_importar (
-            [Nro de Socio] VARCHAR(50),
-            [Nro de socio RP] VARCHAR(50),
-            [Nombre] VARCHAR(100),
-            [ apellido] VARCHAR(100),
-            [ DNI] VARCHAR(20),
-            [ email personal] VARCHAR(150),
-            [ fecha de nacimiento] VARCHAR(30),
-            [ teléfono de contacto] VARCHAR(30),
-            [ teléfono de contacto emergencia] VARCHAR(30),
-            [ Nombre de la obra social o prepaga] VARCHAR(100),
-            [nro. de socio obra social/prepaga ] VARCHAR(50),
-            [teléfono de contacto de emergencia ] VARCHAR(50)
+            [Nro de Socio] VARCHAR(50) COLLATE Modern_Spanish_CI_AS ,
+            [Nro de socio RP] VARCHAR(50) COLLATE Modern_Spanish_CI_AS ,
+            [Nombre] VARCHAR(100) COLLATE Modern_Spanish_CI_AS ,
+            [ apellido] VARCHAR(100) COLLATE Modern_Spanish_CI_AS ,
+            [ DNI] VARCHAR(20) COLLATE Modern_Spanish_CI_AS ,
+            [ email personal] VARCHAR(150) COLLATE Modern_Spanish_CI_AS ,
+            [ fecha de nacimiento] VARCHAR(30) COLLATE Modern_Spanish_CI_AS ,
+            [ teléfono de contacto] VARCHAR(30) COLLATE Modern_Spanish_CI_AS ,
+            [ teléfono de contacto emergencia] VARCHAR(30) COLLATE Modern_Spanish_CI_AS ,
+            [ Nombre de la obra social o prepaga] VARCHAR(100) COLLATE Modern_Spanish_CI_AS ,
+            [nro. de socio obra social/prepaga ] VARCHAR(50) COLLATE Modern_Spanish_CI_AS ,
+            [teléfono de contacto de emergencia ] VARCHAR(50) COLLATE Modern_Spanish_CI_AS 
         );
 
         DECLARE @SQL NVARCHAR(MAX);
@@ -235,7 +245,7 @@ BEGIN
         )
         SELECT 
             LEFT(LTRIM(RTRIM([Nro de Socio])), 9),
-            LEFT(LTRIM(RTRIM([ DNI])), 8),
+            LEFT(TRY_CAST([ DNI] AS CHAR),8),
             LEFT(LTRIM(RTRIM([Nombre])), 50),
             LEFT(LTRIM(RTRIM([ apellido])), 50),
             TRY_CAST([ teléfono de contacto] AS INT),
@@ -249,6 +259,7 @@ BEGIN
             NULL,
             NULL,
             NULL,
+            -- Subconsulta para obtener el ID_socio del grupo familiar a partir del nroSocio RP
             (SELECT TOP 1 ID_socio FROM ddbba.socio WHERE nroSocio = LEFT(LTRIM(RTRIM([Nro de socio RP])), 9))
         FROM primeros_por_rp
         WHERE rn = 1;
@@ -266,7 +277,7 @@ BEGIN
         )
         SELECT 
             LEFT(LTRIM(RTRIM(f.[Nro de Socio])), 9),
-            LEFT(LTRIM(RTRIM(f.[ DNI])), 8),
+            LEFT(TRY_CAST(f.[ DNI] AS CHAR),8),
             LEFT(LTRIM(RTRIM(f.[Nombre])), 50),
             LEFT(LTRIM(RTRIM(f.[ apellido])), 50),
             TRY_CAST(f.[ teléfono de contacto] AS INT),
@@ -296,8 +307,6 @@ BEGIN
     END CATCH
 END;
 GO
-
-
 ---------------------------------------------------
 
 CREATE OR ALTER PROCEDURE ddbba.InsertarActividades
@@ -422,9 +431,9 @@ BEGIN
 
     -- Crear tabla temporal con los datos del archivo
     CREATE TABLE #cuotas_cat_temp (
-        [Categoria socio] VARCHAR(50),
-        [Valor cuota] VARCHAR(50),
-        [Vigente hasta] VARCHAR(50)
+        [Categoria socio] VARCHAR(50) COLLATE Modern_Spanish_CI_AS ,
+        [Valor cuota] VARCHAR(50) COLLATE Modern_Spanish_CI_AS ,
+        [Vigente hasta] VARCHAR(50) COLLATE Modern_Spanish_CI_AS 
     );
 
     -- Cargar datos desde el archivo CSV
@@ -466,8 +475,9 @@ GO
 
 
 ----------------------------------------------
+
 CREATE OR ALTER PROCEDURE ddbba.cargarPresentismo
-    @rutaArchivo NVARCHAR(255) 
+    @rutaArchivo NVARCHAR(255)
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -480,11 +490,12 @@ BEGIN
     CREATE TABLE #presentismo_temp (
         [Nro de Socio] VARCHAR(10),
         [Actividad] VARCHAR(50),
-        [fecha de asistencia] VARCHAR(20), 
+        [fecha de asistencia] VARCHAR(20),  -- se carga como texto para mayor tolerancia
         [Asistencia] VARCHAR(10),
         [Profesor] VARCHAR(50)
     );
 
+    -- Importar desde el archivo CSV
     DECLARE @sql NVARCHAR(MAX);
     SET @sql = '
         BULK INSERT #presentismo_temp
@@ -498,44 +509,50 @@ BEGIN
     ';
     EXEC (@sql);
 
-    -- Insertar datos en la tabla definitiva
-    INSERT INTO ddbba.Presentismo (
-        fecha,
-        presentismo,
-        socio,
-        act,
-        profesor
-    )
-    SELECT
-        TRY_CONVERT(DATE, LTRIM(RTRIM(temp.[fecha de asistencia])), 101),  -- Formato mm/dd/yyyy
-        LEFT(LTRIM(RTRIM(temp.Asistencia)), 1),
-        s.ID_socio,
-        a.codAct,
-        LTRIM(RTRIM(temp.Profesor))
-    FROM #presentismo_temp temp
-    JOIN ddbba.Socio s
-        ON LTRIM(RTRIM(temp.[Nro de Socio])) COLLATE Modern_Spanish_CI_AS = s.nroSocio
-    JOIN ddbba.actDeportiva a
-        ON LTRIM(RTRIM(temp.Actividad)) COLLATE Modern_Spanish_CI_AS = a.nombre
-    WHERE 
-        TRY_CONVERT(DATE, LTRIM(RTRIM(temp.[fecha de asistencia])), 101) IS NOT NULL
-        AND TRY_CONVERT(DATE, LTRIM(RTRIM(temp.[fecha de asistencia])), 101) <= CAST(GETDATE() AS DATE)
-        AND NOT EXISTS (
-            SELECT 1
-            FROM ddbba.Presentismo p
-            WHERE p.socio = s.ID_socio
-              AND p.act = a.codAct
-              AND p.fecha = TRY_CONVERT(DATE, LTRIM(RTRIM(temp.[fecha de asistencia])), 101)
-        );
+    -- Insertar en la tabla Presentismo
+		   INSERT INTO ddbba.Presentismo (
+			fecha,
+			presentismo,
+			socio,
+			act,
+			profesor
+		)
+		-- IMPORTANTE SOBRE EL FORMATO DE FECHAS:
+		-- El tercer parámetro de TRY_CONVERT define el formato de la fecha.
+		-- Elegir el número correcto según el formato de fecha en el archivo .CSV:
+		-- 101 = mm/dd/yyyy (ESTILO ESTADOUNIDENSE) -> USAR ESTE si el archivo se generó desde un Excel en idioma inglés.
+		-- 103 = dd/mm/yyyy (ESTILO EUROPEO/LATINO) -> USAR ESTE si el archivo se generó desde un Excel en español.
+		SELECT
+			TRY_CONVERT(DATE, LTRIM(RTRIM(temp.[fecha de asistencia])), 101) AS fechaAsistencia,
+			LEFT(LTRIM(RTRIM(temp.Asistencia)), 1),
+			s.ID_socio,
+			a.codAct,
+			LTRIM(RTRIM(temp.Profesor))
+		FROM #presentismo_temp temp
+		JOIN ddbba.Socio s
+			ON LTRIM(RTRIM(temp.[Nro de Socio])) COLLATE Modern_Spanish_CI_AS = s.nroSocio
+		JOIN ddbba.actDeportiva a
+			ON LTRIM(RTRIM(temp.Actividad)) COLLATE Modern_Spanish_CI_AS = a.nombre
+		WHERE 
+			TRY_CONVERT(DATE, LTRIM(RTRIM(temp.[fecha de asistencia])), 101) IS NOT NULL
+			AND TRY_CONVERT(DATE, LTRIM(RTRIM(temp.[fecha de asistencia])), 101) <= CAST(GETDATE() AS DATE)
+			AND NOT EXISTS (
+				SELECT 1 
+				FROM ddbba.Presentismo p
+				WHERE p.socio = s.ID_socio
+				  AND p.act = a.codAct
+				  AND p.fecha = TRY_CONVERT(DATE, LTRIM(RTRIM(temp.[fecha de asistencia])), 101)
+			);
 
-    -- Eliminar la tabla temporal
+
+    -- Limpiar tabla temporal
     DROP TABLE #presentismo_temp;
 END;
 GO
 
 
--------------------------------------------------------
-CREATE OR ALTER PROCEDURE ddbba.importarPago
+--insercion datos pago factura
+CREATE OR ALTER PROCEDURE ddbba.InsertarPagoFactura
     @rutaArchivo NVARCHAR(255)
 AS
 BEGIN
@@ -545,15 +562,14 @@ BEGIN
         DROP TABLE #pago_temp;
 
     CREATE TABLE #pago_temp (
-        [Id de pago] VARCHAR(50),
+        [Id de pago] VARCHAR(15),
         [fecha] VARCHAR(20),
         [Responsable de pago] VARCHAR(20),
-        [Valor] VARCHAR(30),
+        [Valor] VARCHAR(20),
         [Medio de pago] VARCHAR(30)
     );
 
-    DECLARE @sql NVARCHAR(MAX);
-    SET @sql = '
+    DECLARE @sql NVARCHAR(MAX) = N'
         BULK INSERT #pago_temp
         FROM ''' + @rutaArchivo + '''
         WITH (
@@ -561,64 +577,53 @@ BEGIN
             FIELDTERMINATOR = '','',
             ROWTERMINATOR = ''\n'',
             CODEPAGE = ''65001''
-        );
-    ';
-    EXEC (@sql);
+        );';
+
+    EXEC sp_executesql @sql;
 
     INSERT INTO ddbba.pagoFactura (
-        idPago,
+		idPago,
         Fecha_Pago,
-        hora,
         montoTotal,
-        montoMedioPago,
-        saldoFavorUsado,
         medioPago,
-        estadoPago,
         codSocio
     )
     SELECT
-        LEFT(LTRIM(RTRIM(t.[Id de pago])), 12),
-        TRY_CONVERT(DATE, LTRIM(RTRIM(t.[fecha])), 103), -- Formato dd/mm/yyyy
-        NULL, -- hora no provista
-        TRY_CONVERT(DECIMAL(8,2), LTRIM(RTRIM(t.[Valor]))),
-        NULL, -- montoMedioPago no provisto
-        NULL, -- saldoFavorUsado no provisto
-        LTRIM(RTRIM(t.[Medio de pago])),
-        NULL, -- estadoPago no provisto
+		LEFT(LTRIM(RTRIM(p.[Id de pago])),12),
+        TRY_CONVERT(DATE, LTRIM(RTRIM(p.[fecha])), 101), 
+        TRY_CAST(p.[Valor] AS DECIMAL(8,2)),
+        LTRIM(RTRIM(p.[Medio de pago])) COLLATE Modern_Spanish_CI_AS,
         s.ID_socio
-    FROM #pago_temp t
-    JOIN ddbba.socio s
-        ON LTRIM(RTRIM(t.[Responsable de pago])) = s.nroSocio
-    WHERE 
-        TRY_CONVERT(DATE, t.[fecha], 103) IS NOT NULL
-        AND TRY_CONVERT(DECIMAL(8,2), t.[Valor]) IS NOT NULL
-        AND LEFT(LTRIM(RTRIM(t.[Id de pago])), 12) IS NOT NULL;
+    FROM #pago_temp p
+    JOIN ddbba.Socio s
+        ON LTRIM(RTRIM(p.[Responsable de pago])) COLLATE Modern_Spanish_CI_AS = s.nroSocio;
 
     DROP TABLE #pago_temp;
 END;
 GO
 
-
--------------------
-CREATE OR ALTER PROCEDURE ddbba.importarCostoPiletaInvitado
-    @rutaArchivo NVARCHAR(255)
+--SP TARIFA PILETA INVITADO
+CREATE OR ALTER PROCEDURE ddbba.InsertarCostoIngresoPileta
+    @rutaArchivo NVARCHAR(260)  -- Ejemplo: 'C:\ruta\archivo.csv'
 AS
 BEGIN
     SET NOCOUNT ON;
 
-    IF OBJECT_ID('tempdb..#costo_temp') IS NOT NULL
-        DROP TABLE #costo_temp;
+    -- Eliminar tabla temporal si ya existe
+    IF OBJECT_ID('tempdb..#costoPileta_temp') IS NOT NULL
+        DROP TABLE #costoPileta_temp;
 
-    CREATE TABLE #costo_temp (
-        edad VARCHAR(50),
-        precio VARCHAR(50),
-        fechaVigenteHasta VARCHAR(50)
+    -- Crear tabla temporal con campos tipo texto para limpieza
+    CREATE TABLE #costoPileta_temp (
+        edad VARCHAR(20),
+        precio VARCHAR(20),
+        fechaVigenteHasta VARCHAR(20)
     );
 
-    DECLARE @sql NVARCHAR(MAX);
-    SET @sql = '
-        BULK INSERT #costo_temp
-        FROM ''' + @rutaArchivo + '''
+    -- Cargar datos desde el archivo CSV
+    DECLARE @sql NVARCHAR(MAX) = N'
+        BULK INSERT #costoPileta_temp
+        FROM ''' + @rutaArchivo + N'''
         WITH (
             FIRSTROW = 2,
             FIELDTERMINATOR = '','',
@@ -626,37 +631,66 @@ BEGIN
             CODEPAGE = ''65001''
         );
     ';
-    EXEC (@sql);
+    EXEC sp_executesql @sql;
 
-    INSERT INTO ddbba.costoIngresoPileta (
-        edad,
-        precio,
-        fechaVigenteHasta
-    )
+    -- Insertar en la tabla final con limpieza y conversión
+    INSERT INTO ddbba.costoIngresoPileta (edad, precio, fechaVigenteHasta)
     SELECT
-        CASE 
-            WHEN LOWER(LTRIM(RTRIM(edad))) LIKE '%adult%' THEN 'Mayor'
-            WHEN LOWER(LTRIM(RTRIM(edad))) LIKE '%menor%' THEN 'Menor'
-            ELSE NULL
-        END,
-        TRY_CONVERT(DECIMAL(7,2), LTRIM(RTRIM(precio))),
-        TRY_CONVERT(DATE, LTRIM(RTRIM(fechaVigenteHasta)), 101) -- Formato mm/dd/yyyy
-    FROM #costo_temp c
-    WHERE
-        ISNULL(LTRIM(RTRIM(edad)), '') <> ''
-        AND TRY_CONVERT(DECIMAL(7,2), precio) IS NOT NULL
-        AND TRY_CONVERT(DATE, fechaVigenteHasta, 101) IS NOT NULL
-        AND NOT EXISTS (
-            SELECT 1 FROM ddbba.costoIngresoPileta p
-            WHERE p.edad = CASE 
-                            WHEN LOWER(LTRIM(RTRIM(c.edad))) LIKE '%adult%' THEN 'Mayor'
-                            WHEN LOWER(LTRIM(RTRIM(c.edad))) LIKE '%menor%' THEN 'Menor'
-                            ELSE NULL
-                          END
-              AND p.precio = TRY_CONVERT(DECIMAL(7,2), LTRIM(RTRIM(c.precio)))
-              AND p.fechaVigenteHasta = TRY_CONVERT(DATE, LTRIM(RTRIM(c.fechaVigenteHasta)), 101)
-        );
+        LTRIM(RTRIM(edad)),
+        TRY_CAST(precio AS DECIMAL(7,2)),
+        TRY_CONVERT(DATE, fechaVigenteHasta, 101)  -- mm/dd/yyyy
+    FROM #costoPileta_temp
+    WHERE 
+        TRY_CAST(precio AS DECIMAL(7,2)) IS NOT NULL AND
+        TRY_CONVERT(DATE, fechaVigenteHasta, 101) IS NOT NULL;
 
-    DROP TABLE #costo_temp;
+    -- Eliminar tabla temporal
+    DROP TABLE #costoPileta_temp;
+END;
+GO
+
+
+
+--sp costo pileta socios
+CREATE OR ALTER PROCEDURE ddbba.InsertarCostoPileta
+    @rutaArchivo NVARCHAR(260)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    IF OBJECT_ID('tempdb..#costoPileta_temp') IS NOT NULL
+        DROP TABLE #costoPileta_temp;
+
+    CREATE TABLE #costoPileta_temp (
+        costo VARCHAR(50),
+        tipo VARCHAR(20),
+        categoria VARCHAR(20),
+        fechaVigenciaHasta VARCHAR(20)
+    );
+
+    DECLARE @sql NVARCHAR(MAX) = N'
+        BULK INSERT #costoPileta_temp
+        FROM ''' + @rutaArchivo + N'''
+        WITH (
+            FIRSTROW = 2,
+            FIELDTERMINATOR = '','',
+            ROWTERMINATOR = ''\n'',
+            CODEPAGE = ''65001''
+        );
+    ';
+    EXEC sp_executesql @sql;
+
+    INSERT INTO ddbba.costoPileta (costo, tipo, categoria, fechaVigenciaHasta)
+    SELECT
+        TRY_CAST(LTRIM(RTRIM(costo)) AS DECIMAL(8,2)),
+        LTRIM(RTRIM(tipo)),
+        LTRIM(RTRIM(categoria)),
+        TRY_CONVERT(DATE, LTRIM(RTRIM(fechaVigenciaHasta)), 101)
+    FROM #costoPileta_temp
+    WHERE 
+        TRY_CAST(costo AS DECIMAL(8,2)) IS NOT NULL AND
+        TRY_CONVERT(DATE, fechaVigenciaHasta, 101) IS NOT NULL;
+
+    DROP TABLE #costoPileta_temp;
 END;
 GO

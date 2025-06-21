@@ -122,15 +122,14 @@ TABLE_SCHEMA =
 BEGIN
 CREATE TABLE ddbba.Presentismo (
     fecha DATE,
-    presentismo CHAR(1) CHECK(presentismo IN ('P','A','J')), -- Presente, Ausente, Justificado
+    presentismo CHAR(1) CHECK(presentismo IN ('P','A','J')), --presente ausente ausente justificado
     socio INT,
     act INT,
     profesor VARCHAR(50),
-    CONSTRAINT PK_Presentismo PRIMARY KEY (socio, act, fecha),
+	PRIMARY KEY (socio, act, fecha),
     CONSTRAINT FK_Presentismo_socio FOREIGN KEY (socio) REFERENCES ddbba.socio(ID_socio),
     CONSTRAINT FK_Presentismo_actividad FOREIGN KEY (act) REFERENCES ddbba.actDeportiva(codAct)
 );
-
 END
 GO
 
@@ -173,7 +172,7 @@ TABLE_SCHEMA =
 BEGIN
 CREATE TABLE ddbba.costoColonia (
     codCostoColonia INT IDENTITY(1,1) PRIMARY KEY,
-    costo DECIMAL(9,2),
+    costo DECIMAL(8,2),
     fechaVigenciaHasta DATE
 );
 END
@@ -203,7 +202,7 @@ TABLE_SCHEMA =
 BEGIN
 CREATE TABLE ddbba.costoSUM (
     codCostoSUM INT IDENTITY(1,1) PRIMARY KEY,
-    costo DECIMAL(9,2),
+    costo DECIMAL(8,2),
     fechaVigenciaHasta DATE
 );
 END
@@ -233,7 +232,7 @@ TABLE_SCHEMA =
 BEGIN
 CREATE TABLE ddbba.costoIngresoPileta (
     codCostoIngreso INT IDENTITY(1,1) PRIMARY KEY,
-    edad int,
+    edad VARCHAR(6),
     precio DECIMAL(7,2),
     fechaVigenteHasta DATE
 );
@@ -275,27 +274,25 @@ CREATE TABLE ddbba.ingresoPiletaInvitado (
 END
 GO
 
-IF NOT EXISTS (
-    SELECT * FROM INFORMATION_SCHEMA.TABLES 
-    WHERE TABLE_SCHEMA = 'ddbba' AND TABLE_NAME = 'pagoFactura'
-)
+IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE
+TABLE_SCHEMA =
+'ddbba' AND TABLE_NAME =
+'pagoFactura')
 BEGIN
-    CREATE TABLE ddbba.pagoFactura (
-        codPago INT IDENTITY(1,1) PRIMARY KEY,
-        idPago CHAR(12) UNIQUE,
-        Fecha_Pago DATE NULL,
-        hora TIME NULL,
-        montoTotal DECIMAL(9,2) NULL,
-        montoMedioPago DECIMAL(9,2) NULL,
-        saldoFavorUsado DECIMAL(9,2) NULL,
-        medioPago VARCHAR(30) NULL,
-        estadoPago CHAR(1) CHECK(estadoPago IN ('P','R')) NULL, -- P: pendiente, R: realizado
-        codSocio INT NULL,
-        CONSTRAINT FK_pagoFactura_socio FOREIGN KEY (codSocio) REFERENCES ddbba.socio(ID_socio)
-    );
+CREATE TABLE ddbba.pagoFactura (
+    idPago CHAR(12) PRIMARY KEY,
+    Fecha_Pago DATE,
+    hora TIME,
+    montoTotal DECIMAL(8,2),
+	montoMedioPago DECIMAL(8,2),
+    saldoFavorUsado DECIMAL(8,2),
+    medioPago VARCHAR(30),
+    estadoPago CHAR(1) CHECK(estadoPago IN ('P','R')), --P de pendiente y R de realizado
+    codSocio INT,
+    CONSTRAINT FK_pagoFactura_socio FOREIGN KEY (codSocio) REFERENCES ddbba.socio(ID_socio)
+);
 END
 GO
-
 
 IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE
 TABLE_SCHEMA =
@@ -307,9 +304,9 @@ CREATE TABLE ddbba.facturaInvitado (
     fechaEmision DATE,
     horaEmision TIME,
     codInvitado INT,
-    codPago INT,
+    idPago CHAR(12),
     CONSTRAINT FK_facturaInvitado_invitado FOREIGN KEY (codInvitado) REFERENCES ddbba.invitado(codInvitado),
-    CONSTRAINT FK_facturaInvitado_pago FOREIGN KEY (codPago) REFERENCES ddbba.pagoFactura(codPago)
+    CONSTRAINT FK_facturaInvitado_pago FOREIGN KEY (idPago) REFERENCES ddbba.pagoFactura(idPago)
 );
 END
 GO
@@ -321,7 +318,7 @@ TABLE_SCHEMA =
 BEGIN
 CREATE TABLE ddbba.cuenta (
     codCuenta INT IDENTITY(1,1) PRIMARY KEY,
-    saldoAFavor DECIMAL(9,2),
+    saldoAFavor DECIMAL(8,2),
     socio INT,
     CONSTRAINT FK_cuenta_socio FOREIGN KEY (socio) REFERENCES ddbba.socio(ID_socio)
 );
@@ -336,9 +333,9 @@ BEGIN
 CREATE TABLE ddbba.detalleFactura (
     codDetalleFac INT IDENTITY(1,1) PRIMARY KEY,
     concepto VARCHAR(50),
-    monto DECIMAL(9,2),
-    descuento DECIMAL(8,2),
-    recargoMorosidad DECIMAL(8,2),
+    monto DECIMAL(8,2),
+    descuento DECIMAL(7,2),
+    recargoMorosidad DECIMAL(7,2),
     codCostoPileta INT,
     idCuotaCatSocio INT,
     idCuotaAct INT,
@@ -383,10 +380,10 @@ CREATE TABLE ddbba.factura (
     horaEmision TIME,
     totalNeto DECIMAL(9,2),
     estadoFactura CHAR(1) CHECK(estadoFactura IN ('P','I')),   --P de pago e I de impago
-    codPago INT,
+    idPago CHAR(12),
     codDetalleFac INT,
     ID_socio INT,
-    CONSTRAINT FK_factura_pago FOREIGN KEY (codPago) REFERENCES ddbba.pagoFactura(codPago),
+    CONSTRAINT FK_factura_pago FOREIGN KEY (idPago) REFERENCES ddbba.pagoFactura(idPago),
     CONSTRAINT FK_factura_detalle FOREIGN KEY (codDetalleFac) REFERENCES ddbba.detalleFactura(codDetalleFac),
     CONSTRAINT FK_factura_socio FOREIGN KEY (ID_socio) REFERENCES ddbba.socio(ID_socio)
 );
@@ -445,19 +442,17 @@ CREATE TABLE ddbba.acceden (
 END
 GO
 
-IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE
-TABLE_SCHEMA =
-'ddbba' AND TABLE_NAME =
-'costoPiletaSocio')
+IF NOT EXISTS (
+    SELECT * FROM INFORMATION_SCHEMA.TABLES
+    WHERE TABLE_SCHEMA = 'ddbba' AND TABLE_NAME = 'costoPileta'
+)
 BEGIN
-CREATE TABLE ddbba.costoPiletaSocio (
-    codCostoPileta INT IDENTITY(1,1) PRIMARY KEY,
-    costo DECIMAL(9,2) NOT NULL,
-    tipo VARCHAR(9) NOT NULL,
-    categoria CHAR(6) NOT NULL,
-    fechaVigenciaHasta DATE,
-);
-END
+    CREATE TABLE ddbba.costoPileta (
+        codCostoPileta INT IDENTITY(1,1) PRIMARY KEY,
+        costo DECIMAL(8,2),
+        tipo VARCHAR(9),
+        categoria VARCHAR(6), 
+        fechaVigenciaHasta DATE
+    );
+END;
 GO
-
-
