@@ -3,6 +3,63 @@
 USE Com2900G17
 GO
 
+
+CREATE OR ALTER PROCEDURE ddbba.InsertarCatSocio
+    @RutaArchivo VARCHAR(255)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    IF OBJECT_ID('tempdb..#cat_temp') IS NOT NULL
+        DROP TABLE #cat_temp;
+
+    CREATE TABLE #cat_temp (
+        [Categoria socio] VARCHAR(50),
+        [Valor cuota] VARCHAR(50),     
+        [Vigente hasta] VARCHAR(50)      
+    );
+
+    DECLARE @sql NVARCHAR(MAX);
+    SET @sql = N'
+        BULK INSERT #cat_temp
+        FROM ''' + @RutaArchivo + '''
+        WITH (
+            FIRSTROW = 2,
+            FIELDTERMINATOR = '','',
+            ROWTERMINATOR = ''\n'',
+            CODEPAGE = ''65001''
+        );';
+    EXEC (@sql);
+
+			INSERT INTO ddbba.catSocio (nombreCat, descripcion, edad_desde, edad_hasta)
+		SELECT DISTINCT
+			LTRIM(RTRIM([Categoria socio])) AS nombreCat,
+			'' AS descripcion, -- si no tenés descripción, la dejamos vacía
+			CASE 
+				WHEN LOWER([Categoria socio]) = 'menor' THEN NULL
+				WHEN LOWER([Categoria socio]) = 'cadete' THEN 13
+				WHEN LOWER([Categoria socio]) = 'mayor' THEN 18
+				ELSE NULL
+			END AS edad_desde,
+			CASE 
+				WHEN LOWER([Categoria socio]) = 'menor' THEN 12
+				WHEN LOWER([Categoria socio]) = 'cadete' THEN 17
+				WHEN LOWER([Categoria socio]) = 'mayor' THEN NULL
+				ELSE NULL
+			END AS edad_hasta
+		FROM #cat_temp t
+		WHERE NOT EXISTS (
+			SELECT 1
+			FROM ddbba.catSocio c
+			WHERE c.nombreCat = LTRIM(RTRIM(t.[Categoria socio]))
+		);
+
+
+    DROP TABLE #cat_temp;
+END;
+GO
+
+-----------------------------
 CREATE OR ALTER PROCEDURE ddbba.InsertarCatSocio
     @RutaArchivo VARCHAR(255)
 AS
@@ -296,5 +353,240 @@ BEGIN
 
         RAISERROR(@ErrorMessage, @ErrorSeverity, @ErrorState);
     END CATCH
+END;
+GO
+---------------------------------------------------
+
+CREATE OR ALTER PROCEDURE ddbba.InsertarActividades
+    @rutaArchivo NVARCHAR(260)  -- Ejemplo: 'C:\ruta\actividades.csv'
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    IF OBJECT_ID('tempdb..#actividades_temp') IS NOT NULL
+        DROP TABLE #actividades_temp;
+
+    CREATE TABLE #actividades_temp (
+        Actividad VARCHAR(50),
+        ValorMensual VARCHAR(50),
+        VigenteHasta VARCHAR(50)
+    );
+
+    DECLARE @sql NVARCHAR(MAX) = N'
+        BULK INSERT #actividades_temp
+        FROM ''' + @rutaArchivo + N'''
+        WITH (
+            FIRSTROW = 2,
+            FIELDTERMINATOR = '','',
+            ROWTERMINATOR = ''\n'',
+            CODEPAGE = ''65001''
+        );';
+
+    EXEC sp_executesql @sql;
+
+    INSERT INTO ddbba.actDeportiva (nombre)
+    SELECT DISTINCT
+        CASE 
+            WHEN LOWER(LTRIM(RTRIM(Actividad))) LIKE '%jederez%' THEN 'Ajedrez'
+            ELSE LTRIM(RTRIM(Actividad)) COLLATE Modern_Spanish_CI_AS
+        END
+    FROM #actividades_temp
+    WHERE NOT EXISTS (
+        SELECT 1
+        FROM ddbba.actDeportiva a
+        WHERE a.nombre = 
+            CASE 
+                WHEN LOWER(LTRIM(RTRIM(Actividad))) LIKE '%jederez%' THEN 'Ajedrez'
+                ELSE LTRIM(RTRIM(Actividad)) COLLATE Modern_Spanish_CI_AS
+            END
+    );
+END;
+GO
+
+
+-------------------------------------------------
+CREATE OR ALTER PROCEDURE ddbba.InsertarCuotasActividad
+    @rutaArchivo NVARCHAR(260)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    IF OBJECT_ID('tempdb..#cuotas_actividad_temp') IS NOT NULL
+        DROP TABLE #cuotas_actividad_temp;
+
+    CREATE TABLE #cuotas_actividad_temp (
+        Actividad VARCHAR(50),
+        ValorMensual VARCHAR(50),
+        VigenteHasta VARCHAR(50)
+    );
+
+    DECLARE @sql NVARCHAR(MAX) = N'
+        BULK INSERT #cuotas_actividad_temp
+        FROM ''' + @rutaArchivo + N'''
+        WITH (
+            FIRSTROW = 2,
+            FIELDTERMINATOR = '','',
+            ROWTERMINATOR = ''\n'',
+            CODEPAGE = ''65001''
+        );';
+
+    EXEC sp_executesql @sql;
+
+    INSERT INTO ddbba.CuotaActividad (
+        fechaVigenciaHasta, actividad, costoActividad, codAct
+    )
+    SELECT 
+        TRY_CONVERT(DATE, VigenteHasta, 103),
+        CASE 
+            WHEN LOWER(LTRIM(RTRIM(Actividad))) LIKE '%jederez%' THEN 'Ajedrez'
+            ELSE LTRIM(RTRIM(Actividad)) COLLATE Modern_Spanish_CI_AS
+        END,
+        TRY_CAST(ValorMensual AS DECIMAL(7,2)),
+        a.codAct
+    FROM #cuotas_actividad_temp t
+    JOIN ddbba.actDeportiva a 
+        ON a.nombre = CASE 
+                         WHEN LOWER(LTRIM(RTRIM(t.Actividad))) LIKE '%jederez%' THEN 'Ajedrez'
+                         ELSE LTRIM(RTRIM(t.Actividad)) COLLATE Modern_Spanish_CI_AS
+                     END
+    WHERE NOT EXISTS (
+        SELECT 1
+        FROM ddbba.CuotaActividad ca
+        WHERE ca.actividad = 
+              CASE 
+                  WHEN LOWER(LTRIM(RTRIM(t.Actividad))) LIKE '%jederez%' THEN 'Ajedrez'
+                  ELSE LTRIM(RTRIM(t.Actividad)) COLLATE Modern_Spanish_CI_AS
+              END
+          AND ca.fechaVigenciaHasta = TRY_CONVERT(DATE, VigenteHasta, 103)
+
+    );
+
+    DROP TABLE #cuotas_actividad_temp;
+END;
+GO
+
+
+----------------------------
+CREATE OR ALTER PROCEDURE ddbba.InsertarCuotasCatSocio
+    @rutaArchivo NVARCHAR(260)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- Eliminar tabla temporal si ya existe
+    IF OBJECT_ID('tempdb..#cuotas_cat_temp') IS NOT NULL
+        DROP TABLE #cuotas_cat_temp;
+
+    -- Crear tabla temporal con los datos del archivo
+    CREATE TABLE #cuotas_cat_temp (
+        [Categoria socio] VARCHAR(50),
+        [Valor cuota] VARCHAR(50),
+        [Vigente hasta] VARCHAR(50)
+    );
+
+    -- Cargar datos desde el archivo CSV
+    DECLARE @sql NVARCHAR(MAX) = N'
+        BULK INSERT #cuotas_cat_temp
+        FROM ''' + @rutaArchivo + N'''
+        WITH (
+            FIRSTROW = 2,
+            FIELDTERMINATOR = '','',
+            ROWTERMINATOR = ''\n'',
+            CODEPAGE = ''65001''
+        );';
+
+    EXEC sp_executesql @sql;
+
+    -- Insertar datos en la tabla CuotaCatSocio evitando duplicados
+    INSERT INTO ddbba.CuotaCatSocio (
+        fechaVigenciaHasta, categoria, costoMembresia, catSocio
+    )
+    SELECT 
+        TRY_CONVERT(DATE, [Vigente hasta], 103),
+        LTRIM(RTRIM([Categoria socio])),
+        TRY_CAST([Valor cuota] AS DECIMAL(7,2)),
+        c.codCat
+    FROM #cuotas_cat_temp t
+    JOIN ddbba.catSocio c
+        ON c.nombreCat = LTRIM(RTRIM(t.[Categoria socio]))
+    WHERE NOT EXISTS (
+        SELECT 1
+        FROM ddbba.CuotaCatSocio cs
+        WHERE cs.categoria = LTRIM(RTRIM(t.[Categoria socio]))
+          AND cs.fechaVigenciaHasta = TRY_CONVERT(DATE, t.[Vigente hasta], 103)
+    );
+
+    -- Limpiar tabla temporal
+    DROP TABLE #cuotas_cat_temp;
+END;
+GO
+
+
+----------------------------------------------
+
+CREATE OR ALTER PROCEDURE ddbba.cargarPresentismo
+    @rutaArchivo NVARCHAR(255)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- Eliminar tabla temporal si ya existe
+    IF OBJECT_ID('tempdb..#presentismo_temp') IS NOT NULL
+        DROP TABLE #presentismo_temp;
+
+    -- Crear tabla temporal para importar datos desde CSV
+    CREATE TABLE #presentismo_temp (
+        [Nro de Socio] VARCHAR(10),
+        [Actividad] VARCHAR(50),
+        [fecha de asistencia] VARCHAR(20),  -- se carga como texto para mayor tolerancia
+        [Asistencia] VARCHAR(10),
+        [Profesor] VARCHAR(50)
+    );
+
+    -- Importar desde el archivo CSV
+    DECLARE @sql NVARCHAR(MAX);
+    SET @sql = '
+        BULK INSERT #presentismo_temp
+        FROM ''' + @rutaArchivo + '''
+        WITH (
+            FIRSTROW = 2,
+            FIELDTERMINATOR = '','',
+            ROWTERMINATOR = ''\n'',
+            CODEPAGE = ''65001''
+        );
+    ';
+    EXEC (@sql);
+
+    -- Insertar en la tabla Presentismo
+    INSERT INTO ddbba.Presentismo (
+        fecha,
+        presentismo,
+        socio,
+        act,
+        profesor
+    )
+    SELECT
+        TRY_CONVERT(DATE, temp.[fecha de asistencia], 103) AS fechaAsistencia,
+        LEFT(LTRIM(RTRIM(temp.Asistencia)), 1),
+        s.ID_socio,
+        a.codAct,
+        LTRIM(RTRIM(temp.Profesor))
+    FROM #presentismo_temp temp
+    JOIN ddbba.Socio s
+        ON LTRIM(RTRIM(temp.[Nro de Socio])) COLLATE Modern_Spanish_CI_AS = s.nroSocio
+    JOIN ddbba.actDeportiva a
+        ON LTRIM(RTRIM(temp.Actividad)) COLLATE Modern_Spanish_CI_AS = a.nombre
+    WHERE 
+        TRY_CONVERT(DATE, temp.[fecha de asistencia], 103) <= CAST(GETDATE() AS DATE)  -- solo hasta hoy
+        AND NOT EXISTS (
+            SELECT 1 
+            FROM ddbba.Presentismo p
+            WHERE p.socio = s.ID_socio
+              AND p.act = a.codAct
+              AND p.fecha = TRY_CONVERT(DATE, temp.[fecha de asistencia], 103)
+        );
+
+    -- Limpiar tabla temporal
+    DROP TABLE #presentismo_temp;
 END;
 GO

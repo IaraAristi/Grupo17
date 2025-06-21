@@ -76,17 +76,25 @@ CREATE TABLE ddbba.socio (
 GO
 
 -- Tabla Presentismo
+DROP TABLE IF EXISTS ddbba.Presentismo;
+GO
+
 CREATE TABLE ddbba.Presentismo (
     fecha DATE,
-    presentismo CHAR(1) CHECK(presentismo IN ('P','A')),
+    presentismo CHAR(2) CHECK(presentismo IN ('P','A', 'J', 'PP')), 
     socio INT,
     act INT,
     profesor VARCHAR(50),
-	PRIMARY KEY (socio, act),
+    PRIMARY KEY (socio, act, fecha),
     CONSTRAINT FK_Presentismo_socio FOREIGN KEY (socio) REFERENCES ddbba.socio(ID_socio),
     CONSTRAINT FK_Presentismo_actividad FOREIGN KEY (act) REFERENCES ddbba.actDeportiva(codAct)
 );
 GO
+
+
+
+-- Ajustar clave primaria para que se permita una fila por día
+
 
 
 -- 6. CuotaCatSocio
