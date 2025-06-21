@@ -37,7 +37,6 @@ BEGIN
 CREATE TABLE ddbba.catSocio (
     codCat INT IDENTITY(1,1) PRIMARY KEY,
     nombreCat VARCHAR(50),
-    descripcion VARCHAR(50),
     edad_desde INT,
     edad_hasta INT
 );

@@ -3,62 +3,6 @@
 USE Com2900G17
 GO
 
-
-CREATE OR ALTER PROCEDURE ddbba.InsertarCatSocio
-    @RutaArchivo VARCHAR(255)
-AS
-BEGIN
-    SET NOCOUNT ON;
-
-    IF OBJECT_ID('tempdb..#cat_temp') IS NOT NULL
-        DROP TABLE #cat_temp;
-
-    CREATE TABLE #cat_temp (
-        [Categoria socio] VARCHAR(50),
-        [Valor cuota] VARCHAR(50),     
-        [Vigente hasta] VARCHAR(50)      
-    );
-
-    DECLARE @sql NVARCHAR(MAX);
-    SET @sql = N'
-        BULK INSERT #cat_temp
-        FROM ''' + @RutaArchivo + '''
-        WITH (
-            FIRSTROW = 2,
-            FIELDTERMINATOR = '','',
-            ROWTERMINATOR = ''\n'',
-            CODEPAGE = ''65001''
-        );';
-    EXEC (@sql);
-
-			INSERT INTO ddbba.catSocio (nombreCat, descripcion, edad_desde, edad_hasta)
-		SELECT DISTINCT
-			LTRIM(RTRIM([Categoria socio])) AS nombreCat,
-			'' AS descripcion, -- si no tenés descripción, la dejamos vacía
-			CASE 
-				WHEN LOWER([Categoria socio]) = 'menor' THEN NULL
-				WHEN LOWER([Categoria socio]) = 'cadete' THEN 13
-				WHEN LOWER([Categoria socio]) = 'mayor' THEN 18
-				ELSE NULL
-			END AS edad_desde,
-			CASE 
-				WHEN LOWER([Categoria socio]) = 'menor' THEN 12
-				WHEN LOWER([Categoria socio]) = 'cadete' THEN 17
-				WHEN LOWER([Categoria socio]) = 'mayor' THEN NULL
-				ELSE NULL
-			END AS edad_hasta
-		FROM #cat_temp t
-		WHERE NOT EXISTS (
-			SELECT 1
-			FROM ddbba.catSocio c
-			WHERE c.nombreCat = LTRIM(RTRIM(t.[Categoria socio]))
-		);
-
-
-    DROP TABLE #cat_temp;
-END;
-GO
-
 -----------------------------
 CREATE OR ALTER PROCEDURE ddbba.InsertarCatSocio
     @RutaArchivo VARCHAR(255)
@@ -87,10 +31,9 @@ BEGIN
         );';
     EXEC (@sql);
 
-    INSERT INTO ddbba.catSocio (nombreCat, descripcion, edad_desde, edad_hasta)
+    INSERT INTO ddbba.catSocio (nombreCat, edad_desde, edad_hasta)
     SELECT DISTINCT
         LTRIM(RTRIM([Categoria socio])) AS nombreCat,
-        'Categoría ' + LTRIM(RTRIM([Categoria socio])) AS descripcion,
         CASE 
             WHEN LOWER([Categoria socio]) = 'menor' THEN 0
             WHEN LOWER([Categoria socio]) = 'cadete' THEN 13
@@ -558,33 +501,35 @@ BEGIN
     EXEC (@sql);
 
     -- Insertar en la tabla Presentismo
-    INSERT INTO ddbba.Presentismo (
-        fecha,
-        presentismo,
-        socio,
-        act,
-        profesor
-    )
-    SELECT
-        TRY_CONVERT(DATE, temp.[fecha de asistencia], 103) AS fechaAsistencia,
-        LEFT(LTRIM(RTRIM(temp.Asistencia)), 1),
-        s.ID_socio,
-        a.codAct,
-        LTRIM(RTRIM(temp.Profesor))
-    FROM #presentismo_temp temp
-    JOIN ddbba.Socio s
-        ON LTRIM(RTRIM(temp.[Nro de Socio])) COLLATE Modern_Spanish_CI_AS = s.nroSocio
-    JOIN ddbba.actDeportiva a
-        ON LTRIM(RTRIM(temp.Actividad)) COLLATE Modern_Spanish_CI_AS = a.nombre
-    WHERE 
-        TRY_CONVERT(DATE, temp.[fecha de asistencia], 103) <= CAST(GETDATE() AS DATE)  -- solo hasta hoy
-        AND NOT EXISTS (
-            SELECT 1 
-            FROM ddbba.Presentismo p
-            WHERE p.socio = s.ID_socio
-              AND p.act = a.codAct
-              AND p.fecha = TRY_CONVERT(DATE, temp.[fecha de asistencia], 103)
-        );
+		   INSERT INTO ddbba.Presentismo (
+			fecha,
+			presentismo,
+			socio,
+			act,
+			profesor
+		)
+		SELECT
+			TRY_CONVERT(DATE, LTRIM(RTRIM(temp.[fecha de asistencia])), 103) AS fechaAsistencia,
+			LEFT(LTRIM(RTRIM(temp.Asistencia)), 1),
+			s.ID_socio,
+			a.codAct,
+			LTRIM(RTRIM(temp.Profesor))
+		FROM #presentismo_temp temp
+		JOIN ddbba.Socio s
+			ON LTRIM(RTRIM(temp.[Nro de Socio])) COLLATE Modern_Spanish_CI_AS = s.nroSocio
+		JOIN ddbba.actDeportiva a
+			ON LTRIM(RTRIM(temp.Actividad)) COLLATE Modern_Spanish_CI_AS = a.nombre
+		WHERE 
+			TRY_CONVERT(DATE, LTRIM(RTRIM(temp.[fecha de asistencia])), 103) IS NOT NULL
+			AND TRY_CONVERT(DATE, LTRIM(RTRIM(temp.[fecha de asistencia])), 103) <= CAST(GETDATE() AS DATE)
+			AND NOT EXISTS (
+				SELECT 1 
+				FROM ddbba.Presentismo p
+				WHERE p.socio = s.ID_socio
+				  AND p.act = a.codAct
+				  AND p.fecha = TRY_CONVERT(DATE, LTRIM(RTRIM(temp.[fecha de asistencia])), 103)
+			);
+
 
     -- Limpiar tabla temporal
     DROP TABLE #presentismo_temp;
