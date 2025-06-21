@@ -173,7 +173,7 @@ TABLE_SCHEMA =
 BEGIN
 CREATE TABLE ddbba.costoColonia (
     codCostoColonia INT IDENTITY(1,1) PRIMARY KEY,
-    costo DECIMAL(8,2),
+    costo DECIMAL(9,2),
     fechaVigenciaHasta DATE
 );
 END
@@ -203,7 +203,7 @@ TABLE_SCHEMA =
 BEGIN
 CREATE TABLE ddbba.costoSUM (
     codCostoSUM INT IDENTITY(1,1) PRIMARY KEY,
-    costo DECIMAL(8,2),
+    costo DECIMAL(9,2),
     fechaVigenciaHasta DATE
 );
 END
@@ -285,9 +285,9 @@ BEGIN
         idPago CHAR(12) UNIQUE,
         Fecha_Pago DATE NULL,
         hora TIME NULL,
-        montoTotal DECIMAL(8,2) NULL,
-        montoMedioPago DECIMAL(8,2) NULL,
-        saldoFavorUsado DECIMAL(8,2) NULL,
+        montoTotal DECIMAL(9,2) NULL,
+        montoMedioPago DECIMAL(9,2) NULL,
+        saldoFavorUsado DECIMAL(9,2) NULL,
         medioPago VARCHAR(30) NULL,
         estadoPago CHAR(1) CHECK(estadoPago IN ('P','R')) NULL, -- P: pendiente, R: realizado
         codSocio INT NULL,
@@ -321,7 +321,7 @@ TABLE_SCHEMA =
 BEGIN
 CREATE TABLE ddbba.cuenta (
     codCuenta INT IDENTITY(1,1) PRIMARY KEY,
-    saldoAFavor DECIMAL(8,2),
+    saldoAFavor DECIMAL(9,2),
     socio INT,
     CONSTRAINT FK_cuenta_socio FOREIGN KEY (socio) REFERENCES ddbba.socio(ID_socio)
 );
@@ -336,9 +336,9 @@ BEGIN
 CREATE TABLE ddbba.detalleFactura (
     codDetalleFac INT IDENTITY(1,1) PRIMARY KEY,
     concepto VARCHAR(50),
-    monto DECIMAL(8,2),
-    descuento DECIMAL(7,2),
-    recargoMorosidad DECIMAL(7,2),
+    monto DECIMAL(9,2),
+    descuento DECIMAL(8,2),
+    recargoMorosidad DECIMAL(8,2),
     codCostoPileta INT,
     idCuotaCatSocio INT,
     idCuotaAct INT,
@@ -356,7 +356,7 @@ GO
 IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE
 TABLE_SCHEMA =
 'ddbba' AND TABLE_NAME =
-'pagCuenta')
+'pagoCuenta')
 BEGIN
 CREATE TABLE ddbba.pagoCuenta (
     codPagoCuenta INT IDENTITY(1,1) PRIMARY KEY,
@@ -381,7 +381,7 @@ CREATE TABLE ddbba.factura (
     fechaVencimiento DATE,
     fecha2Vencimiento DATE,
     horaEmision TIME,
-    totalNeto DECIMAL(8,2),
+    totalNeto DECIMAL(9,2),
     estadoFactura CHAR(1) CHECK(estadoFactura IN ('P','I')),   --P de pago e I de impago
     codPago INT,
     codDetalleFac INT,
@@ -441,6 +441,21 @@ CREATE TABLE ddbba.acceden (
     PRIMARY KEY (codCat, codAct),
     CONSTRAINT FK_acceden_cat FOREIGN KEY (codCat) REFERENCES ddbba.catSocio(codCat),
     CONSTRAINT FK_acceden_act FOREIGN KEY (codAct) REFERENCES ddbba.actDeportiva(codAct)
+);
+END
+GO
+
+IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE
+TABLE_SCHEMA =
+'ddbba' AND TABLE_NAME =
+'costoPiletaSocio')
+BEGIN
+CREATE TABLE ddbba.costoPiletaSocio (
+    codCostoPileta INT IDENTITY(1,1) PRIMARY KEY,
+    costo DECIMAL(9,2) NOT NULL,
+    tipo VARCHAR(9) NOT NULL,
+    categoria CHAR(6) NOT NULL,
+    fechaVigenciaHasta DATE,
 );
 END
 GO
