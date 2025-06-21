@@ -46,3 +46,9 @@ EXEC ddbba.cargarPresentismo
 	@rutaArchivo = 'C:\Users\agusr\Downloads\Presentismo Corregido.csv'
 
 select * from ddbba.Presentismo order by fecha
+
+-------------------------------
+EXEC ddbba.InsertarPagoFactura
+	@rutaArchivo = 'C:\Users\agusr\Downloads\Pago Cuotas.csv'
+
+select * from ddbba.pagoFactura

@@ -280,7 +280,7 @@ TABLE_SCHEMA =
 'pagoFactura')
 BEGIN
 CREATE TABLE ddbba.pagoFactura (
-    codPago INT IDENTITY(1,1) PRIMARY KEY,
+    idPago CHAR(12) PRIMARY KEY,
     Fecha_Pago DATE,
     hora TIME,
     montoTotal DECIMAL(8,2),
@@ -304,9 +304,9 @@ CREATE TABLE ddbba.facturaInvitado (
     fechaEmision DATE,
     horaEmision TIME,
     codInvitado INT,
-    codPago INT,
+    idPago CHAR(12),
     CONSTRAINT FK_facturaInvitado_invitado FOREIGN KEY (codInvitado) REFERENCES ddbba.invitado(codInvitado),
-    CONSTRAINT FK_facturaInvitado_pago FOREIGN KEY (codPago) REFERENCES ddbba.pagoFactura(codPago)
+    CONSTRAINT FK_facturaInvitado_pago FOREIGN KEY (idPago) REFERENCES ddbba.pagoFactura(idPago)
 );
 END
 GO
@@ -380,10 +380,10 @@ CREATE TABLE ddbba.factura (
     horaEmision TIME,
     totalNeto DECIMAL(8,2),
     estadoFactura CHAR(1) CHECK(estadoFactura IN ('P','I')),   --P de pago e I de impago
-    codPago INT,
+    idPago CHAR(12),
     codDetalleFac INT,
     ID_socio INT,
-    CONSTRAINT FK_factura_pago FOREIGN KEY (codPago) REFERENCES ddbba.pagoFactura(codPago),
+    CONSTRAINT FK_factura_pago FOREIGN KEY (idPago) REFERENCES ddbba.pagoFactura(idPago),
     CONSTRAINT FK_factura_detalle FOREIGN KEY (codDetalleFac) REFERENCES ddbba.detalleFactura(codDetalleFac),
     CONSTRAINT FK_factura_socio FOREIGN KEY (ID_socio) REFERENCES ddbba.socio(ID_socio)
 );

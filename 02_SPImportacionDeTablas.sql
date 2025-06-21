@@ -129,7 +129,7 @@ BEGIN
         ;WITH ordenados AS (
             SELECT 
                 LEFT(LTRIM(RTRIM([Nro de Socio])), 7) AS nroSocio,
-                TRY_CAST(LTRIM(RTRIM([DNI])) AS INT) AS dni,
+                LEFT(TRY_CAST(LTRIM(RTRIM([DNI])) AS INT),8) AS dni,
                 LEFT(LTRIM(RTRIM([Nombre])), 50) AS nombre,
                 LEFT(LTRIM(RTRIM([Apellido])), 50) AS apellido,
                 TRY_CAST(LTRIM(RTRIM([Telefono])) AS INT) AS telContacto,
@@ -245,7 +245,7 @@ BEGIN
         )
         SELECT 
             LEFT(LTRIM(RTRIM([Nro de Socio])), 9),
-            LEFT(TRY_CAST([ DNI] AS INT),1),
+            LEFT(TRY_CAST([ DNI] AS INT),8),
             LEFT(LTRIM(RTRIM([Nombre])), 50),
             LEFT(LTRIM(RTRIM([ apellido])), 50),
             TRY_CAST([ teléfono de contacto] AS INT),
@@ -547,5 +547,57 @@ BEGIN
 
     -- Limpiar tabla temporal
     DROP TABLE #presentismo_temp;
+END;
+GO
+
+
+--insercion datos pago factura
+CREATE OR ALTER PROCEDURE ddbba.InsertarPagoFactura
+    @rutaArchivo NVARCHAR(255)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    IF OBJECT_ID('tempdb..#pago_temp') IS NOT NULL
+        DROP TABLE #pago_temp;
+
+    CREATE TABLE #pago_temp (
+        [Id de pago] VARCHAR(15),
+        [fecha] VARCHAR(20),
+        [Responsable de pago] VARCHAR(20),
+        [Valor] VARCHAR(20),
+        [Medio de pago] VARCHAR(30)
+    );
+
+    DECLARE @sql NVARCHAR(MAX) = N'
+        BULK INSERT #pago_temp
+        FROM ''' + @rutaArchivo + '''
+        WITH (
+            FIRSTROW = 2,
+            FIELDTERMINATOR = '','',
+            ROWTERMINATOR = ''\n'',
+            CODEPAGE = ''65001''
+        );';
+
+    EXEC sp_executesql @sql;
+
+    INSERT INTO ddbba.pagoFactura (
+		idPago,
+        Fecha_Pago,
+        montoTotal,
+        medioPago,
+        codSocio
+    )
+    SELECT
+		LEFT(LTRIM(RTRIM(p.[Id de pago])),12),
+        TRY_CONVERT(DATE, LTRIM(RTRIM(p.[fecha])), 101), 
+        TRY_CAST(p.[Valor] AS DECIMAL(8,2)),
+        LTRIM(RTRIM(p.[Medio de pago])) COLLATE Modern_Spanish_CI_AS,
+        s.ID_socio
+    FROM #pago_temp p
+    JOIN ddbba.Socio s
+        ON LTRIM(RTRIM(p.[Responsable de pago])) COLLATE Modern_Spanish_CI_AS = s.nroSocio;
+
+    DROP TABLE #pago_temp;
 END;
 GO
