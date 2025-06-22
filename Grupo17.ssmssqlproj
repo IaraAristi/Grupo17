@@ -37,47 +37,29 @@
     </LogicalFolder>
     <LogicalFolder Name="Queries" Type="0" Sorted="true">
       <Items>
-        <FileNode Name="00_CreacionDeBDyTablas.sql">
+        <FileNode Name="00_CreacionDeTablasyBDD.sql">
           <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:LAPTOP-KOOVHGNG:True</AssociatedConnectionMoniker>
           <AssociatedConnSrvName>LAPTOP-KOOVHGNG</AssociatedConnSrvName>
           <AssociatedConnUserName />
-          <FullPath>00_CreacionDeBDyTablas.sql</FullPath>
+          <FullPath>00_CreacionDeTablasyBDD.sql</FullPath>
         </FileNode>
-        <FileNode Name="01_ImportacionResponsableACargo.sql">
+        <FileNode Name="01_RellenarTablas.sql">
           <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:LAPTOP-KOOVHGNG:True</AssociatedConnectionMoniker>
           <AssociatedConnSrvName>LAPTOP-KOOVHGNG</AssociatedConnSrvName>
           <AssociatedConnUserName />
-          <FullPath>01_ImportacionResponsableACargo.sql</FullPath>
+          <FullPath>01_RellenarTablas.sql</FullPath>
         </FileNode>
-        <FileNode Name="02_ImportacionesGrupoFamiliar.sql">
+        <FileNode Name="02_SPImportacionDeTablas.sql">
           <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:LAPTOP-KOOVHGNG:True</AssociatedConnectionMoniker>
           <AssociatedConnSrvName>LAPTOP-KOOVHGNG</AssociatedConnSrvName>
           <AssociatedConnUserName />
-          <FullPath>02_ImportacionesGrupoFamiliar.sql</FullPath>
+          <FullPath>02_SPImportacionDeTablas.sql</FullPath>
         </FileNode>
-        <FileNode Name="03_ImportacionesGrupoFamiliarRP.sql">
+        <FileNode Name="03_EjecucionDeImportaciones.sql">
           <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:LAPTOP-KOOVHGNG:True</AssociatedConnectionMoniker>
           <AssociatedConnSrvName>LAPTOP-KOOVHGNG</AssociatedConnSrvName>
           <AssociatedConnUserName />
-          <FullPath>03_ImportacionesGrupoFamiliarRP.sql</FullPath>
-        </FileNode>
-        <FileNode Name="04_ActualizarNumeroDeGrupo.sql">
-          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:LAPTOP-KOOVHGNG:True</AssociatedConnectionMoniker>
-          <AssociatedConnSrvName>LAPTOP-KOOVHGNG</AssociatedConnSrvName>
-          <AssociatedConnUserName />
-          <FullPath>04_ActualizarNumeroDeGrupo.sql</FullPath>
-        </FileNode>
-        <FileNode Name="05_ImportarActividadDeportiva.sql">
-          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:LAPTOP-KOOVHGNG:True</AssociatedConnectionMoniker>
-          <AssociatedConnSrvName>LAPTOP-KOOVHGNG</AssociatedConnSrvName>
-          <AssociatedConnUserName />
-          <FullPath>05_ImportarActividadDeportiva.sql</FullPath>
-        </FileNode>
-        <FileNode Name="06_ImportarCategoriaDeSocio.sql">
-          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:LAPTOP-KOOVHGNG:True</AssociatedConnectionMoniker>
-          <AssociatedConnSrvName>LAPTOP-KOOVHGNG</AssociatedConnSrvName>
-          <AssociatedConnUserName />
-          <FullPath>06_ImportarCategoriaDeSocio.sql</FullPath>
+          <FullPath>03_EjecucionDeImportaciones.sql</FullPath>
         </FileNode>
         <FileNode Name="07_ImportarDatosPresentismo.sql">
           <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:LAPTOP-KOOVHGNG:True</AssociatedConnectionMoniker>
@@ -85,11 +67,11 @@
           <AssociatedConnUserName />
           <FullPath>07_ImportarDatosPresentismo.sql</FullPath>
         </FileNode>
-        <FileNode Name="09_LlamadaALosArchivosCSV.sql">
+        <FileNode Name="CargarTablas.sql">
           <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:LAPTOP-KOOVHGNG:True</AssociatedConnectionMoniker>
           <AssociatedConnSrvName>LAPTOP-KOOVHGNG</AssociatedConnSrvName>
           <AssociatedConnUserName />
-          <FullPath>09_LlamadaALosArchivosCSV.sql</FullPath>
+          <FullPath>CargarTablas.sql</FullPath>
         </FileNode>
       </Items>
     </LogicalFolder>

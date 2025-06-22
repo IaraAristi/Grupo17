@@ -30,3 +30,7 @@ INSERT INTO ddbba.inscripcion (fecha, hora) VALUES
 ('2025-01-19', '19:00');
 
 SELECT* FROM ddbba.inscripcion
+GO
+
+EXEC ddbba.ActualizarCategoriaSociosPorEdad
+GO
