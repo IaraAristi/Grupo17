@@ -336,7 +336,6 @@ CREATE TABLE ddbba.factura (
     mesFacturado INT,
     fechaVencimiento DATE,
     fecha2Vencimiento DATE,
-    horaEmision TIME,
     totalNeto DECIMAL(9,2),
     estadoFactura CHAR(1) CHECK(estadoFactura IN ('P','I')),   --P de pago e I de impago
     idPago CHAR(12),

@@ -3,12 +3,6 @@ GO
 
 --Cargar categoria de socio en Socio
 -- ================================================
--- Nombre: USP_ActualizarCategoriaSociosPorEdad
--- Descripción: Actualiza la columna Categoria_Socio en la tabla Socios
---              basándose en la fecha de nacimiento del socio y las reglas
---              definidas en la tabla Categoria_Socios.
--- Fecha Creación: 2025-06-22
--- ================================================
 CREATE OR ALTER PROCEDURE ddbba.ActualizarCategoriaSociosPorEdad
 AS
 BEGIN
@@ -70,87 +64,188 @@ BEGIN
     END CATCH;
 END;
 GO
-
-CREATE OR ALTER PROCEDURE ddbba.cargarDetalleFactura
-    @rutaArchivo NVARCHAR(255)
+--------------------------------------------------------------------------------------------------------------------------
+--Actualizar el número de grupo familiar para aquellos socios que sean responsables de pago del grupo
+-- ================================================
+CREATE OR ALTER PROCEDURE ddbba.ActualizarGrupoFamiliarResponsables
 AS
 BEGIN
     SET NOCOUNT ON;
 
-    -- Eliminar tabla temporal si ya existe
-    IF OBJECT_ID('tempdb..#detalle_temp') IS NOT NULL
-        DROP TABLE #detalle_temp;
+    -- Actualiza el campo grupoFamiliar de todos los socios responsables (que tienen a otros socios a cargo)
+    UPDATE s
+    SET codGrupoFamiliar = s.ID_socio
+    FROM ddbba.socio s
+    WHERE EXISTS (
+        SELECT 1
+        FROM ddbba.socio m
+        WHERE m.codGrupoFamiliar = s.ID_socio
+    )
+    AND s.codGrupoFamiliar IS NULL;
+END;
+GO
 
-	CREATE TABLE #detalle_temp (
-    socio                        INT,
-    categoria                    INT,
-    actividad                    INT,
-    costoActividadIndividual     DECIMAL(9,2),
-    costoMembresia               DECIMAL(9,2),
-    mes_fecha                    INT,
-    nombre_actividad             VARCHAR(100),
-    nombre_mes                   VARCHAR(20),
-    codAct                       INT
-	);
-	DECLARE @sql NVARCHAR(MAX) = N'
-        BULK INSERT #detalle_temp
-        FROM ''' + @rutaArchivo + N'''
+----------------------------------------------------------------------------------------------
+--Cargar en base al CSV de detalle de factura la tabla detalle de factura y factura
+-- ================================================
+CREATE OR ALTER PROCEDURE ddbba.cargarDetalleFacturaDesdeCSV
+    @rutaArchivo NVARCHAR(500)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    CREATE TABLE #detalleCarga (
+        socio                        INT,
+        categoria                    INT,
+        actividad                    INT,
+        costoActividadIndividual     DECIMAL(9,2),
+        costoMembresia               DECIMAL(9,2),
+        mes_fecha                    INT,
+        nombre_actividad             VARCHAR(100),
+        nombre_mes                   VARCHAR(20)
+    );
+
+    DECLARE @sql NVARCHAR(MAX) = '
+        BULK INSERT #detalleCarga
+        FROM ''' + @rutaArchivo + '''
         WITH (
-            FIRSTROW = 2,
-            FIELDTERMINATOR = '','',
-            ROWTERMINATOR = ''\n''
-        );
-    ';
-    EXEC sp_executesql @sql;
-	SELECT TOP 10 * FROM #detalle_temp;
+            FIELDTERMINATOR = '';'',
+            ROWTERMINATOR = ''\n'',
+            FIRSTROW = 2
+        );';
+    EXEC(@sql);
 
-	INSERT INTO ddbba.detalleFactura(
-	concepto,
-	monto,
-	descuento,
-	recargoMorosidad,
-	idCuotaCatSocio
-	)
-	SELECT
-	'Membresia' AS Concepto,
-	dc.costoMembresia AS Monto,
-	CASE 
-		WHEN s.codGrupoFamiliar IS NOT NULL THEN dc.costoMembresia* 0.10
-		ELSE 0
-	END AS Descuento,
-	0 AS RecargoMorosidad,
-	dc.categoria AS idCuotaCatUsuario
-	FROM (
-		SELECT socio, categoria, costoMembresia,
-		row_number() OVER(PARTITION BY socio ORDER BY actividad) AS rn
-		FROM #detalle_temp
-	) dc
-	JOIN ddbba.socio s ON s.ID_socio=dc.socio
-	WHERE dc.rn=1;
+    ;WITH FacturasAgrupadas AS (
+        SELECT DISTINCT socio, mes_fecha
+        FROM #detalleCarga
+    )
+    INSERT INTO ddbba.factura (
+        ID_socio,
+        fechaEmision,
+        mesFacturado,
+        fechaVencimiento,
+        fecha2Vencimiento,
+        totalNeto,
+        estadoFactura
+    )
+    SELECT
+        fa.socio,
+        DATEFROMPARTS(2025, fa.mes_fecha, 1),
+        fa.mes_fecha,
+        DATEADD(DAY, 5, DATEFROMPARTS(2025, fa.mes_fecha, 1)),
+        DATEADD(DAY, 10, DATEFROMPARTS(2025, fa.mes_fecha, 1)),
+        0,
+        'I'
+    FROM FacturasAgrupadas fa;
 
-	;WITH ActividadesPorSocio AS(
-		SELECT socio, COUNT(distinct actividad) AS cantActividades
-		FROM #detalle_temp
-		GROUP BY socio
-	)
-	INSERT INTO ddbba.detalleFactura(
-		concepto,
-		monto,
-		descuento,
-		recargoMorosidad,
-		idCuotaAct
-	)
-	SELECT 
-	'Actividad' + CAST(d.actividad AS VARCHAR),
-	d.costoActividadIndividual,
-	CASE 
-		WHEN a.cantActividades >1 THEN d.costoActividadIndividual * 0.15
-		ELSE 0
-	END,
-	0,
-	d.actividad
-	FROM #detalle_temp d
-	JOIN ActividadesPorSocio a ON a.socio=d.socio;
-	DROP TABLE #detalle_temp
+    SELECT 
+        f.codFactura,
+        dc.*
+    INTO #detalleExpandida
+    FROM #detalleCarga dc
+    JOIN ddbba.factura f
+        ON f.mesFacturado = dc.mes_fecha
+       AND f.ID_socio = dc.socio
+       AND f.estadoFactura = 'I';
+
+    INSERT INTO ddbba.detalleFactura (
+        codFactura,
+        concepto,
+        monto,
+        descuento,
+        recargoMorosidad,
+        idCuotaCatSocio
+    )
+    SELECT
+        d.codFactura,
+        'Membresía Categoría',
+        d.costoMembresia,
+        CASE WHEN s.codGrupoFamiliar IS NOT NULL THEN d.costoMembresia * 0.15 ELSE 0 END,
+        0,
+        d.categoria
+    FROM (
+        SELECT DISTINCT codFactura, socio, categoria, costoMembresia
+        FROM #detalleExpandida
+    ) d
+    JOIN ddbba.Socio s ON s.ID_socio = d.socio;
+
+    ;WITH ActividadesPorSocio AS (
+        SELECT socio, mes_fecha, COUNT(DISTINCT actividad) AS cant
+        FROM #detalleCarga
+        GROUP BY socio, mes_fecha
+    )
+    INSERT INTO ddbba.detalleFactura (
+        codFactura,
+        concepto,
+        monto,
+        descuento,
+        recargoMorosidad,
+        idCuotaAct
+    )
+    SELECT
+        d.codFactura,
+        'Actividad ' + CAST(d.actividad AS VARCHAR),
+        d.costoActividadIndividual,
+        CASE WHEN a.cant > 1 THEN d.costoActividadIndividual * 0.10 ELSE 0 END,
+        0,
+        d.actividad
+    FROM #detalleExpandida d
+    JOIN ActividadesPorSocio a
+        ON d.socio = a.socio AND d.mes_fecha = a.mes_fecha;
+
+    UPDATE f
+    SET totalNeto = df.total
+    FROM ddbba.factura f
+    JOIN (
+        SELECT codFactura, SUM(monto - descuento + recargoMorosidad) AS total
+        FROM ddbba.detalleFactura
+        GROUP BY codFactura
+    ) df ON f.codFactura = df.codFactura;
+
+    DROP TABLE #detalleCarga;
+    DROP TABLE #detalleExpandida;
+
+    PRINT 'Carga finalizada correctamente';
+END;
+GO
+-----------------------------------------------------------------------------------------------------
+--Reporte ingresos mensuales por actividad
+-- ================================================
+CREATE OR ALTER PROCEDURE ddbba.Reporte_ingresos_por_actividad
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    WITH MontoFacturadoPorMes AS (
+        SELECT 
+            f.mesFacturado, 
+            ad.nombre AS Actividad, 
+            df.monto - df.descuento AS MontoConDescuento
+        FROM ddbba.detalleFactura df
+        JOIN ddbba.factura AS f ON f.codFactura = df.codFactura
+        JOIN ddbba.actDeportiva AS ad ON ad.codAct = df.idCuotaAct
+        WHERE df.concepto <> 'Membresía Categoría'
+    )
+    SELECT
+        mesFacturado,
+        ISNULL([Ajedrez], 0) AS Ajedrez,
+        ISNULL([Baile Artístico], 0) AS [Baile Artístico],
+        ISNULL([Futsal], 0) AS Futsal,
+        ISNULL([Natación], 0) AS Natación,
+        ISNULL([Taekwondo], 0) AS Taekwondo,
+        ISNULL([Vóley], 0) AS Vóley
+    FROM MontoFacturadoPorMes
+    PIVOT (
+        SUM(MontoConDescuento)
+        FOR Actividad IN (
+            [Ajedrez], 
+            [Baile Artístico], 
+            [Futsal], 
+            [Natación], 
+            [Taekwondo], 
+            [Vóley]
+        )
+    ) AS ReporteMensual
+    ORDER BY mesFacturado;
 END;
 GO

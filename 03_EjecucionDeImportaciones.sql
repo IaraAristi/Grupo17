@@ -8,29 +8,24 @@ EXEC ddbba.InsertarCatSocio
 
 SELECT * FROM ddbba.catSocio
 
-
 EXEC  ddbba.ImportarSociosRP
     @rutaArchivo = 'C:\Users\iaraa\OneDrive\Documentos\BDAA\BASEDEDATOSTP\Grupo17\Responsables a cargo.csv';
 
 SELECT * FROM ddbba.Socio
 -------------------------
 EXEC  ddbba.ImportarSociosConGrupoFamiliar
-    @rutaArchivo = 'C:\Users\iaraa\OneDrive\Documentos\BDAA\BASEDEDATOSTP\Grupo17\Grupo familiar.csv';
+    @rutaArchivo = 'C:\Users\iaraa\OneDrive\Documentos\BDAA\BASEDEDATOSTP\Grupo17\Grupo familiar.csv'; 
 
-SELECT * FROM ddbba.Socio s
-WHERE s.codGrupoFamiliar IS NOT NULL
-ORDER BY ID_socio
+EXEC ddbba.ActualizarGrupoFamiliarResponsables
+GO
 
-
+SELECT s.ID_socio, s.codGrupoFamiliar FROM ddbba.Socio s
 -----------------
-
 EXEC  ddbba.InsertarActividades
     @rutaArchivo = 'C:\Users\iaraa\OneDrive\Documentos\BDAA\BASEDEDATOSTP\Grupo17\Actividad deportiva.csv';
 
 SELECT * FROM ddbba.actDeportiva
-
 -----------------------------------------
-
 EXEC ddbba.InsertarCuotasActividad
 	@rutaArchivo = 'C:\Users\iaraa\OneDrive\Documentos\BDAA\BASEDEDATOSTP\Grupo17\Actividad deportiva.csv'
 
@@ -44,19 +39,13 @@ EXEC ddbba.InsertarCuotasCatSocio
 SELECT * FROM ddbba.CuotaCatSocio
 
 
-------------------------------------------
 EXEC ddbba.cargarPresentismo
 	@rutaArchivo = 'C:\Users\iaraa\OneDrive\Documentos\BDAA\BASEDEDATOSTP\Grupo17\Presentismo.csv'
 
-SELECT * FROM ddbba.Presentismo
-ORDER BY fecha DESC
-
-
+SELECT * FROM ddbba.Presentismo p 
 
 EXEC ddbba.InsertarPagoFactura
 	@rutaArchivo = 'C:\Users\iaraa\OneDrive\Documentos\BDAA\BASEDEDATOSTP\Grupo17\Pago Cuotas.csv'
-
-
 
 SELECT * FROM ddbba.pagoFactura
 

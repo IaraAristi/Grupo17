@@ -35,6 +35,9 @@ GO
 EXEC ddbba.ActualizarCategoriaSociosPorEdad
 GO
 
-EXEC ddbba.cargarDetalleFactura
-	@rutaArchivo='C:\Users\iaraa\Downloads\detalledefactura(in).csv'
-select * from ddbba.detalleFactura
+EXEC ddbba.cargarDetalleFacturaDesdeCSV
+	@rutaArchivo='C:\Users\iaraa\OneDrive\Documentos\BDAA\BASEDEDATOSTP\Grupo17\detalledefactura(in).csv'
+GO
+
+EXEC ddbba.Reporte_ingresos_por_actividad --Reporte 2
+GO

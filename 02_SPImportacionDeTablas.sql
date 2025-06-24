@@ -156,8 +156,7 @@ BEGIN
 			   FROM ddbba.socio s 
 			   WHERE s.dni = o.dni
 		   );
-
-
+		
         -- Insertar registros únicos en la tabla socio
         INSERT INTO ddbba.socio (
             nroSocio, dni, nombre, apellido, telContacto, telEmergencia,
@@ -172,7 +171,7 @@ BEGIN
           AND NOT EXISTS (SELECT 1 FROM ddbba.socio s WHERE s.dni = o.dni);
 
         -- Mostrar los DNI duplicados
-        SELECT * FROM #socios_duplicados;
+        --SELECT * FROM #socios_duplicados;
 
         -- Eliminar tabla auxiliar
         DROP TABLE #ordenados_temp;
