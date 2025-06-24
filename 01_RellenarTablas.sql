@@ -36,8 +36,22 @@ EXEC ddbba.ActualizarCategoriaSociosPorEdad
 GO
 
 EXEC ddbba.cargarDetalleFacturaDesdeCSV
-	@rutaArchivo='C:\Users\iaraa\OneDrive\Documentos\BDAA\BASEDEDATOSTP\Grupo17\detalledefactura(in).csv'
+	@rutaArchivo='C:\Users\Diego\Desktop\LOS DOMINGUEZ\Luana Unlam\Bdda\Grupo17-main\Grupo17-main\Detalle De Factura.csv'
 GO
+
+
+EXEC ddbba.ActualizarGrupoFamiliarResponsables
+GO
+
+
 
 EXEC ddbba.Reporte_ingresos_por_actividad --Reporte 2
 GO
+
+
+EXEC ddbba.reporteInasistenciasAlternadas --Reporte 3
+
+
+
+
+EXEC ddbba.SociosConAlgunaInasistencia --Reporte 4

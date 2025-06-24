@@ -208,8 +208,133 @@ BEGIN
     PRINT 'Carga finalizada correctamente';
 END;
 GO
+
+-------------------------------------------------------------------------------------------------
+--Reporte 3:  cantidad de socios que han realizado alguna actividad de forma alternada(inasistencias)
+CREATE OR ALTER PROCEDURE ddbba.reporteInasistenciasAlternadas
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    WITH PresentismoConContexto AS (
+        SELECT 
+            p.socio,
+            p.act,
+            p.fecha,
+            p.presentismo,
+            LAG(p.presentismo) OVER (PARTITION BY p.socio, p.act ORDER BY p.fecha) AS anterior,
+            LEAD(p.presentismo) OVER (PARTITION BY p.socio, p.act ORDER BY p.fecha) AS siguiente
+        FROM ddbba.Presentismo p
+    ),
+    InasistenciasAlternadas AS (
+        SELECT 
+            pc.socio,
+            pc.act,
+            pc.fecha
+        FROM PresentismoConContexto pc
+        WHERE pc.presentismo IN ('A', 'J')  -- la fila actual es una inasistencia
+          AND ('P' IN (pc.anterior, pc.siguiente)) --tine al menos una P
+    )
+
+    SELECT 
+        cs.nombreCat AS Categoria,
+        ad.nombre AS Actividad,
+        COUNT(*) AS CantidadInasistenciasAlternadas
+    FROM InasistenciasAlternadas ia
+    JOIN ddbba.socio s ON ia.socio = s.ID_socio
+    JOIN ddbba.catSocio cs ON s.codCat = cs.codCat
+    JOIN ddbba.actDeportiva ad ON ia.act = ad.codAct
+    GROUP BY cs.nombreCat, ad.nombre
+    ORDER BY CantidadInasistenciasAlternadas DESC;
+END;
+GO
+
+---------------------------------------------------------------------------------------------
+--Reporte 4:  socios que no han asistido a alguna clase de la actividad
+CREATE OR ALTER PROCEDURE ddbba.SociosConAlgunaInasistencia
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT DISTINCT
+        s.nombre,
+        s.apellido,
+        DATEDIFF(YEAR, s.fechaNac, GETDATE()) - 
+            CASE 
+                WHEN MONTH(s.fechaNac) > MONTH(GETDATE()) 
+                     OR (MONTH(s.fechaNac) = MONTH(GETDATE()) AND DAY(s.fechaNac) > DAY(GETDATE()))
+                THEN 1 ELSE 0 
+            END AS edad,
+        cs.nombreCat AS categoria,
+        ad.nombre AS actividad
+    FROM ddbba.socio s
+    JOIN ddbba.catSocio cs ON s.codCat = cs.codCat
+    JOIN ddbba.Presentismo p ON s.ID_socio = p.socio
+    JOIN ddbba.actDeportiva ad ON p.act = ad.codAct
+    WHERE p.presentismo = 'A' OR p.presentismo = 'J'
+END;
+GO
+--------------------------------------------------------------------------------
+--Reporte 1: Socios morosos recurrentes
+CREATE OR ALTER PROCEDURE ddbba.MorososRecurrentes
+    @FechaDesde DATE,
+    @FechaHasta DATE
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- Paso 1: Obtener todas las morosidades del período con datos del socio
+    WITH Morosidades AS (
+        SELECT
+            rm.socio,
+            s.nroSocio,
+            s.nombre,
+            s.apellido,
+            rm.mesAdeudado
+        FROM ddbba.registroMoroso rm
+        JOIN ddbba.socio s ON s.ID_socio = rm.socio
+        WHERE rm.fechaMorosidad BETWEEN @FechaDesde AND @FechaHasta
+    ),
+    
+    -- Paso 2: Contar morosidades por socio
+    ConteoMorosidades AS (
+        SELECT 
+            socio,
+            nroSocio,
+            nombre,
+            apellido,
+            COUNT(*) AS CantidadIncumplimientos
+        FROM Morosidades
+        GROUP BY socio, nroSocio, nombre, apellido
+        HAVING COUNT(*) > 2
+    ),
+    
+    -- Paso 3: Calcular el ranking
+    RankingMorosidades AS (
+        SELECT *,
+            RANK() OVER (ORDER BY CantidadIncumplimientos DESC) AS RankingMorosidad
+        FROM ConteoMorosidades
+    )
+
+    -- Paso 4: Mostrar los resultados finales
+    SELECT
+        'Morosos Recurrentes' AS [Nombre del Reporte],
+        CONCAT(CONVERT(VARCHAR, @FechaDesde, 103), ' al ', CONVERT(VARCHAR, @FechaHasta, 103)) AS [Periodo],
+        r.nroSocio,
+        CONCAT(r.nombre, ' ', r.apellido) AS [Nombre y Apellido],
+        m.mesAdeudado AS [Mes Incumplido],
+        r.RankingMorosidad
+    FROM RankingMorosidades r
+    JOIN Morosidades m ON r.socio = m.socio
+    ORDER BY r.RankingMorosidad;
+END;
+GO
+
+
+
+
 -----------------------------------------------------------------------------------------------------
---Reporte ingresos mensuales por actividad
+--Reporte 2: ingresos mensuales por actividad
 -- ================================================
 CREATE OR ALTER PROCEDURE ddbba.Reporte_ingresos_por_actividad
 AS
