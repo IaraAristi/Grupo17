@@ -70,3 +70,87 @@ BEGIN
     END CATCH;
 END;
 GO
+
+CREATE OR ALTER PROCEDURE ddbba.cargarDetalleFactura
+    @rutaArchivo NVARCHAR(255)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- Eliminar tabla temporal si ya existe
+    IF OBJECT_ID('tempdb..#detalle_temp') IS NOT NULL
+        DROP TABLE #detalle_temp;
+
+	CREATE TABLE #detalle_temp (
+    socio                        INT,
+    categoria                    INT,
+    actividad                    INT,
+    costoActividadIndividual     DECIMAL(9,2),
+    costoMembresia               DECIMAL(9,2),
+    mes_fecha                    INT,
+    nombre_actividad             VARCHAR(100),
+    nombre_mes                   VARCHAR(20),
+    codAct                       INT
+	);
+	DECLARE @sql NVARCHAR(MAX) = N'
+        BULK INSERT #detalle_temp
+        FROM ''' + @rutaArchivo + N'''
+        WITH (
+            FIRSTROW = 2,
+            FIELDTERMINATOR = '','',
+            ROWTERMINATOR = ''\n''
+        );
+    ';
+    EXEC sp_executesql @sql;
+	SELECT TOP 10 * FROM #detalle_temp;
+
+	INSERT INTO ddbba.detalleFactura(
+	concepto,
+	monto,
+	descuento,
+	recargoMorosidad,
+	idCuotaCatSocio
+	)
+	SELECT
+	'Membresia' AS Concepto,
+	dc.costoMembresia AS Monto,
+	CASE 
+		WHEN s.codGrupoFamiliar IS NOT NULL THEN dc.costoMembresia* 0.10
+		ELSE 0
+	END AS Descuento,
+	0 AS RecargoMorosidad,
+	dc.categoria AS idCuotaCatUsuario
+	FROM (
+		SELECT socio, categoria, costoMembresia,
+		row_number() OVER(PARTITION BY socio ORDER BY actividad) AS rn
+		FROM #detalle_temp
+	) dc
+	JOIN ddbba.socio s ON s.ID_socio=dc.socio
+	WHERE dc.rn=1;
+
+	;WITH ActividadesPorSocio AS(
+		SELECT socio, COUNT(distinct actividad) AS cantActividades
+		FROM #detalle_temp
+		GROUP BY socio
+	)
+	INSERT INTO ddbba.detalleFactura(
+		concepto,
+		monto,
+		descuento,
+		recargoMorosidad,
+		idCuotaAct
+	)
+	SELECT 
+	'Actividad' + CAST(d.actividad AS VARCHAR),
+	d.costoActividadIndividual,
+	CASE 
+		WHEN a.cantActividades >1 THEN d.costoActividadIndividual * 0.15
+		ELSE 0
+	END,
+	0,
+	d.actividad
+	FROM #detalle_temp d
+	JOIN ActividadesPorSocio a ON a.socio=d.socio;
+	DROP TABLE #detalle_temp
+END;
+GO

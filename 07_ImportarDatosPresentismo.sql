@@ -33,6 +33,11 @@ BEGIN
     ';
     EXEC (@sql);
 
+	SELECT * FROM #presentismo_temp;
+
+	DECLARE @ultimaFecha DATE;
+	SELECT @ultimaFecha = MAX(fecha) FROM ddbba.Presentismo;
+
     -- Inserta los datos limpios a la tabla real, verificando duplicados
     INSERT INTO ddbba.Presentismo (
         fecha,
@@ -54,7 +59,8 @@ BEGIN
     JOIN ddbba.actDeportiva a
         ON LTRIM(RTRIM(temp.Actividad)) COLLATE Modern_Spanish_CI_AS 
          = LTRIM(RTRIM(a.nombreActividad))
-    WHERE NOT EXISTS (
+    WHERE (@ultimaFecha IS NULL OR temp.[fecha de asistencia]> @ultimaFecha)
+	AND NOT EXISTS (
         SELECT 1 
         FROM ddbba.Presentismo p
         WHERE p.socio = s.ID_socio

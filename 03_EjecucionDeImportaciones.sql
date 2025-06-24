@@ -19,7 +19,7 @@ EXEC  ddbba.ImportarSociosConGrupoFamiliar
 
 SELECT * FROM ddbba.Socio s
 WHERE s.codGrupoFamiliar IS NOT NULL
-ORDER BY codGrupoFamiliar
+ORDER BY ID_socio
 
 
 -----------------

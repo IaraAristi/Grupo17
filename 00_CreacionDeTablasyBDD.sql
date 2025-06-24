@@ -328,10 +328,33 @@ GO
 IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE
 TABLE_SCHEMA =
 'ddbba' AND TABLE_NAME =
+'factura')
+BEGIN
+CREATE TABLE ddbba.factura (
+    codFactura INT IDENTITY(1,1) PRIMARY KEY,
+    fechaEmision DATE,
+    mesFacturado INT,
+    fechaVencimiento DATE,
+    fecha2Vencimiento DATE,
+    horaEmision TIME,
+    totalNeto DECIMAL(9,2),
+    estadoFactura CHAR(1) CHECK(estadoFactura IN ('P','I')),   --P de pago e I de impago
+    idPago CHAR(12),
+    ID_socio INT,
+    CONSTRAINT FK_factura_pago FOREIGN KEY (idPago) REFERENCES ddbba.pagoFactura(idPago),
+    CONSTRAINT FK_factura_socio FOREIGN KEY (ID_socio) REFERENCES ddbba.socio(ID_socio)
+);
+END
+GO
+
+IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE
+TABLE_SCHEMA =
+'ddbba' AND TABLE_NAME =
 'detalleFactura')
 BEGIN
 CREATE TABLE ddbba.detalleFactura (
     codDetalleFac INT IDENTITY(1,1) PRIMARY KEY,
+	codFactura INT,
     concepto VARCHAR(50),
     monto DECIMAL(8,2),
     descuento DECIMAL(7,2),
@@ -341,6 +364,7 @@ CREATE TABLE ddbba.detalleFactura (
     idCuotaAct INT,
     codCostoColonia INT,
     codCostoSUM INT,
+	CONSTRAINT FK_detalle_factura FOREIGN KEY (codFactura) REFERENCES ddbba.factura(codFactura),
     CONSTRAINT FK_detalle_costoPileta FOREIGN KEY (codCostoPileta) REFERENCES ddbba.costoIngresoPileta(codCostoIngreso),
     CONSTRAINT FK_detalle_cuotaCat FOREIGN KEY (idCuotaCatSocio) REFERENCES ddbba.CuotaCatSocio(idCuotaCatSocio),
     CONSTRAINT FK_detalle_cuotaAct FOREIGN KEY (idCuotaAct) REFERENCES ddbba.CuotaActividad(idCuotaAct),
@@ -366,29 +390,6 @@ CREATE TABLE ddbba.pagoCuenta (
 END
 GO
 
-IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE
-TABLE_SCHEMA =
-'ddbba' AND TABLE_NAME =
-'factura')
-BEGIN
-CREATE TABLE ddbba.factura (
-    codFactura INT IDENTITY(1,1) PRIMARY KEY,
-    fechaEmision DATE,
-    mesFacturado INT,
-    fechaVencimiento DATE,
-    fecha2Vencimiento DATE,
-    horaEmision TIME,
-    totalNeto DECIMAL(9,2),
-    estadoFactura CHAR(1) CHECK(estadoFactura IN ('P','I')),   --P de pago e I de impago
-    idPago CHAR(12),
-    codDetalleFac INT,
-    ID_socio INT,
-    CONSTRAINT FK_factura_pago FOREIGN KEY (idPago) REFERENCES ddbba.pagoFactura(idPago),
-    CONSTRAINT FK_factura_detalle FOREIGN KEY (codDetalleFac) REFERENCES ddbba.detalleFactura(codDetalleFac),
-    CONSTRAINT FK_factura_socio FOREIGN KEY (ID_socio) REFERENCES ddbba.socio(ID_socio)
-);
-END
-GO
 
 IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE
 TABLE_SCHEMA =
