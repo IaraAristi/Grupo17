@@ -416,7 +416,7 @@ TABLE_SCHEMA =
 BEGIN
 CREATE TABLE ddbba.pasePileta (
     codPase INT IDENTITY(1,1) PRIMARY KEY,
-    tipo VARCHAR(10),
+    tipo VARCHAR(10) CHECK (tipo IN ('dia', 'mes', 'temporada')),
     fechaDesde DATE,
     fechaHasta DATE,
     idSocio INT,
