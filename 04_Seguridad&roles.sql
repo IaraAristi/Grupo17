@@ -1,5 +1,8 @@
 USE master
 GO
+
+
+--Logins
 IF SUSER_ID(N'JefeTesoreria') IS NULL
 BEGIN
     CREATE LOGIN Jefe_Tesoreria
@@ -58,7 +61,7 @@ GO
 
 IF SUSER_ID(N'Vicepresidente') IS NULL
 BEGIN
-    CREATE LOGIN login_Vicepresidente
+    CREATE LOGIN Vicepresidente
         WITH PASSWORD = 'vickyvillaruel10',
         DEFAULT_DATABASE = Com2900G17;
 END
@@ -80,38 +83,69 @@ BEGIN
 END
 GO
 
--- creacion user
+--Users
 USE Com2900G17
 GO
 
 IF DATABASE_PRINCIPAL_ID('Jefe_Tesoreria') IS NULL
-    CREATE USER Jefe_Tesoreria FOR LOGIN Jefe_Tesoreria WITH DEFAULT_SCHEMA = tesoreria;
+    CREATE USER user_Jefe_Tesoreria FOR LOGIN Jefe_Tesoreria WITH DEFAULT_SCHEMA = tesoreria;
 
 IF DATABASE_PRINCIPAL_ID('Administrativo_Cobranza') IS NULL
-    CREATE USER Administrativo_Cobranza FOR LOGIN Administrativo_Cobranza WITH DEFAULT_SCHEMA = tesoreria;
+    CREATE USER user_Administrativo_Cobranza FOR LOGIN Administrativo_Cobranza WITH DEFAULT_SCHEMA = tesoreria;
 
 IF DATABASE_PRINCIPAL_ID('Administrativo_Morosidad') IS NULL
-    CREATE USER Administrativo_Morosidad FOR LOGIN Administrativo_Morosidad WITH DEFAULT_SCHEMA = tesoreria;
+    CREATE USER user_Administrativo_Morosidad FOR LOGIN Administrativo_Morosidad WITH DEFAULT_SCHEMA = tesoreria;
 
 IF DATABASE_PRINCIPAL_ID('Administrativo_Facturacion') IS NULL
-    CREATE USER Administrativo_Facturacion FOR LOGIN Administrativo_Facturacion WITH DEFAULT_SCHEMA = tesoreria;
+    CREATE USER user_Administrativo_Facturacion FOR LOGIN Administrativo_Facturacion WITH DEFAULT_SCHEMA = tesoreria;
 	
 IF DATABASE_PRINCIPAL_ID('Administrativo_Socio') IS NULL
-    CREATE USER Administrativo_Socio FOR LOGIN Administrativo_Socio WITH DEFAULT_SCHEMA = socios;
+    CREATE USER user_Administrativo_Socio FOR LOGIN Administrativo_Socio WITH DEFAULT_SCHEMA = socios;
 
 IF DATABASE_PRINCIPAL_ID('Socios_Web') IS NULL
-    CREATE USER Socios_Web FOR LOGIN Socios_Web WITH DEFAULT_SCHEMA = socios;
+    CREATE USER user_Socios_Web FOR LOGIN Socios_Web WITH DEFAULT_SCHEMA = socios;
 
 IF DATABASE_PRINCIPAL_ID('Presidente') IS NULL
-    CREATE USER Presidente FOR LOGIN Presidente WITH DEFAULT_SCHEMA = autoridades;
+    CREATE USER user_Presidente FOR LOGIN Presidente WITH DEFAULT_SCHEMA = autoridades;
 
 IF DATABASE_PRINCIPAL_ID('Vicepresidente') IS NULL
-    CREATE USER Vicepresidente FOR LOGIN Vicepresidente WITH DEFAULT_SCHEMA = autoridades;
+    CREATE USER user_Vicepresidente FOR LOGIN Vicepresidente WITH DEFAULT_SCHEMA = autoridades;
 
 IF DATABASE_PRINCIPAL_ID('Secretario') IS NULL
-    CREATE USER Secretario FOR LOGIN Secretario WITH DEFAULT_SCHEMA = autoridades;
+    CREATE USER user_Secretario FOR LOGIN Secretario WITH DEFAULT_SCHEMA = autoridades;
 
 IF DATABASE_PRINCIPAL_ID('user_Vocales') IS NULL
-    CREATE USER Vocales FOR LOGIN Vocales WITH DEFAULT_SCHEMA = autoridades;
+    CREATE USER user_Vocales FOR LOGIN Vocales WITH DEFAULT_SCHEMA = autoridades;
 GO
 
+--Roles
+IF DATABASE_PRINCIPAL_ID('rol_Jefe_Tesoreria') IS NULL
+    CREATE ROLE rol_Jefe_Tesoreria AUTHORIZATION dbo;
+
+IF DATABASE_PRINCIPAL_ID('rol_Administrativo_Cobranza') IS NULL
+    CREATE ROLE rol_Administrativo_Cobranza AUTHORIZATION dbo;
+
+IF DATABASE_PRINCIPAL_ID('rol_Administrativo_Morosidad') IS NULL
+    CREATE ROLE rol_Administrativo_Morosidad AUTHORIZATION dbo;
+
+IF DATABASE_PRINCIPAL_ID('rol_Administrativo_Facturacion') IS NULL
+    CREATE ROLE rol_Administrativo_Facturacion AUTHORIZATION dbo;
+
+IF DATABASE_PRINCIPAL_ID('rol_Administrativo_Socio') IS NULL
+    CREATE ROLE rol_Administrativo_Socio AUTHORIZATION dbo;
+
+IF DATABASE_PRINCIPAL_ID('rol_Socios_Web') IS NULL
+    CREATE ROLE rol_Socios_Web AUTHORIZATION Administrativo_Socio;
+
+IF DATABASE_PRINCIPAL_ID('rol_Presidente') IS NULL
+    CREATE ROLE rol_Presidente AUTHORIZATION dbo;
+
+IF DATABASE_PRINCIPAL_ID('rol_Vicepresidente') IS NULL
+    CREATE ROLE rol_Vicepresidente AUTHORIZATION dbo;
+
+IF DATABASE_PRINCIPAL_ID('rol_Secretario') IS NULL
+    CREATE ROLE rol_Secretario AUTHORIZATION dbo;
+
+IF DATABASE_PRINCIPAL_ID('rol_Vocales') IS NULL
+    CREATE ROLE rol_Vocales AUTHORIZATION dbo;
+GO
