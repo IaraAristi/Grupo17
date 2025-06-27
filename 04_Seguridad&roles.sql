@@ -149,3 +149,16 @@ IF DATABASE_PRINCIPAL_ID('rol_Secretario') IS NULL
 IF DATABASE_PRINCIPAL_ID('rol_Vocales') IS NULL
     CREATE ROLE rol_Vocales AUTHORIZATION dbo;
 GO
+
+--Asignar roles
+-- ALTER ROLE [nombre_rol] ADD MEMBER [nombre_usuario];
+ALTER ROLE rol_Jefe_Tesoreria ADD MEMBER user_Jefe_Tesoreria;
+ALTER ROLE rol_Administrativo_Cobranza ADD MEMBER user_Administrativo_Cobranza;
+ALTER ROLE rol_Administrativo_Morosidad ADD MEMBER user_Administrativo_Morosidad;
+ALTER ROLE rol_Administrativo_Facturacion ADD MEMBER user_Administrativo_Facturacion;
+ALTER ROLE rol_Administrativo_Socio ADD MEMBER user_Administrativo_Facturacion;
+ALTER ROLE rol_Socios_Web ADD MEMBER user_Socios_Web;
+ALTER ROLE rol_Presidente ADD MEMBER user_Presidente;
+ALTER ROLE rol_Vicepresidente ADD MEMBER user_Vicepresidente;
+ALTER ROLE rol_Secretario ADD MEMBER user_Secretario;
+ALTER ROLE rol_Vocales ADD MEMBER user_Vocales;
