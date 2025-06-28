@@ -138,13 +138,13 @@ TABLE_SCHEMA =
 'ddbba' AND TABLE_NAME =
 'CuotaCatSocio')
 BEGIN
-CREATE TABLE ddbba.CuotaCatSocio (
+CREATE TABLE ddbba.TarifarioCatSocio (
     idCuotaCatSocio INT IDENTITY(1,1) PRIMARY KEY,
     fechaVigenciaHasta DATE,
     categoria VARCHAR(6),
     costoMembresia DECIMAL(7,2),
     catSocio INT,
-    CONSTRAINT FK_CuotaCatSocio_catSocio FOREIGN KEY (catSocio) REFERENCES ddbba.catSocio(codCat)
+    CONSTRAINT FK_TarifarioCatSocio_catSocio FOREIGN KEY (catSocio) REFERENCES ddbba.catSocio(codCat)
 );
 END
 GO
@@ -154,13 +154,13 @@ TABLE_SCHEMA =
 'ddbba' AND TABLE_NAME =
 'CuotaActividad')
 BEGIN
-CREATE TABLE ddbba.CuotaActividad (
+CREATE TABLE ddbba.TarifarioActividad (
     idCuotaAct INT IDENTITY(1,1) PRIMARY KEY,
     fechaVigenciaHasta DATE,
     actividad VARCHAR(20),
     costoActividad DECIMAL(7,2),
     codAct INT,
-    CONSTRAINT FK_CuotaActividad_codAct FOREIGN KEY (codAct) REFERENCES ddbba.actDeportiva(codAct)
+    CONSTRAINT FK_TarifarioActividad_codAct FOREIGN KEY (codAct) REFERENCES ddbba.actDeportiva(codAct)
 );
 END
 GO
@@ -280,9 +280,9 @@ TABLE_SCHEMA =
 'pagoFactura')
 BEGIN
 CREATE TABLE ddbba.pagoFactura (
-    idPago CHAR(12) PRIMARY KEY,
+	codPago INT IDENTITY (1,1) PRIMARY KEY,
+    idPago CHAR(12),
     Fecha_Pago DATE,
-    hora TIME,
     montoTotal DECIMAL(8,2),
 	montoMedioPago DECIMAL(8,2),
     saldoFavorUsado DECIMAL(8,2),
@@ -302,11 +302,10 @@ BEGIN
 CREATE TABLE ddbba.facturaInvitado (
     codFactura INT IDENTITY(1,1) PRIMARY KEY,
     fechaEmision DATE,
-    horaEmision TIME,
     codInvitado INT,
-    idPago CHAR(12),
+    idPago INT,
     CONSTRAINT FK_facturaInvitado_invitado FOREIGN KEY (codInvitado) REFERENCES ddbba.invitado(codInvitado),
-    CONSTRAINT FK_facturaInvitado_pago FOREIGN KEY (idPago) REFERENCES ddbba.pagoFactura(idPago)
+    CONSTRAINT FK_facturaInvitado_pago FOREIGN KEY (idPago) REFERENCES ddbba.pagoFactura(codPago)
 );
 END
 GO
@@ -338,9 +337,9 @@ CREATE TABLE ddbba.factura (
     fecha2Vencimiento DATE,
     totalNeto DECIMAL(9,2),
     estadoFactura CHAR(1) CHECK(estadoFactura IN ('P','I')),   --P de pago e I de impago
-    idPago CHAR(12),
+    idPago INT,
     ID_socio INT,
-    CONSTRAINT FK_factura_pago FOREIGN KEY (idPago) REFERENCES ddbba.pagoFactura(idPago),
+    CONSTRAINT FK_factura_pago FOREIGN KEY (idPago) REFERENCES ddbba.pagoFactura(codPago),
     CONSTRAINT FK_factura_socio FOREIGN KEY (ID_socio) REFERENCES ddbba.socio(ID_socio)
 );
 END
@@ -374,17 +373,7 @@ CREATE TABLE ddbba.detalleFactura (
     monto DECIMAL(8,2),
     descuento DECIMAL(7,2),
     recargoMorosidad DECIMAL(7,2),
-    codCostoPileta INT,
-    idCuotaCatSocio INT,
-    idCuotaAct INT,
-    codCostoColonia INT,
-    codCostoSUM INT,
 	CONSTRAINT FK_detalle_factura FOREIGN KEY (codFactura) REFERENCES ddbba.factura(codFactura),
-    CONSTRAINT FK_detalle_costoPileta FOREIGN KEY (codCostoPileta) REFERENCES ddbba.costoPileta(codCostoPileta),
-    CONSTRAINT FK_detalle_cuotaCat FOREIGN KEY (idCuotaCatSocio) REFERENCES ddbba.CuotaCatSocio(idCuotaCatSocio),
-    CONSTRAINT FK_detalle_cuotaAct FOREIGN KEY (idCuotaAct) REFERENCES ddbba.CuotaActividad(idCuotaAct),
-    CONSTRAINT FK_detalle_costoColonia FOREIGN KEY (codCostoColonia) REFERENCES ddbba.costoColonia(codCostoColonia),
-    CONSTRAINT FK_detalle_costoSUM FOREIGN KEY (codCostoSUM) REFERENCES ddbba.costoSUM(codCostoSUM)
 	CONSTRAINT FK_detalleFactura_socio FOREIGN KEY (ID_socio) REFERENCES ddbba.socio(ID_socio)
 );
 END
@@ -433,7 +422,7 @@ TABLE_SCHEMA =
 BEGIN
 CREATE TABLE ddbba.pasePileta (
     codPase INT IDENTITY(1,1) PRIMARY KEY,
-    tipo VARCHAR(10) CHECK (tipo IN ('dia', 'mes', 'temporada')),
+    tipo VARCHAR(10) CHECK (tipo IN ('día', 'mes', 'temporada')),
     fechaDesde DATE,
     fechaHasta DATE,
     idSocio INT,
@@ -460,33 +449,33 @@ END
 GO
 
 IF NOT EXISTS (
-    SELECT * FROM sys.tables WHERE name = 'cuota_mensual_membresia_categoria' AND schema_id = SCHEMA_ID('ddbba')
+    SELECT * FROM sys.tables WHERE name = 'cuotaMensualCategoria' AND schema_id = SCHEMA_ID('ddbba')
 )
 BEGIN
-    CREATE TABLE ddbba.cuota_mensual_membresia_categoria (
+    CREATE TABLE ddbba.cuotaMensualCategoria (
         ID INT IDENTITY(1,1) PRIMARY KEY,
         ID_socio INT NOT NULL,
         codCat INT NOT NULL,
         precio_bruto DECIMAL(9,2) NOT NULL,
         descuento_aplicado DECIMAL(9,2) NOT NULL,
         fechaGeneracion DATE NOT NULL,
-        CONSTRAINT FK_socio_ FOREIGN KEY (ID_socio) REFERENCES ddbba.socio(ID_socio),
-        CONSTRAINT FK_categoria_ FOREIGN KEY (codCat) REFERENCES ddbba.catSocio(codCat)
+        CONSTRAINT FK_cuotaCategoria_socio FOREIGN KEY (ID_socio) REFERENCES ddbba.socio(ID_socio),
+        CONSTRAINT FK_cuotaCategoria_categoria FOREIGN KEY (codCat) REFERENCES ddbba.catSocio(codCat)
     );
 END;
 
 IF NOT EXISTS (
-    SELECT * FROM sys.tables WHERE name = 'cuota_mensual_actividad' AND schema_id = SCHEMA_ID('ddbba')
+    SELECT * FROM sys.tables WHERE name = 'cuotaMensualActividad' AND schema_id = SCHEMA_ID('ddbba')
 )
 BEGIN
-    CREATE TABLE ddbba.cuota_mensual_actividad (
+    CREATE TABLE ddbba.cuotaMensualActividad (
         ID INT IDENTITY(1,1) PRIMARY KEY,
         ID_socio INT NOT NULL,
         codAct INT NOT NULL,
         precio_bruto DECIMAL(9,2) NOT NULL,
         descuento_aplicado DECIMAL(9,2) NOT NULL,
         fechaGeneracion DATE NOT NULL,
-        CONSTRAINT FK_socio_tarifario FOREIGN KEY (ID_socio) REFERENCES ddbba.socio(ID_socio),
-        CONSTRAINT FK_actividad FOREIGN KEY (codAct) REFERENCES ddbba.actDeportiva(codAct)
+        CONSTRAINT FK_cuotaActividad_socio FOREIGN KEY (ID_socio) REFERENCES ddbba.socio(ID_socio),
+        CONSTRAINT FK_cuotaActividad_actividad FOREIGN KEY (codAct) REFERENCES ddbba.actDeportiva(codAct)
     );
 END;

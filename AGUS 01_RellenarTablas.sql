@@ -61,26 +61,6 @@ EXEC ddbba.SociosConAlgunaInasistencia --Reporte 4
 
 SELECT * FROM ddbba.socio
 
-
----------------
----Lote para probar el reintegro por lluvia
-INSERT INTO ddbba.pasePileta (tipo, fechaDesde, fechaHasta, idSocio, codCostoPileta)
-VALUES
-    ('dia', '2025-01-20', '2025-01-20', 5, 1),        -- Socio 5, 20 de enero
-    ('dia', '2025-02-28', '2025-02-28', 12, 1),       -- Socio 12, 28 de febrero
-    ('dia', '2025-02-28', '2025-02-28', 50, 1),       -- Socio 50, 28 de febrero
-    ('dia', '2025-01-15', '2025-01-15', 87, 1),       -- Socio 87, otra de enero
-    ('dia', '2025-02-10', '2025-02-10', 119, 2);      -- Socio 120, otra de febrero
-
-SELECT * FROM ddbba.pasePileta
-
-INSERT INTO ddbba.pasePileta (tipo, fechaDesde, fechaHasta, idSocio, codCostoPileta)
-VALUES
-    ('mes', '2025-01-01', '2025-01-31', 11, 3),
-    ('mes', '2025-02-01', '2025-02-28', 17, 3)
-
-SELECT * FROM ddbba.pasePileta
-
 INSERT INTO ddbba.invitado (nombre, apellido, fechaNac, dni, mail) VALUES
 ('Lucía', 'Pérez', '2001-05-23', '34567890', 'lucia.perez@email.com'),
 ('Mateo', 'Fernández', '1999-11-12', '32145678', 'mateo.fernandez@email.com'),

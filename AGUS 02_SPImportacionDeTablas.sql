@@ -383,7 +383,7 @@ BEGIN
 
     EXEC sp_executesql @sql;
 
-    INSERT INTO ddbba.CuotaActividad (
+    INSERT INTO ddbba.TarifarioActividad (
         fechaVigenciaHasta, actividad, costoActividad, codAct
     )
     SELECT 
@@ -402,7 +402,7 @@ BEGIN
                      END
     WHERE NOT EXISTS (
         SELECT 1
-        FROM ddbba.CuotaActividad ca
+        FROM ddbba.TarifarioActividad ca
         WHERE ca.actividad = 
               CASE 
                   WHEN LOWER(LTRIM(RTRIM(t.Actividad))) LIKE '%jederez%' THEN 'Ajedrez'
@@ -449,7 +449,7 @@ BEGIN
     EXEC sp_executesql @sql;
 
     -- Insertar datos en la tabla CuotaCatSocio evitando duplicados
-    INSERT INTO ddbba.CuotaCatSocio (
+    INSERT INTO ddbba.TarifarioCatSocio(
         fechaVigenciaHasta, categoria, costoMembresia, catSocio
     )
     SELECT 
@@ -462,7 +462,7 @@ BEGIN
         ON c.nombreCat = LTRIM(RTRIM(t.[Categoria socio]))
     WHERE NOT EXISTS (
         SELECT 1
-        FROM ddbba.CuotaCatSocio cs
+        FROM ddbba.TarifarioCatSocio cs
         WHERE cs.categoria = LTRIM(RTRIM(t.[Categoria socio]))
           AND cs.fechaVigenciaHasta = TRY_CONVERT(DATE, t.[Vigente hasta], 101)
     );
@@ -602,7 +602,7 @@ END;
 GO
 
 --SP TARIFA PILETA INVITADO
-CREATE OR ALTER PROCEDURE ddbba.InsertarCostoIngresoPileta
+CREATE OR ALTER PROCEDURE ddbba.InsertarCostoPiletaInvitado
     @rutaArchivo NVARCHAR(260)  -- Ejemplo: 'C:\ruta\archivo.csv'
 AS
 BEGIN

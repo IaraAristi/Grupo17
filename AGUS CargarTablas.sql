@@ -85,130 +85,6 @@ BEGIN
 END;
 GO
 
-/*----------------------------------------------------------------------------------------------
---Cargar en base al CSV de detalle de factura la tabla detalle de factura y factura
--- ================================================
-CREATE OR ALTER PROCEDURE ddbba.cargarDetalleFacturaDesdeCSV
-    @rutaArchivo NVARCHAR(500)
-AS
-BEGIN
-    SET NOCOUNT ON;
-
-    CREATE TABLE #detalleCarga (
-        socio                        INT,
-        categoria                    INT,
-        actividad                    INT,
-        costoActividadIndividual     DECIMAL(9,2),
-        costoMembresia               DECIMAL(9,2),
-        mes_fecha                    INT,
-        nombre_actividad             VARCHAR(100),
-        nombre_mes                   VARCHAR(20)
-    );
-
-    DECLARE @sql NVARCHAR(MAX) = '
-        BULK INSERT #detalleCarga
-        FROM ''' + @rutaArchivo + '''
-        WITH (
-            FIELDTERMINATOR = '';'',
-            ROWTERMINATOR = ''\n'',
-            FIRSTROW = 2
-        );';
-    EXEC(@sql);
-
-    ;WITH FacturasAgrupadas AS (
-        SELECT DISTINCT socio, mes_fecha
-        FROM #detalleCarga
-    )
-    INSERT INTO ddbba.factura (
-        ID_socio,
-        fechaEmision,
-        mesFacturado,
-        fechaVencimiento,
-        fecha2Vencimiento,
-        totalNeto,
-        estadoFactura
-    )
-    SELECT
-        fa.socio,
-        DATEFROMPARTS(2025, fa.mes_fecha, 1),
-        fa.mes_fecha,
-        DATEADD(DAY, 5, DATEFROMPARTS(2025, fa.mes_fecha, 1)),
-        DATEADD(DAY, 10, DATEFROMPARTS(2025, fa.mes_fecha, 1)),
-        0,
-        'I'
-    FROM FacturasAgrupadas fa;
-
-    SELECT 
-        f.codFactura,
-        dc.*
-    INTO #detalleExpandida
-    FROM #detalleCarga dc
-    JOIN ddbba.factura f
-        ON f.mesFacturado = dc.mes_fecha
-       AND f.ID_socio = dc.socio
-       AND f.estadoFactura = 'I';
-
-    INSERT INTO ddbba.detalleFactura (
-        codFactura,
-        concepto,
-        monto,
-        descuento,
-        recargoMorosidad,
-        idCuotaCatSocio
-    )
-    SELECT
-        d.codFactura,
-        'Membresía Categoría',
-        d.costoMembresia,
-        CASE WHEN s.codGrupoFamiliar IS NOT NULL THEN d.costoMembresia * 0.15 ELSE 0 END,
-        0,
-        d.categoria
-    FROM (
-        SELECT DISTINCT codFactura, socio, categoria, costoMembresia
-        FROM #detalleExpandida
-    ) d
-    JOIN ddbba.Socio s ON s.ID_socio = d.socio;
-
-    ;WITH ActividadesPorSocio AS (
-        SELECT socio, mes_fecha, COUNT(DISTINCT actividad) AS cant
-        FROM #detalleCarga
-        GROUP BY socio, mes_fecha
-    )
-    INSERT INTO ddbba.detalleFactura (
-        codFactura,
-        concepto,
-        monto,
-        descuento,
-        recargoMorosidad,
-        idCuotaAct
-    )
-    SELECT
-        d.codFactura,
-        'Actividad ' + CAST(d.actividad AS VARCHAR),
-        d.costoActividadIndividual,
-        CASE WHEN a.cant > 1 THEN d.costoActividadIndividual * 0.10 ELSE 0 END,
-        0,
-        d.actividad
-    FROM #detalleExpandida d
-    JOIN ActividadesPorSocio a
-        ON d.socio = a.socio AND d.mes_fecha = a.mes_fecha;
-
-    UPDATE f
-    SET totalNeto = df.total
-    FROM ddbba.factura f
-    JOIN (
-        SELECT codFactura, SUM(monto - descuento + recargoMorosidad) AS total
-        FROM ddbba.detalleFactura
-        GROUP BY codFactura
-    ) df ON f.codFactura = df.codFactura;
-
-    DROP TABLE #detalleCarga;
-    DROP TABLE #detalleExpandida;
-
-    PRINT 'Carga finalizada correctamente';
-END;
-GO
-*/
 -------------------------------------------------------------------------------------------------
 --Reporte 3:  cantidad de socios que han realizado alguna actividad de forma alternada(inasistencias)
 CREATE OR ALTER PROCEDURE ddbba.reporteInasistenciasAlternadas
@@ -346,7 +222,7 @@ BEGIN
             df.monto - df.descuento AS MontoConDescuento
         FROM ddbba.detalleFactura df
         JOIN ddbba.factura f ON f.codFactura = df.codFactura
-        JOIN ddbba.cuota_mensual_actividad cma ON cma.ID_socio = df.ID_socio
+        JOIN ddbba.cuotaMensualActividad cma ON cma.ID_socio = df.ID_socio
         JOIN ddbba.actDeportiva ad ON ad.codAct = cma.codAct
         WHERE MONTH(cma.fechaGeneracion) = f.mesFacturado
     )
@@ -384,10 +260,10 @@ BEGIN
 
     DECLARE @fechaFactura DATE = DATEFROMPARTS(2025, @mes, 1);
 
-    DELETE FROM ddbba.cuota_mensual_membresia_categoria WHERE MONTH(fechaGeneracion) = @mes;
-    DELETE FROM ddbba.cuota_mensual_actividad WHERE MONTH(fechaGeneracion) = @mes;
+    DELETE FROM ddbba.cuotaMensualCategoria WHERE MONTH(fechaGeneracion) = @mes;
+    DELETE FROM ddbba.cuotaMensualActividad WHERE MONTH(fechaGeneracion) = @mes;
 
-    INSERT INTO ddbba.cuota_mensual_membresia_categoria (
+    INSERT INTO ddbba.cuotaMensualCategoria (
         ID_socio, codCat, precio_bruto, descuento_aplicado, fechaGeneracion
     )
     SELECT 
@@ -402,7 +278,7 @@ BEGIN
     FROM ddbba.socio s
     CROSS APPLY (
         SELECT TOP 1 *
-        FROM ddbba.CuotaCatSocio t
+        FROM ddbba.TarifarioCatSocio t
         WHERE t.catSocio = s.codCat
           AND t.fechaVigenciaHasta >= @fechaFactura
         ORDER BY t.fechaVigenciaHasta
@@ -426,7 +302,7 @@ BEGIN
         FROM actividades_presentes
         GROUP BY socio
     )
-    INSERT INTO ddbba.cuota_mensual_actividad (ID_socio, codAct, precio_bruto, descuento_aplicado, fechaGeneracion)
+    INSERT INTO ddbba.cuotaMensualActividad (ID_socio, codAct, precio_bruto, descuento_aplicado, fechaGeneracion)
     SELECT 
         ap.socio,
         ap.act,
@@ -440,7 +316,7 @@ BEGIN
     JOIN cantidad_actividades ca ON ca.socio = ap.socio
     CROSS APPLY (
         SELECT TOP 1 *
-        FROM ddbba.CuotaActividad t
+        FROM ddbba.TarifarioActividad t
         WHERE t.codAct = ap.act
           AND t.fechaVigenciaHasta >= @fechaFactura
         ORDER BY t.fechaVigenciaHasta
@@ -451,7 +327,7 @@ END;
 GO
 
 
-CREATE OR ALTER PROCEDURE ddbba.GenerarDetalleFacturaFamiliar
+CREATE OR ALTER PROCEDURE ddbba.GenerarDetalleFactura
     @mes INT
 AS
 BEGIN
@@ -470,7 +346,7 @@ BEGIN
         cmmc.descuento_aplicado,
 		s.ID_socio
     FROM ddbba.socio s
-    JOIN ddbba.cuota_mensual_membresia_categoria cmmc ON cmmc.ID_socio = s.ID_socio
+    JOIN ddbba.cuotaMensualCategoria cmmc ON cmmc.ID_socio = s.ID_socio
     JOIN ddbba.catSocio cs ON cs.codCat = s.codCat
     WHERE MONTH(cmmc.fechaGeneracion) = @mes;
 
@@ -482,7 +358,7 @@ BEGIN
         cma.descuento_aplicado,
 		s.ID_socio
     FROM ddbba.socio s
-    JOIN ddbba.cuota_mensual_actividad cma ON cma.ID_socio = s.ID_socio
+    JOIN ddbba.cuotaMensualActividad cma ON cma.ID_socio = s.ID_socio
     JOIN ddbba.actDeportiva ad ON ad.codAct = cma.codAct
     WHERE MONTH(cma.fechaGeneracion) = @mes;
 
@@ -490,7 +366,7 @@ BEGIN
 END;
 GO
 
-CREATE OR ALTER PROCEDURE ddbba.GenerarFacturasMensualesConsolidadas
+CREATE OR ALTER PROCEDURE ddbba.GenerarFacturasMensuales
     @mes INT
 AS
 BEGIN
@@ -559,6 +435,62 @@ JOIN ddbba.pagoFactura p
     AND f.totalNeto = p.montoTotal
     AND f.mesFacturado = MONTH(p.Fecha_Pago)
 WHERE f.idPago IS NULL;*/
+
+--SP PARA LLENAR PASES PILETA
+CREATE OR ALTER PROCEDURE ddbba.InsertarPasesPileta
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    IF OBJECT_ID('tempdb..#pases_temp') IS NOT NULL
+        DROP TABLE #pases_temp;
+
+    CREATE TABLE #pases_temp (
+        tipo VARCHAR(10),
+        fechaDesde DATE,
+        fechaHasta DATE,
+        idSocio INT
+    );
+
+    INSERT INTO #pases_temp (tipo, fechaDesde, fechaHasta, idSocio)
+    VALUES
+        ('día', '2025-01-20', '2025-01-20', 5),
+        ('día', '2025-02-28', '2025-02-28', 12),
+        ('día', '2025-02-28', '2025-02-28', 50),
+        ('día', '2025-01-15', '2025-01-15', 87),
+        ('día', '2025-02-10', '2025-02-10', 119),
+        ('mes', '2025-01-01', '2025-01-31', 11),
+        ('mes', '2025-02-01', '2025-02-28', 17);
+
+    INSERT INTO ddbba.pasePileta (tipo, fechaDesde, fechaHasta, idSocio, codCostoPileta)
+    SELECT 
+		p.tipo,
+        p.fechaDesde,
+        p.fechaHasta,
+        p.idSocio,
+        cp.codCostoPileta
+    FROM #pases_temp p
+    JOIN ddbba.socio s ON s.ID_socio = p.idSocio
+    JOIN ddbba.catSocio cs ON cs.codCat = s.codCat
+    OUTER APPLY (
+        SELECT TOP 1 cp.codCostoPileta
+        FROM ddbba.costoPileta cp
+        WHERE cp.tipo COLLATE Modern_Spanish_CI_AS = p.tipo COLLATE Modern_Spanish_CI_AS
+          AND cp.categoria COLLATE Modern_Spanish_CI_AS = 
+                CASE 
+                    WHEN cs.nombreCat COLLATE Modern_Spanish_CI_AS LIKE '%menor%' THEN 'menor'
+                    ELSE 'adulto'
+                END
+          AND cp.fechaVigenciaHasta >= p.fechaDesde
+        ORDER BY cp.fechaVigenciaHasta ASC
+    ) cp;
+
+    DROP TABLE #pases_temp;
+
+    PRINT 'Pases de pileta insertados correctamente con codCostoPileta calculado.';
+END;
+GO
+
 
 --SP DETALLES DE FACTURA PASE PILETA SOCIOS
 CREATE OR ALTER PROCEDURE ddbba.GenerarDetallePasePileta
@@ -631,9 +563,6 @@ BEGIN
     WHERE rango.dia IN (SELECT fecha FROM #dias_lluvia)
       AND df.concepto LIKE '%pileta%'
     GROUP BY df.codDetalleFac, df.ID_socio, p.fechaDesde, p.fechaHasta, df.monto;
-
-    -- Depuración: Mostrar los que cumplen condición
-    SELECT * FROM #reintegros_detectados;
 
     -- Paso 4: Generar reintegros
     INSERT INTO ddbba.pagoCuenta (monto, cuenta, detalleFactura)
