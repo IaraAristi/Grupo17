@@ -30,16 +30,9 @@ INSERT INTO ddbba.socio (
 VALUES
 ('SN-5002', '39002137', 'Pedro', 'Gómez', 11206365, 'pedro@mail.com', '1975-03-10', 1166667777, 'Omint', 'SS85', '11-2344-4466', 'A');
 
--- Juan Pérez (34 años) - Adulto
-UPDATE ddbba.socio SET codCat = 2 WHERE nroSocio = 'SN-5000';
 
--- María López (28 años) - Adulto
-UPDATE ddbba.socio SET codCat = 2 WHERE nroSocio = 'SN-5011';
-
--- Pedro Gómez (48 años) - Adulto
-UPDATE ddbba.socio SET codCat = 2 WHERE nroSocio = 'SN-5002';
-
-
+-- le inserto unos valores a registroMoroso
+a los 3 socios que agregue
 INSERT INTO ddbba.registroMoroso (montoAdeudado, fechaMorosidad, mesAdeudado, mesAplicado, socio)
 VALUES
 (1500, '2025-02-01', 1, 2, 154),
