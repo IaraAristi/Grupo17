@@ -2,8 +2,7 @@ Use Com2900G17;
 -- ========================================
 -- SCRIPT DE TESTING PARA sp_MorososRecurrentes
 -- ========================================
--- CARGA DE DATOS FICTICIOS
--- ========================================
+
 -- Insertar socios
 
 INSERT INTO ddbba.socio (
