@@ -352,8 +352,8 @@ IF NOT EXISTS (
 BEGIN
     CREATE TABLE ddbba.costoPileta (
         codCostoPileta INT IDENTITY(1,1) PRIMARY KEY,
-        costo DECIMAL(8,2),
-        tipo VARCHAR(9),
+        costo DECIMAL(9,2),
+        tipo VARCHAR(10),
         categoria VARCHAR(6), 
         fechaVigenciaHasta DATE
     );

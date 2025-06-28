@@ -679,16 +679,27 @@ BEGIN
     ';
     EXEC sp_executesql @sql;
 
-    INSERT INTO ddbba.costoPileta (costo, tipo, categoria, fechaVigenciaHasta)
-    SELECT
-        TRY_CAST(LTRIM(RTRIM(costo)) AS DECIMAL(8,2)),
-        LTRIM(RTRIM(tipo)),
-        LTRIM(RTRIM(categoria)),
-        TRY_CONVERT(DATE, LTRIM(RTRIM(fechaVigenciaHasta)), 101)
-    FROM #costoPileta_temp
-    WHERE 
-        TRY_CAST(costo AS DECIMAL(8,2)) IS NOT NULL AND
-        TRY_CONVERT(DATE, fechaVigenciaHasta, 101) IS NOT NULL;
+
+		INSERT INTO ddbba.costoPileta (costo, tipo, categoria, fechaVigenciaHasta)
+	SELECT
+		TRY_CAST(LTRIM(RTRIM(costo)) AS DECIMAL(9,2)),
+		LTRIM(RTRIM(tipo)),
+		LTRIM(RTRIM(categoria)),
+		TRY_CONVERT(DATE, LTRIM(RTRIM(fechaVigenciaHasta)), 101)
+	FROM #costoPileta_temp AS t
+	WHERE 
+		TRY_CAST(costo AS DECIMAL(9,2)) IS NOT NULL AND
+		TRY_CONVERT(DATE, fechaVigenciaHasta, 101) IS NOT NULL AND
+		NOT EXISTS (
+			SELECT 1 FROM ddbba.costoPileta AS c
+			WHERE
+				c.costo = TRY_CAST(LTRIM(RTRIM(t.costo)) AS DECIMAL(9,2))
+				AND c.tipo = LTRIM(RTRIM(t.tipo))
+				AND c.categoria = LTRIM(RTRIM(t.categoria))
+				AND c.fechaVigenciaHasta = TRY_CONVERT(DATE, LTRIM(RTRIM(t.fechaVigenciaHasta)), 101)
+		)
+
+
 
     DROP TABLE #costoPileta_temp;
 END;
