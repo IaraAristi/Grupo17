@@ -87,6 +87,12 @@ GO
 USE Com2900G17
 GO
 
+
+-- creacion schema tesoreria
+IF NOT EXISTS (SELECT * FROM sys.schemas WHERE name = 'tesoreria')
+    EXEC('CREATE SCHEMA tesoreria AUTHORIZATION dbo');
+
+
 IF DATABASE_PRINCIPAL_ID('Jefe_Tesoreria') IS NULL
     CREATE USER user_Jefe_Tesoreria FOR LOGIN Jefe_Tesoreria WITH DEFAULT_SCHEMA = tesoreria;
 
@@ -98,12 +104,23 @@ IF DATABASE_PRINCIPAL_ID('Administrativo_Morosidad') IS NULL
 
 IF DATABASE_PRINCIPAL_ID('Administrativo_Facturacion') IS NULL
     CREATE USER user_Administrativo_Facturacion FOR LOGIN Administrativo_Facturacion WITH DEFAULT_SCHEMA = tesoreria;
+
+	-- creacion schema socio
+IF NOT EXISTS (SELECT * FROM sys.schemas WHERE name = 'socios')
+    EXEC('CREATE SCHEMA socios AUTHORIZATION dbo');
+
+
 	
 IF DATABASE_PRINCIPAL_ID('Administrativo_Socio') IS NULL
     CREATE USER user_Administrativo_Socio FOR LOGIN Administrativo_Socio WITH DEFAULT_SCHEMA = socios;
 
 IF DATABASE_PRINCIPAL_ID('Socios_Web') IS NULL
     CREATE USER user_Socios_Web FOR LOGIN Socios_Web WITH DEFAULT_SCHEMA = socios;
+
+	--crear schema autoridades
+IF NOT EXISTS (SELECT * FROM sys.schemas WHERE name = 'autoridades')
+    EXEC('CREATE SCHEMA autoridades AUTHORIZATION dbo');
+
 
 IF DATABASE_PRINCIPAL_ID('Presidente') IS NULL
     CREATE USER user_Presidente FOR LOGIN Presidente WITH DEFAULT_SCHEMA = autoridades;
@@ -135,7 +152,7 @@ IF DATABASE_PRINCIPAL_ID('rol_Administrativo_Socio') IS NULL
     CREATE ROLE rol_Administrativo_Socio AUTHORIZATION dbo;
 
 IF DATABASE_PRINCIPAL_ID('rol_Socios_Web') IS NULL
-    CREATE ROLE rol_Socios_Web AUTHORIZATION Administrativo_Socio;
+    CREATE ROLE rol_Socios_Web AUTHORIZATION user_Administrativo_Socio;
 
 IF DATABASE_PRINCIPAL_ID('rol_Presidente') IS NULL
     CREATE ROLE rol_Presidente AUTHORIZATION dbo;
@@ -162,3 +179,54 @@ ALTER ROLE rol_Presidente ADD MEMBER user_Presidente;
 ALTER ROLE rol_Vicepresidente ADD MEMBER user_Vicepresidente;
 ALTER ROLE rol_Secretario ADD MEMBER user_Secretario;
 ALTER ROLE rol_Vocales ADD MEMBER user_Vocales;
+
+--Permisos 
+
+	--tesoreria
+GRANT CONTROL ON SCHEMA:: tesoreria TO rol_Jefe_Tesoreria;
+
+	--administrativo cobranza 
+GRANT SELECT ON SCHEMA::tesoreria TO rol_Administrativo_Cobranza;
+GRANT UPDATE ON SCHEMA::tesoreria TO rol_Administrativo_Cobranza;
+
+--GRANT SELECT ON socios.socio TO rol_Administrativo_Cobranza;
+--GRANT SELECT ON socios.cuenta TO rol_Administrativo_Cobranza; -- ver
+--GRANT EXECUTE ON SCHEMA::reportes TO rol_Administrativo_Cobranza;
+
+	--administrativo morosidad
+GRANT SELECT ON SCHEMA::tesoreria TO rol_Administrativo_Morosidad;
+GRANT UPDATE ON SCHEMA::tesoreria TO rol_Administrativo_Morosidad;
+--GRANT SELECT ON socios.socio TO rol_Administrativo_Morosidad;
+
+	--administrativo de facturacion
+GRANT SELECT ON SCHEMA::tesoreria TO rol_Administrativo_Facturacion;
+GRANT UPDATE ON SCHEMA::tesoreria TO rol_Administrativo_Cobranza;
+
+	--administrativo socio
+GRANT CONTROL ON SCHEMA::socios TO rol_Administrativo_Socio;
+GRANT UPDATE ON SCHEMA::socios TO rol_Administrativo_Socio;
+	--socio web
+GRANT SELECT ON SCHEMA::socios TO rol_Socios_Web;
+
+	--presidente
+GRANT CONTROL ON SCHEMA::autoridades TO rol_Presidente;
+GRANT SELECT ON SCHEMA::socios TO rol_Presidente;
+GRANT SELECT ON SCHEMA::tesoreria TO rol_Presidente;
+
+	--vice presidente
+GRANT SELECT ON SCHEMA::autoridades TO rol_Vicepresidente;
+GRANT UPDATE ON SCHEMA::autoridades TO rol_Vicepresidente;
+GRANT SELECT ON SCHEMA::socios TO rol_Vicepresidente;
+GRANT SELECT ON SCHEMA::tesoreria TO rol_Vicepresidente;
+
+	--secretario
+GRANT SELECT ON SCHEMA::autoridades TO rol_Secretario;
+GRANT SELECT ON SCHEMA::socios TO rol_Secretario;
+GRANT SELECT ON SCHEMA::tesoreria TO rol_Secretario;
+
+	--vocales
+GRANT SELECT ON SCHEMA::autoridades TO rol_Vocales;
+GRANT SELECT ON SCHEMA::socios TO rol_Vocales;
+GRANT SELECT ON SCHEMA::tesoreria TO rol_Vocales;
+
+
