@@ -352,8 +352,8 @@ IF NOT EXISTS (
 BEGIN
     CREATE TABLE ddbba.costoPileta (
         codCostoPileta INT IDENTITY(1,1) PRIMARY KEY,
-        costo DECIMAL(9,2),
-        tipo VARCHAR(10),
+        costo DECIMAL(10,2),
+        tipo VARCHAR(9),
         categoria VARCHAR(6), 
         fechaVigenciaHasta DATE
     );
@@ -477,5 +477,21 @@ BEGIN
         fechaGeneracion DATE NOT NULL,
         CONSTRAINT FK_cuotaActividad_socio FOREIGN KEY (ID_socio) REFERENCES ddbba.socio(ID_socio),
         CONSTRAINT FK_cuotaActividad_actividad FOREIGN KEY (codAct) REFERENCES ddbba.actDeportiva(codAct)
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM sys.tables WHERE name = 'reembolso' AND schema_id = SCHEMA_ID('ddbba')
+)
+BEGIN
+    CREATE TABLE ddbba.reembolso (
+        codReembolso INT IDENTITY(1,1) PRIMARY KEY,
+		fecha DATE,
+		monto DECIMAL (9,2),
+		motivo VARCHAR (100)
+        ID_socio INT,
+        ID_pago INT,
+        CONSTRAINT FK_reembolso_socio FOREIGN KEY (ID_socio) REFERENCES ddbba.socio(ID_socio),
+        CONSTRAINT FK_reembolso_pago FOREIGN KEY (ID_pago) REFERENCES ddbba.pagoFactura(codPago)
     );
 END;
