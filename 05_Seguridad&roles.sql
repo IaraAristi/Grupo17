@@ -226,6 +226,8 @@ GRANT SELECT ON SCHEMA::socio TO rol_Vocales;
 GRANT SELECT ON SCHEMA::tesoreria TO rol_Vocales;
 
 -- creacion de tabla empleado
+DROP TABLE club.Empleado
+
 
 IF NOT EXISTS (
     SELECT * FROM INFORMATION_SCHEMA.TABLES 
@@ -283,6 +285,19 @@ VALUES (
     '12345678', 'Juan', 'Pérez', 1144556677, '1990-05-15', 1122334455
 );
 
+INSERT INTO club.Empleado (
+    dni, nombre, apellido, telContacto, fechaNac, telEmergencia
+)
+VALUES (
+    '87654321', 'Tomas', 'Lopardo', 998877665, '2003-12-07', 114488221
+);
+
+INSERT INTO club.Empleado (
+    dni, nombre, apellido, telContacto, fechaNac, telEmergencia
+)
+VALUES (
+    '87654322', 'Luana', 'Dominguez', 998877663, '2004-12-28', 114458221
+);
 
 SELECT 
     ID_socio,
@@ -293,6 +308,28 @@ SELECT
     fechaNac_enc,
     telEmergencia_enc
 FROM club.Empleado;
+
+
+-- desencriptacion
+CREATE OR ALTER PROCEDURE club.sp_DesencriptarEmpleado
+    @password NVARCHAR(100)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    UPDATE emp
+    SET 
+        nombre = CONVERT(VARCHAR(50), DECRYPTBYPASSPHRASE(@password, nombre_enc)),
+        apellido = CONVERT(VARCHAR(50), DECRYPTBYPASSPHRASE(@password, apellido_enc)),
+        dni = CONVERT(CHAR(8), DECRYPTBYPASSPHRASE(@password, dni_enc)),
+        fechaNac = CONVERT(DATE, CONVERT(VARCHAR(10), DECRYPTBYPASSPHRASE(@password, fechaNac_enc))),
+        telContacto = CAST(CONVERT(VARCHAR(20), DECRYPTBYPASSPHRASE(@password, telContacto_enc)) AS INT),
+        telEmergencia = CAST(CONVERT(VARCHAR(20), DECRYPTBYPASSPHRASE(@password, telEmergencia_enc)) AS INT)
+    FROM club.Empleado emp;
+END;
+GO
+
+
 
 
 
