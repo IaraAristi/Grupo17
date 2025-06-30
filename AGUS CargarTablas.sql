@@ -262,7 +262,7 @@ BEGIN
 
     DELETE FROM ddbba.cuotaMensualCategoria WHERE MONTH(fechaGeneracion) = @mes;
     DELETE FROM ddbba.cuotaMensualActividad WHERE MONTH(fechaGeneracion) = @mes;
-
+	
     INSERT INTO ddbba.cuotaMensualCategoria (
         ID_socio, codCat, precio_bruto, descuento_aplicado, fechaGeneracion
     )
@@ -583,3 +583,40 @@ BEGIN
 END;
 GO
 
+--SP PARA CARGAR REEMBOLSOS
+CREATE OR ALTER PROCEDURE ddbba.InsertarReembolso
+    @codPago INT,
+    @motivo VARCHAR(100)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    DECLARE @ID_socio INT;
+    DECLARE @monto DECIMAL(9,2);
+
+    -- Buscar datos en pagoFactura
+    SELECT 
+        @ID_socio = codSocio,
+        @monto = montoTotal
+    FROM ddbba.pagoFactura
+    WHERE codPago = @codPago;
+
+    -- Insertar en reembolso
+    INSERT INTO ddbba.reembolso (
+        fecha,
+        monto,
+        motivo,
+        ID_socio,
+        ID_pago
+    )
+    VALUES (
+        GETDATE(),
+        @monto,
+        @motivo,
+        @ID_socio,
+        @codPago
+    );
+
+    PRINT 'Reembolso registrado correctamente.';
+END;
+GO
