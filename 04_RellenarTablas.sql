@@ -75,43 +75,26 @@ INSERT INTO socio.inscripcion (fecha, hora) VALUES
 ('2025-02-18', '18:00'),
 ('2025-02-19', '19:00');
 
-
 SELECT* FROM socio.inscripcion
 GO
+
 --------------------------------------------------
+
 EXEC socio.AsignarInscripcionesASocios
 
 SELECT *FROM socio.socio
+
 ---------------------------------------------------
 
 EXEC socio.ActualizarCategoriaSociosPorEdad
 GO
+
 -------------------------------------------------
+
 EXEC socio.ActualizarGrupoFamiliarResponsables
 GO
+
 -----------------------------------------------------
-
-DECLARE @mes INT = 1;
-DECLARE @anio INT = 2025;
-
-WHILE @mes <= 3
-BEGIN
-    EXEC tesoreria.GenerarCuotasMensuales @mes, @anio;
-    EXEC tesoreria.GenerarDetalleFactura @mes, @anio;
-    EXEC tesoreria.GenerarFacturasMensuales @mes, @anio;
-
-    SET @mes = @mes + 1;
-END;
-
-
-
-select * from tesoreria.cuotaMensualActividad
-select * from tesoreria.cuotaMensualCategoria
-
-select * from tesoreria.detalleFactura
-
-SELECT * from tesoreria.Factura
------------------------------------------------------------
 
 INSERT INTO club.pasePileta (tipo, fechaDesde, fechaHasta, idSocio)
 VALUES
@@ -127,21 +110,67 @@ EXEC club.AsignarCostoPiletaAPases --agrega el cod del costo del pase de pileta
 
 SELECT * FROM club.pasePileta
 --------------------------------------------------------
-EXEC tesoreria.GenerarDetallePasePileta
-	@mes = 2,
+
+INSERT INTO club.costoColonia (costo, fechaVigenciaHasta, turno) VALUES
+(3000, '2025-02-28', 'mañana'),
+(3000, '2025-02-28', 'tarde'),
+(5000, '2025-02-28', 'doble');
+
+INSERT INTO club.coloniaVerano (mes, turno, socio) VALUES
+(1, 'mañana', 130),
+(1, 'tarde', 121),
+(2, 'doble', 124);
+
+EXEC club.AsignarCostoColonia
+	@mes = 1,
 	@anio = 2025
 
-SELECT * FROM tesoreria.detalleFactura WHERE concepto LIKE 'Pase pileta%'
+SELECT * FROM club.coloniaVerano
 
+---------------------------------------------
 
-SELECT * FROM tesoreria.factura WHERE mesFacturado = 2
-SELECT * FROM tesoreria.detalleFactura WHERE concepto LIKE 'Pase pileta%'
+INSERT INTO club.costoSUM (costo, fechaVigenciaHasta) VALUES
+(1000, '2025-06-30');
 
--------------------------------------------------------------------------------
+INSERT INTO club.alquilerSUM (fecha, turno, socio) VALUES
+('2025-03-03', 'mañana', 100),
+('2025-04-03', 'noche', 10);
+
+EXEC club.AsignarCostoSUM
+	@mes = 3,
+	@anio = 2025
+
+SELECT * FROM club.alquilerSUM
+
+-----------------------------------------------
+
+DECLARE @mes INT = 1;
+DECLARE @anio INT = 2025;
+
+WHILE @mes <= 3
+BEGIN
+    EXEC tesoreria.GenerarCuotasMensuales @mes, @anio;
+    EXEC tesoreria.GenerarDetalleFactura @mes, @anio;
+    EXEC tesoreria.GenerarFacturasMensuales @mes, @anio,
+	EXEC tesoreria.GenerarDetallePasePileta @mes, @anio,
+	EXEC tesoreria.GenerarDetalleFacturaColonia @mes, @anio,
+	EXEC tesoreria.GenerarDetalleFacturaSUM @mes, @anio
+
+    SET @mes = @mes + 1;
+END;
+
+select * from tesoreria.cuotaMensualActividad
+select * from tesoreria.cuotaMensualCategoria
+select * from tesoreria.detalleFactura
+SELECT * from tesoreria.Factura
+
+-----------------------------------------------------------------
+
 EXEC tesoreria.GenerarReintegrosPiletaPorLluvia
 
 SELECT * FROM tesoreria.pagoCuenta
 SELECT * FROM socio.cuenta
+
 -------------------------------------------------------------
 
 INSERT INTO club.invitado (nombre, apellido, fechaNac, dni, mail) VALUES
@@ -164,7 +193,9 @@ SELECT * FROM club.ingresoPiletaInvitado
 
 EXEC tesoreria.GenerarFacturasInvitados
 SELECT * FROM tesoreria.facturaInvitado
+
 ---------------------------------------
+
 EXEC tesoreria.InsertarReembolso
 	@codPago = 1,
 	@motivo = 'error en facturacion'

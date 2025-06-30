@@ -197,6 +197,7 @@ TABLE_SCHEMA =
 BEGIN
 CREATE TABLE club.costoColonia (
     codCostoColonia INT IDENTITY(1,1) PRIMARY KEY,
+	turno VARCHAR(6),
     costo DECIMAL(8,2),
     fechaVigenciaHasta DATE
 );
@@ -210,8 +211,8 @@ TABLE_SCHEMA =
 BEGIN
 CREATE TABLE club.coloniaVerano (
     codColonia INT IDENTITY(1,1) PRIMARY KEY,
-    fechaDesde DATE,
-	FechaHasta DATE,
+    mes INT,
+	turno VARCHAR (6),
     socio INT,
     codCostoColonia INT,
     CONSTRAINT FK_coloniaVerano_socio FOREIGN KEY (socio) REFERENCES socio.socio(ID_socio),
@@ -241,7 +242,7 @@ BEGIN
 CREATE TABLE club.alquilerSUM (
     codAlquilerSum INT IDENTITY(1,1) PRIMARY KEY,
     fecha DATE,
-    horario TIME,
+    turno VARCHAR(6),
     socio INT,
     codCostoSUM INT,
     CONSTRAINT FK_alquilerSUM_socio FOREIGN KEY (socio) REFERENCES socio.socio(ID_socio),

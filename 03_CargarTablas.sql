@@ -585,3 +585,102 @@ BEGIN
 END;
 GO
 
+--SP asignar cod costo colonia
+CREATE OR ALTER PROCEDURE club.AsignarCostoColonia
+	@mes INT,
+    @anio INT
+AS
+BEGIN
+    DECLARE @fecha DATE = DATEFROMPARTS(@anio, @mes, 1);
+
+    UPDATE c
+    SET c.codCostoColonia = cc.codCostoColonia
+    FROM club.coloniaVerano c
+    JOIN club.costoColonia cc ON
+        cc.turno COLLATE Modern_Spanish_CI_AS = c.turno COLLATE Modern_Spanish_CI_AS
+        AND cc.fechaVigenciaHasta >= @fecha
+    WHERE c.codCostoColonia IS NULL;
+END;
+GO
+
+
+-- SP para generar detalles de factura por colonia
+CREATE OR ALTER PROCEDURE tesoreria.GenerarDetalleFacturaColonia
+    @mes INT,
+    @anio INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    INSERT INTO tesoreria.detalleFactura (
+        ID_socio,
+        concepto,
+        monto,
+		descuento
+    )
+    SELECT 
+        c.socio,
+        CONCAT('Colonia de verano - Turno ', c.turno),
+        cc.costo,
+		0
+    FROM club.coloniaVerano c
+    JOIN club.costoColonia cc ON cc.codCostoColonia = c.codCostoColonia
+    WHERE c.mes = @mes
+      AND NOT EXISTS (
+            SELECT 1
+            FROM tesoreria.detalleFactura df
+            WHERE df.ID_socio = c.socio
+              AND df.concepto LIKE CONCAT('Colonia de verano%', c.turno)
+        );
+END;
+GO
+
+--SP cod costo sum
+CREATE OR ALTER PROCEDURE club.AsignarCostoSUM
+	@mes INT,
+    @anio INT
+AS
+BEGIN
+    DECLARE @fecha DATE = DATEFROMPARTS(@anio, @mes, 1);
+
+    UPDATE a
+    SET a.codCostoSUM = cs.codCostoSUM
+    FROM club.alquilerSUM a
+    JOIN club.costoSUM cs ON cs.fechaVigenciaHasta >= @fecha
+    WHERE a.codCostoSUM IS NULL;
+END;
+GO
+
+
+-- SP para generar detalles de factura por alquiler del SUM
+CREATE OR ALTER PROCEDURE tesoreria.GenerarDetalleFacturaSUM
+    @mes INT,
+    @anio INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    INSERT INTO tesoreria.detalleFactura (
+        ID_socio,
+        concepto,
+        monto,
+		descuento
+    )
+    SELECT 
+        a.socio,
+        CONCAT('Alquiler SUM - ', a.turno, ' - ', FORMAT(a.fecha, 'yyyy-MM-dd')),
+        cs.costo,
+		0
+    FROM club.alquilerSUM a
+    JOIN club.costoSUM cs ON cs.codCostoSUM = a.codCostoSUM
+    WHERE MONTH(a.fecha) = @mes AND YEAR(a.fecha) = @anio
+      AND NOT EXISTS (
+            SELECT 1
+            FROM tesoreria.detalleFactura df
+            WHERE df.ID_socio = a.socio
+              AND df.concepto LIKE CONCAT('Alquiler SUM - ', a.turno, ' - ', FORMAT(a.fecha, 'yyyy-MM-dd'))
+        );
+END;
+GO
+
+
