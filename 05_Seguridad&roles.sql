@@ -225,4 +225,76 @@ GRANT SELECT ON SCHEMA::club TO rol_Vocales;
 GRANT SELECT ON SCHEMA::socio TO rol_Vocales;
 GRANT SELECT ON SCHEMA::tesoreria TO rol_Vocales;
 
+-- creacion de tabla empleado
+
+IF NOT EXISTS (
+    SELECT * FROM INFORMATION_SCHEMA.TABLES 
+    WHERE TABLE_SCHEMA = 'club' AND TABLE_NAME = 'Empleado'
+)
+BEGIN
+    CREATE TABLE club.Empleado (
+        ID_socio INT IDENTITY(1,1) PRIMARY KEY,
+        dni CHAR(8) UNIQUE,
+        nombre VARCHAR(50),
+        apellido VARCHAR(50),
+        telContacto INT,
+        fechaNac DATE,
+        telEmergencia INT,
+
+        -- Campos duplicados encriptados
+        dni_enc VARBINARY(256),
+        nombre_enc VARBINARY(256),
+        apellido_enc VARBINARY(256),
+        telContacto_enc VARBINARY(256),
+        fechaNac_enc VARBINARY(256),
+        telEmergencia_enc VARBINARY(256)
+    );
+END;
+GO
+
+IF EXISTS (SELECT 1 FROM sys.triggers WHERE name = 'trigger_encriptacion_empleado')
+    DROP TRIGGER club.trigger_encriptacion_empleado;
+GO
+
+CREATE TRIGGER club.trigger_encriptacion_empleado
+ON club.Empleado
+AFTER INSERT
+AS
+BEGIN
+    DECLARE @password VARCHAR(50) = 'Hola123';
+
+    UPDATE emp
+    SET 
+        nombre_enc = ENCRYPTBYPASSPHRASE(@password, i.nombre),
+        apellido_enc = ENCRYPTBYPASSPHRASE(@password, i.apellido),
+        dni_enc = ENCRYPTBYPASSPHRASE(@password, i.dni),
+        fechaNac_enc = ENCRYPTBYPASSPHRASE(@password, CONVERT(VARCHAR, i.fechaNac, 23)),
+        telContacto_enc = ENCRYPTBYPASSPHRASE(@password, CAST(i.telContacto AS VARCHAR)),
+        telEmergencia_enc = ENCRYPTBYPASSPHRASE(@password, CAST(i.telEmergencia AS VARCHAR))
+    FROM club.Empleado emp
+    INNER JOIN inserted i ON emp.ID_socio = i.ID_socio;
+END;
+GO
+-- probando que funcione
+INSERT INTO club.Empleado (
+    dni, nombre, apellido, telContacto, fechaNac, telEmergencia
+)
+VALUES (
+    '12345678', 'Juan', 'Pérez', 1144556677, '1990-05-15', 1122334455
+);
+
+
+SELECT 
+    ID_socio,
+    nombre_enc,
+    apellido_enc,
+    dni_enc,
+    telContacto_enc,
+    fechaNac_enc,
+    telEmergencia_enc
+FROM club.Empleado;
+
+
+
+
 
