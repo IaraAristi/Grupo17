@@ -2,6 +2,38 @@
 Use Com2900G17;
 GO
 
+--LOTE DE DATOS DE SOCIOS FICTICIOS PARA PROBAR EL REPORTE1:MOROSIDAD
+
+INSERT INTO socio.socio (
+    nroSocio, dni, nombre, apellido, telContacto, email, fechaNac,
+    telEmergencia, nombreObraSoc, numeroObraSoc, telObraSoc, estado
+)
+VALUES
+('SN-5000', '33456456', 'Juan', 'Pérez', 11345678, 'juan@mail.com', '1990-01-01', 1120639585, 'Osde', 'SS83', '4802-0022', 'A'),
+('SN-5011', '33456900', 'María', 'López', 11206365, 'maria@mail.com', '1995-05-05', 1144445555, 'Osdepym', 'SS84', '11-2344-4444', 'A'),
+('SN-5002', '39002137', 'Pedro', 'Gómez', 11206365, 'pedro@mail.com', '1975-03-10', 1166667777, 'Omint', 'SS85', '11-2344-4466', 'A');
+
+
+INSERT INTO club.Presentismo (fecha, presentismo, socio, act, profesor) VALUES
+('2025-01-10', 'P', 154, 1, 'Hector Alvarez'),
+('2025-02-15', 'P', 154, 1, 'Hector Alvarez'),
+('2025-03-10', 'P', 154, 1, 'Hector Alvarez'),
+('2025-04-12', 'P', 154, 1, 'Hector Alvarez'),
+('2025-05-08', 'P', 154, 1, 'Hector Alvarez'),
+
+('2025-01-12', 'P', 155, 3, 'Pablo Rodrigez'),
+('2025-02-17', 'P', 155, 3, 'Pablo Rodrigez'),
+('2025-03-14', 'P', 155, 3, 'Pablo Rodrigez'),
+('2025-04-15', 'P', 155, 3, 'Pablo Rodrigez'),
+('2025-05-09', 'P', 155, 3, 'Pablo Rodrigez'),
+
+('2025-01-18', 'P', 156, 4, 'Paula Quiroga'),
+('2025-02-20', 'P', 156, 4, 'Paula Quiroga'),
+('2025-03-16', 'P', 156, 4, 'Paula Quiroga'),
+('2025-04-18', 'P', 156, 4, 'Paula Quiroga'),
+('2025-05-12', 'P', 156, 4, 'Paula Quiroga');
+
+--FIN LOTE DE DATOS DE SOCIOS FICTICIOS PARA PROBAR EL REPORTE1:MOROSIDAD
 
 --DATOS TUTOR
 INSERT INTO socio.tutor (nombre, apellido, dni, email, parentesco) VALUES
@@ -58,25 +90,27 @@ GO
 EXEC socio.ActualizarGrupoFamiliarResponsables
 GO
 -----------------------------------------------------
-EXEC tesoreria.GenerarCuotasMensuales
-	@mes = 3,
-	@anio = 2025
+
+DECLARE @mes INT = 1;
+DECLARE @anio INT = 2025;
+
+WHILE @mes <= 3
+BEGIN
+    EXEC tesoreria.GenerarCuotasMensuales @mes, @anio;
+    EXEC tesoreria.GenerarDetalleFactura @mes, @anio;
+    EXEC tesoreria.GenerarFacturasMensuales @mes, @anio;
+
+    SET @mes = @mes + 1;
+END;
+
+
 
 select * from tesoreria.cuotaMensualActividad
 select * from tesoreria.cuotaMensualCategoria
------------------------------------------------------------
-EXEC tesoreria.GenerarDetalleFactura
-	@mes = 3,
-	@anio = 2025
 
 select * from tesoreria.detalleFactura
----------------------------------------------------------
-EXEC tesoreria.GenerarFacturasMensuales
-	@mes = 3,
-	@anio = 2025
 
 SELECT * from tesoreria.Factura
-select * from tesoreria.detalleFactura
 -----------------------------------------------------------
 
 INSERT INTO club.pasePileta (tipo, fechaDesde, fechaHasta, idSocio)
@@ -99,9 +133,6 @@ EXEC tesoreria.GenerarDetallePasePileta
 
 SELECT * FROM tesoreria.detalleFactura WHERE concepto LIKE 'Pase pileta%'
 
-EXEC tesoreria.GenerarFacturasMensuales
-	@mes = 2,
-	@anio = 2025;
 
 SELECT * FROM tesoreria.factura WHERE mesFacturado = 2
 SELECT * FROM tesoreria.detalleFactura WHERE concepto LIKE 'Pase pileta%'
