@@ -2,16 +2,19 @@
 Use Com2900G17;
 GO
 
+
+--DATOS TUTOR
 INSERT INTO socio.tutor (nombre, apellido, dni, email, parentesco) VALUES
 ('Juan', 'Pérez', 25123456, 'juan.perez@email.com', 'padre'),
 ('María', 'Gómez', 27567890, 'maria.gomez@email.com', 'madre'),
 ('Carlos', 'López', 28444555, 'carlos.lopez@email.com', 'tutor'),
 ('Laura', 'Fernández', 29555111, 'laura.fernandez@email.com', 'madre'),
-('José', 'Martínez', 30666222, 'jose.martinez@email.com', 'padre'),
+('José', 'Martínez', 30666222, 'jose.martinez@email.com', 'padre')
 
 SELECT* FROM socio.Tutor
 
-INSERT INTO socio.socio ( --socios menores para asignarles tutores
+--DATOS SOCIOS MENORES DE EDAD, PARA PODER ASIGNARLES UN TUTOR
+INSERT INTO socio.socio (
     nroSocio, dni, nombre, apellido, fechaNac,
     telEmergencia, nombreObraSoc, numeroObraSoc, telObraSoc, estado, codTutor
 )
@@ -27,6 +30,7 @@ VALUES
 ('SN-4159', '47258779', 'Tomás', 'Molina', '2014-04-22',
  1133124571, 'Medife', '0005566778', '0116000555', 'A',5);
 
+--DATOS INSCRIPCION
 INSERT INTO socio.inscripcion (fecha, hora) VALUES
 ('2025-02-10', '10:00'),
 ('2025-02-11', '11:00'),
@@ -75,7 +79,7 @@ SELECT * from tesoreria.Factura
 select * from tesoreria.detalleFactura
 -----------------------------------------------------------
 
-INSERT INTO ddbba.pasePileta (tipo, fechaDesde, fechaHasta, idSocio)
+INSERT INTO club.pasePileta (tipo, fechaDesde, fechaHasta, idSocio)
 VALUES
     ('día', '2025-01-20', '2025-01-20', 5),
     ('día', '2025-02-28', '2025-02-28', 12),
@@ -85,7 +89,7 @@ VALUES
     ('mes', '2025-01-01', '2025-01-31', 11),
     ('mes', '2025-02-01', '2025-02-28', 17);
 
-EXEC club.InsertarPasesPileta --agrega el cod del costo del pase de pileta
+EXEC club.AsignarCostoPiletaAPases --agrega el cod del costo del pase de pileta
 
 SELECT * FROM club.pasePileta
 --------------------------------------------------------
@@ -101,6 +105,7 @@ EXEC tesoreria.GenerarFacturasMensuales
 
 SELECT * FROM tesoreria.factura WHERE mesFacturado = 2
 SELECT * FROM tesoreria.detalleFactura WHERE concepto LIKE 'Pase pileta%'
+
 -------------------------------------------------------------------------------
 EXEC tesoreria.GenerarReintegrosPiletaPorLluvia
 
@@ -127,7 +132,7 @@ EXEC club.AsignarCostoIngresoInvitados
 SELECT * FROM club.ingresoPiletaInvitado
 
 EXEC tesoreria.GenerarFacturasInvitados
-SELECT * FROM ddbba.facturaInvitado
+SELECT * FROM tesoreria.facturaInvitado
 ---------------------------------------
 EXEC tesoreria.InsertarReembolso
 	@codPago = 1,

@@ -428,7 +428,7 @@ TABLE_SCHEMA =
 BEGIN
 CREATE TABLE tesoreria.registroMoroso (
     codMorosidad INT IDENTITY(1,1) PRIMARY KEY,
-    montoAdeudado DECIMAL(8,2),
+    montoAdeudado DECIMAL(9,2),
     fechaMorosidad DATE,
     mesAdeudado INT,
     mesAplicado INT,
@@ -439,6 +439,7 @@ CREATE TABLE tesoreria.registroMoroso (
 );
 END
 GO
+
 
 IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE
 TABLE_SCHEMA =

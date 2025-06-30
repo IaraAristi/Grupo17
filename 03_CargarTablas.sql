@@ -115,6 +115,45 @@ BEGIN
 END;
 GO
 
+--Generar registro moroso
+CREATE OR ALTER PROCEDURE tesoreria.GenerarRegistroMoroso
+    @anio INT,
+    @mes INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    INSERT INTO tesoreria.registroMoroso (
+        montoAdeudado,
+        fechaMorosidad,
+        mesAdeudado,
+        mesAplicado,
+        socio,
+        codFactura
+    )
+    SELECT
+        f.totalNeto AS montoAdeudado,
+        f.fecha2Vencimiento AS fechaMorosidad,
+        f.mesFacturado AS mesAdeudado,
+        (f.mesFacturado + 1) AS mesAplicado,
+        f.ID_socio,
+        f.codFactura
+    FROM tesoreria.factura f
+    WHERE
+        f.estadoFactura = 'I'
+        AND f.mesFacturado <= @mes
+        AND YEAR(f.fechaEmision) = @anio
+        AND NOT EXISTS (
+            SELECT 1
+            FROM tesoreria.registroMoroso rm
+            WHERE rm.codFactura = f.codFactura
+        );
+
+    PRINT 'Registro de morosos generado correctamente.';
+END;
+GO
+
+
 --STORE PROCEDURES PARA DETALLE DE FACTURA Y FACTURA
 
 CREATE OR ALTER PROCEDURE tesoreria.GenerarCuotasMensuales

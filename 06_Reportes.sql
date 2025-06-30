@@ -58,6 +58,9 @@ BEGIN
 END;
 GO
 
+
+
+
 --Reporte 2: ingresos mensuales por actividad
 CREATE OR ALTER PROCEDURE reportes.Reporte_ingresos_por_actividad
 AS
