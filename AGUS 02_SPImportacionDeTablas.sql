@@ -4,7 +4,7 @@ USE Com2900G17
 GO
 
 -----------------------------
-CREATE OR ALTER PROCEDURE ddbba.InsertarCatSocio
+CREATE OR ALTER PROCEDURE importaciones.InsertarCatSocio
     @RutaArchivo VARCHAR(255)
 AS
 BEGIN
@@ -40,7 +40,7 @@ BEGIN
         );
 	'; EXEC (@sql);
 
-    INSERT INTO ddbba.catSocio (nombreCat, edad_desde, edad_hasta)
+    INSERT INTO club.catSocio (nombreCat, edad_desde, edad_hasta)
     SELECT DISTINCT
         LTRIM(RTRIM([Categoria socio])) AS nombreCat,
         CASE 
@@ -58,7 +58,7 @@ BEGIN
     FROM #cat_temp t
     WHERE NOT EXISTS (
         SELECT 1
-        FROM ddbba.catSocio c
+        FROM club.catSocio c
         WHERE c.nombreCat = LTRIM(RTRIM(t.[Categoria socio])) --esta es la comparación en la que, de ser necesario, si no cambiamos la collation nos devuelve error
     );
 
@@ -68,7 +68,7 @@ GO
 
 
 ---Levantar tabla RP
-CREATE OR ALTER PROCEDURE ddbba.ImportarSociosRP
+CREATE OR ALTER PROCEDURE importaciones.ImportarSociosRP
     @RutaArchivo NVARCHAR(255)
 AS
 BEGIN
@@ -153,12 +153,12 @@ BEGIN
 		WHERE o.rn > 1
 		   OR EXISTS (
 			   SELECT 1 
-			   FROM ddbba.socio s 
+			   FROM socio.socio s 
 			   WHERE s.dni = o.dni
 		   );
 		
         -- Insertar registros únicos en la tabla socio
-        INSERT INTO ddbba.socio (
+        INSERT INTO socio.socio (
             nroSocio, dni, nombre, apellido, telContacto, telEmergencia,
             email, fechaNac, nombreObraSoc, numeroObraSoc, telObraSoc,
             estado, codCat, codTutor, codInscripcion, codGrupoFamiliar
@@ -168,7 +168,7 @@ BEGIN
                'A', NULL, NULL, NULL, NULL
         FROM #ordenados_temp o
         WHERE o.rn = 1
-          AND NOT EXISTS (SELECT 1 FROM ddbba.socio s WHERE s.dni = o.dni);
+          AND NOT EXISTS (SELECT 1 FROM socio.socio s WHERE s.dni = o.dni);
 
         -- Mostrar los DNI duplicados
         --SELECT * FROM #socios_duplicados;
@@ -193,7 +193,7 @@ GO
 
 
 ------------------
-CREATE OR ALTER PROCEDURE ddbba.ImportarSociosConGrupoFamiliar
+CREATE OR ALTER PROCEDURE importaciones.ImportarSociosConGrupoFamiliar
     @RutaArchivo NVARCHAR(255)
 AS
 BEGIN
@@ -237,7 +237,7 @@ BEGIN
             FROM #socios_importar
             WHERE [ DNI] IS NOT NULL
         )
-        INSERT INTO ddbba.socio (
+        INSERT INTO socio.socio (
             nroSocio, dni, nombre, apellido, telContacto, email,
             fechaNac, telEmergencia, nombreObraSoc, numeroObraSoc,
             telObraSoc, estado, codCat, codTutor, codInscripcion, codGrupoFamiliar
@@ -259,7 +259,7 @@ BEGIN
             NULL,
             NULL,
             -- Subconsulta para obtener el ID_socio del grupo familiar a partir del nroSocio RP
-            (SELECT TOP 1 ID_socio FROM ddbba.socio WHERE nroSocio = LEFT(LTRIM(RTRIM([Nro de socio RP])), 9))
+            (SELECT TOP 1 ID_socio FROM socio.socio WHERE nroSocio = LEFT(LTRIM(RTRIM([Nro de socio RP])), 9))
         FROM primeros_por_rp
         WHERE rn = 1;
 
@@ -269,7 +269,7 @@ BEGIN
                    ROW_NUMBER() OVER (PARTITION BY [Nro de socio RP] ORDER BY [Nro de Socio]) AS rn
             FROM #socios_importar
         )
-        INSERT INTO ddbba.socio (
+        INSERT INTO socio.socio (
             nroSocio, dni, nombre, apellido, telContacto, email,
             fechaNac, telEmergencia, nombreObraSoc, numeroObraSoc,
             telObraSoc, estado, codCat, codTutor, codInscripcion, codGrupoFamiliar
@@ -289,7 +289,7 @@ BEGIN
             'A', NULL, NULL, NULL,
             s.ID_socio
         FROM datos_familiares f
-        JOIN ddbba.socio s
+        JOIN socio.socio s
           ON s.nroSocio = LEFT(LTRIM(RTRIM(f.[Nro de socio RP])), 9)
         WHERE f.rn > 1;
 
@@ -308,8 +308,8 @@ END;
 GO
 ---------------------------------------------------
 
-CREATE OR ALTER PROCEDURE ddbba.InsertarActividades
-    @rutaArchivo NVARCHAR(260)  -- Ejemplo: 'C:\ruta\actividades.csv'
+CREATE OR ALTER PROCEDURE importaciones.InsertarActividades
+    @rutaArchivo NVARCHAR(260)  
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -335,7 +335,7 @@ BEGIN
 
     EXEC sp_executesql @sql;
 
-    INSERT INTO ddbba.actDeportiva (nombre)
+    INSERT INTO club.actDeportiva (nombre)
     SELECT DISTINCT
         CASE 
             WHEN LOWER(LTRIM(RTRIM(Actividad))) LIKE '%jederez%' THEN 'Ajedrez'
@@ -344,7 +344,7 @@ BEGIN
     FROM #actividades_temp
     WHERE NOT EXISTS (
         SELECT 1
-        FROM ddbba.actDeportiva a
+        FROM club.actDeportiva a
         WHERE a.nombre = 
             CASE 
                 WHEN LOWER(LTRIM(RTRIM(Actividad))) LIKE '%jederez%' THEN 'Ajedrez'
@@ -356,7 +356,7 @@ GO
 
 
 -------------------------------------------------
-CREATE OR ALTER PROCEDURE ddbba.InsertarCuotasActividad
+CREATE OR ALTER PROCEDURE importaciones.InsertarCuotasActividad
     @rutaArchivo NVARCHAR(260)
 AS
 BEGIN
@@ -383,11 +383,11 @@ BEGIN
 
     EXEC sp_executesql @sql;
 
-    INSERT INTO ddbba.TarifarioActividad (
+    INSERT INTO club.TarifarioActividad (
         fechaVigenciaHasta, actividad, costoActividad, codAct
     )
     SELECT 
-        TRY_CONVERT(DATE, VigenteHasta, 101),
+        TRY_CONVERT(DATE, VigenteHasta, 103),
         CASE 
             WHEN LOWER(LTRIM(RTRIM(Actividad))) LIKE '%jederez%' THEN 'Ajedrez'
             ELSE LTRIM(RTRIM(Actividad)) COLLATE Modern_Spanish_CI_AS
@@ -395,20 +395,20 @@ BEGIN
         TRY_CAST(ValorMensual AS DECIMAL(7,2)),
         a.codAct
     FROM #cuotas_actividad_temp t
-    JOIN ddbba.actDeportiva a 
+    JOIN club.actDeportiva a 
         ON a.nombre = CASE 
                          WHEN LOWER(LTRIM(RTRIM(t.Actividad))) LIKE '%jederez%' THEN 'Ajedrez'
                          ELSE LTRIM(RTRIM(t.Actividad)) COLLATE Modern_Spanish_CI_AS
                      END
     WHERE NOT EXISTS (
         SELECT 1
-        FROM ddbba.TarifarioActividad ca
+        FROM club.TarifarioActividad ca
         WHERE ca.actividad = 
               CASE 
                   WHEN LOWER(LTRIM(RTRIM(t.Actividad))) LIKE '%jederez%' THEN 'Ajedrez'
                   ELSE LTRIM(RTRIM(t.Actividad)) COLLATE Modern_Spanish_CI_AS
               END
-          AND ca.fechaVigenciaHasta = TRY_CONVERT(DATE, VigenteHasta, 101)
+          AND ca.fechaVigenciaHasta = TRY_CONVERT(DATE, VigenteHasta, 103)
 
     );
 
@@ -418,7 +418,7 @@ GO
 
 
 ----------------------------
-CREATE OR ALTER PROCEDURE ddbba.InsertarCuotasCatSocio
+CREATE OR ALTER PROCEDURE importaciones.InsertarCuotasCatSocio
     @rutaArchivo NVARCHAR(260)
 AS
 BEGIN
@@ -449,22 +449,22 @@ BEGIN
     EXEC sp_executesql @sql;
 
     -- Insertar datos en la tabla CuotaCatSocio evitando duplicados
-    INSERT INTO ddbba.TarifarioCatSocio(
+    INSERT INTO club.TarifarioCatSocio(
         fechaVigenciaHasta, categoria, costoMembresia, catSocio
     )
     SELECT 
-        TRY_CONVERT(DATE, [Vigente hasta], 101),
+        TRY_CONVERT(DATE, [Vigente hasta], 103),
         LTRIM(RTRIM([Categoria socio])),
         TRY_CAST([Valor cuota] AS DECIMAL(7,2)),
         c.codCat
     FROM #cuotas_cat_temp t
-    JOIN ddbba.catSocio c
+    JOIN club.catSocio c
         ON c.nombreCat = LTRIM(RTRIM(t.[Categoria socio]))
     WHERE NOT EXISTS (
         SELECT 1
-        FROM ddbba.TarifarioCatSocio cs
+        FROM club.TarifarioCatSocio cs
         WHERE cs.categoria = LTRIM(RTRIM(t.[Categoria socio]))
-          AND cs.fechaVigenciaHasta = TRY_CONVERT(DATE, t.[Vigente hasta], 101)
+          AND cs.fechaVigenciaHasta = TRY_CONVERT(DATE, t.[Vigente hasta], 103)
     );
 
     -- Limpiar tabla temporal
@@ -475,7 +475,7 @@ GO
 
 ----------------------------------------------
 
-CREATE OR ALTER PROCEDURE ddbba.cargarPresentismo
+CREATE OR ALTER PROCEDURE importaciones.cargarPresentismo
     @rutaArchivo NVARCHAR(255)
 AS
 BEGIN
@@ -501,15 +501,15 @@ BEGIN
         FROM ''' + @rutaArchivo + '''
         WITH (
             FIRSTROW = 2,
-            FIELDTERMINATOR = '','',
+            FIELDTERMINATOR = '';'', 
             ROWTERMINATOR = ''\n'',
             CODEPAGE = ''65001''
         );
-    ';
+    ';-- Depende del csv que usemos si es , o ;
     EXEC (@sql);
 
     -- Insertar en la tabla Presentismo
-		   INSERT INTO ddbba.Presentismo (
+		   INSERT INTO club.Presentismo (
 			fecha,
 			presentismo,
 			socio,
@@ -522,25 +522,25 @@ BEGIN
 		-- 101 = mm/dd/yyyy (ESTILO ESTADOUNIDENSE) -> USAR ESTE si el archivo se generó desde un Excel en idioma inglés.
 		-- 103 = dd/mm/yyyy (ESTILO EUROPEO/LATINO) -> USAR ESTE si el archivo se generó desde un Excel en español.
 		SELECT
-			TRY_CONVERT(DATE, LTRIM(RTRIM(temp.[fecha de asistencia])), 101) AS fechaAsistencia,
+			TRY_CONVERT(DATE, LTRIM(RTRIM(temp.[fecha de asistencia])), 103) AS fechaAsistencia,
 			LEFT(LTRIM(RTRIM(temp.Asistencia)), 1),
 			s.ID_socio,
 			a.codAct,
 			LTRIM(RTRIM(temp.Profesor))
 		FROM #presentismo_temp temp
-		JOIN ddbba.Socio s
+		JOIN socio.Socio s
 			ON LTRIM(RTRIM(temp.[Nro de Socio])) COLLATE Modern_Spanish_CI_AS = s.nroSocio
-		JOIN ddbba.actDeportiva a
+		JOIN club.actDeportiva a
 			ON LTRIM(RTRIM(temp.Actividad)) COLLATE Modern_Spanish_CI_AS = a.nombre
 		WHERE 
-			TRY_CONVERT(DATE, LTRIM(RTRIM(temp.[fecha de asistencia])), 101) IS NOT NULL
-			AND TRY_CONVERT(DATE, LTRIM(RTRIM(temp.[fecha de asistencia])), 101) <= CAST(GETDATE() AS DATE)
+			TRY_CONVERT(DATE, LTRIM(RTRIM(temp.[fecha de asistencia])), 103) IS NOT NULL
+			AND TRY_CONVERT(DATE, LTRIM(RTRIM(temp.[fecha de asistencia])), 103) <= CAST(GETDATE() AS DATE)
 			AND NOT EXISTS (
 				SELECT 1 
-				FROM ddbba.Presentismo p
+				FROM club.Presentismo p
 				WHERE p.socio = s.ID_socio
 				  AND p.act = a.codAct
-				  AND p.fecha = TRY_CONVERT(DATE, LTRIM(RTRIM(temp.[fecha de asistencia])), 101)
+				  AND p.fecha = TRY_CONVERT(DATE, LTRIM(RTRIM(temp.[fecha de asistencia])), 103)
 			);
 
 
@@ -551,7 +551,7 @@ GO
 
 
 --insercion datos pago factura
-CREATE OR ALTER PROCEDURE ddbba.InsertarPagoFactura
+CREATE OR ALTER PROCEDURE importaciones.InsertarPagoFactura
     @rutaArchivo NVARCHAR(255)
 AS
 BEGIN
@@ -573,14 +573,14 @@ BEGIN
         FROM ''' + @rutaArchivo + '''
         WITH (
             FIRSTROW = 2,
-            FIELDTERMINATOR = '','',
+            FIELDTERMINATOR = '';'',
             ROWTERMINATOR = ''\n'',
             CODEPAGE = ''65001''
         );';
 
-    EXEC sp_executesql @sql;
+    EXEC sp_executesql @sql;-- Lo cambie a ; porque en mi maquina sino no funciona
 
-    INSERT INTO ddbba.pagoFactura (
+    INSERT INTO tesoreria.pagoFactura (
 		idPago,
         Fecha_Pago,
         montoTotal,
@@ -589,12 +589,12 @@ BEGIN
     )
     SELECT
 		LEFT(LTRIM(RTRIM(p.[Id de pago])),12),
-        TRY_CONVERT(DATE, LTRIM(RTRIM(p.[fecha])), 101), 
+        TRY_CONVERT(DATE, LTRIM(RTRIM(p.[fecha])), 103), 
         TRY_CAST(p.[Valor] AS DECIMAL(8,2)),
         LTRIM(RTRIM(p.[Medio de pago])) COLLATE Modern_Spanish_CI_AS,
         s.ID_socio
     FROM #pago_temp p
-    JOIN ddbba.Socio s
+    JOIN socio.Socio s
         ON LTRIM(RTRIM(p.[Responsable de pago])) COLLATE Modern_Spanish_CI_AS = s.nroSocio;
 
     DROP TABLE #pago_temp;
@@ -602,8 +602,8 @@ END;
 GO
 
 --SP TARIFA PILETA INVITADO
-CREATE OR ALTER PROCEDURE ddbba.InsertarCostoPiletaInvitado
-    @rutaArchivo NVARCHAR(260)  -- Ejemplo: 'C:\ruta\archivo.csv'
+CREATE OR ALTER PROCEDURE importaciones.InsertarCostoPiletaInvitado
+    @rutaArchivo NVARCHAR(260)  
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -633,15 +633,15 @@ BEGIN
     EXEC sp_executesql @sql;
 
     -- Insertar en la tabla final con limpieza y conversión
-    INSERT INTO ddbba.costoPiletaInvitado (edad, precio, fechaVigenteHasta)
+    INSERT INTO club.costoPiletaInvitado (edad, precio, fechaVigenteHasta)
     SELECT
         LTRIM(RTRIM(edad)),
         TRY_CAST(precio AS DECIMAL(7,2)),
-        TRY_CONVERT(DATE, fechaVigenteHasta, 101)  -- mm/dd/yyyy
+        TRY_CONVERT(DATE, fechaVigenteHasta, 103)  -- mm/dd/yyyy
     FROM #costoPileta_temp
     WHERE 
         TRY_CAST(precio AS DECIMAL(7,2)) IS NOT NULL AND
-        TRY_CONVERT(DATE, fechaVigenteHasta, 101) IS NOT NULL;
+        TRY_CONVERT(DATE, fechaVigenteHasta, 103) IS NOT NULL;
 
     -- Eliminar tabla temporal
     DROP TABLE #costoPileta_temp;
@@ -651,7 +651,7 @@ GO
 
 
 --sp costo pileta socios
-CREATE OR ALTER PROCEDURE ddbba.InsertarCostoPileta
+CREATE OR ALTER PROCEDURE importaciones.InsertarCostoPileta
     @rutaArchivo NVARCHAR(260)
 AS
 BEGIN
@@ -680,23 +680,23 @@ BEGIN
     EXEC sp_executesql @sql;
 
 
-		INSERT INTO ddbba.costoPileta (costo, tipo, categoria, fechaVigenciaHasta)
+		INSERT INTO club.costoPileta (costo, tipo, categoria, fechaVigenciaHasta)
 	SELECT
 		TRY_CAST(LTRIM(RTRIM(costo)) AS DECIMAL(9,2)),
 		LTRIM(RTRIM(tipo)),
 		LTRIM(RTRIM(categoria)),
-		TRY_CONVERT(DATE, LTRIM(RTRIM(fechaVigenciaHasta)), 101)
+		TRY_CONVERT(DATE, LTRIM(RTRIM(fechaVigenciaHasta)), 103)
 	FROM #costoPileta_temp AS t
 	WHERE 
 		TRY_CAST(costo AS DECIMAL(9,2)) IS NOT NULL AND
-		TRY_CONVERT(DATE, fechaVigenciaHasta, 101) IS NOT NULL AND
+		TRY_CONVERT(DATE, fechaVigenciaHasta, 103) IS NOT NULL AND
 		NOT EXISTS (
-			SELECT 1 FROM ddbba.costoPileta AS c
+			SELECT 1 FROM club.costoPileta AS c
 			WHERE
 				c.costo = TRY_CAST(LTRIM(RTRIM(t.costo)) AS DECIMAL(9,2))
 				AND c.tipo = LTRIM(RTRIM(t.tipo))
 				AND c.categoria = LTRIM(RTRIM(t.categoria))
-				AND c.fechaVigenciaHasta = TRY_CONVERT(DATE, LTRIM(RTRIM(t.fechaVigenciaHasta)), 101)
+				AND c.fechaVigenciaHasta = TRY_CONVERT(DATE, LTRIM(RTRIM(t.fechaVigenciaHasta)), 103)
 		)
 
 
@@ -706,7 +706,7 @@ END;
 GO
 
 --SP IMPORTAR LLUVIAS
-CREATE OR ALTER PROCEDURE ddbba.InsertarLluvias
+CREATE OR ALTER PROCEDURE importaciones.InsertarLluvias
     @rutaArchivo1 NVARCHAR(260),
     @rutaArchivo2 NVARCHAR(260)
 AS

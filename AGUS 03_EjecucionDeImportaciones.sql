@@ -3,122 +3,122 @@
 USE Com2900G17;
 GO
 
-EXEC ddbba.InsertarCatSocio
-    @rutaArchivo = 'C:\Users\agusr\Downloads\Categoria de socio.csv';
+EXEC importaciones.InsertarCatSocio
+    @rutaArchivo = 'C:\Users\iaraa\OneDrive\Documentos\BDAA\BASEDEDATOSTP\Grupo17\Grupo17\Categoria de socio.csv';
 
-SELECT * FROM ddbba.catSocio
+SELECT * FROM club.catSocio
 
 
-EXEC  ddbba.ImportarSociosRP
-    @rutaArchivo = 'C:\Users\agusr\Downloads\Datos socios.csv';
+EXEC  importaciones.ImportarSociosRP
+    @rutaArchivo = 'C:\Users\iaraa\OneDrive\Documentos\BDAA\BASEDEDATOSTP\Grupo17-Nuevos-cambios\Grupo17-Nuevos-cambios\Datos socios.csv';
 
-SELECT * FROM ddbba.Socio
+SELECT * FROM socio.Socio
 -------------------------
-EXEC  ddbba.ImportarSociosConGrupoFamiliar
-    @rutaArchivo = 'C:\Users\agusr\Downloads\Datos socios GF.csv';
+EXEC  importaciones.ImportarSociosConGrupoFamiliar
+    @rutaArchivo = 'C:\Users\iaraa\OneDrive\Documentos\BDAA\BASEDEDATOSTP\Grupo17-Nuevos-cambios\Grupo17-Nuevos-cambios\Datos socios GF.csv';
 
-SELECT * FROM ddbba.Socio
+SELECT * FROM socio.Socio order by nroSocio desc
 
 -----------------------------------------------
-EXEC ddbba.ActualizarCategoriaSociosPorEdad
+EXEC socio.ActualizarCategoriaSociosPorEdad
 
-select * from ddbba.socio
+select * from socio.socio
 -----------------------------------------------------
-EXEC ddbba.ActualizarGrupoFamiliarResponsables
+EXEC socio.ActualizarGrupoFamiliarResponsables
 
-select * from ddbba.socio
+select * from socio.socio
 -----------------
 --AGREGAR SP PARA ASIGNAR INSCRIPCIONES Y TUTORES
 ---------------------------------------------------------
 
-EXEC  ddbba.InsertarActividades
-    @rutaArchivo = 'C:\Users\agusr\Downloads\Cuota Actividad.csv';
+EXEC  importaciones.InsertarActividades
+    @rutaArchivo = 'C:\Users\iaraa\OneDrive\Documentos\BDAA\BASEDEDATOSTP\Grupo17-Nuevos-cambios\Grupo17-Nuevos-cambios\Actividad deportiva.csv';
 
-SELECT * FROM ddbba.actDeportiva
+SELECT * FROM club.actDeportiva
 
 -----------------------------------------
 
-EXEC ddbba.InsertarCuotasActividad
-	@rutaArchivo = 'C:\Users\agusr\Downloads\Cuota Actividad.csv'
+EXEC importaciones.InsertarCuotasActividad
+	@rutaArchivo = 'C:\Users\iaraa\OneDrive\Documentos\BDAA\BASEDEDATOSTP\Grupo17-Nuevos-cambios\Grupo17-Nuevos-cambios\Actividad deportiva.csv'
 
-SELECT * FROM ddbba.TarifarioActividad
+SELECT * FROM club.TarifarioActividad
 
 -----------------------------
 
-EXEC ddbba.InsertarCuotasCatSocio
-	@rutaArchivo = 'C:\Users\agusr\Downloads\Cuota Cat. Socio.csv'
+EXEC importaciones.InsertarCuotasCatSocio
+	@rutaArchivo = 'C:\Users\iaraa\OneDrive\Documentos\BDAA\BASEDEDATOSTP\Grupo17-Nuevos-cambios\Grupo17-Nuevos-cambios\Categoria de socio.csv'
 
-SELECT * FROM ddbba.TarifarioCatSocio
+SELECT * FROM club.TarifarioCatSocio
 
 ------------------------------------------
-EXEC ddbba.cargarPresentismo
-	@rutaArchivo = 'C:\Users\agusr\Downloads\Presentismo.csv'
+EXEC importaciones.cargarPresentismo
+	@rutaArchivo = 'C:\Users\iaraa\Downloads\Datos socios2(presentismo_actividades).csv'
 
-select * from ddbba.Presentismo order by fecha
+select * from club.Presentismo order by fecha desc--Revisar ,,, del final
 
 -------------------------------
-EXEC ddbba.InsertarPagoFactura
-	@rutaArchivo = 'C:\Users\agusr\Downloads\Pago Cuotas.csv'
+EXEC importaciones.InsertarPagoFactura
+	@rutaArchivo = 'C:\Users\iaraa\Downloads\Datos socios2(pago cuotas).csv'
 
-select * from ddbba.pagoFactura
+select * from tesoreria.pagoFactura order by idPago desc
 
 ---------------------------------
-EXEC ddbba.InsertarCostoPiletaInvitado  ------invitado
+EXEC importaciones.InsertarCostoPiletaInvitado  ------invitado
 	@rutaArchivo = 'C:\Users\agusr\Downloads\Costo Pileta Invitado.csv'
 
-select * from ddbba.costoPiletaInvitado
+select * from club.costoPiletaInvitado
 ---------------------------------
-EXEC ddbba.InsertarCostoPileta ----socio
+EXEC importaciones.InsertarCostoPileta ----socio
 	@rutaArchivo = 'C:\Users\agusr\Downloads\Costo Pase Pileta.csv'
 
-select * from ddbba.costoPileta --falta el registro de pase por temporada no se por que no se me importa
+select * from club.costoPileta --falta el registro de pase por temporada no se por que no se me importa
 ---------------------------------------------------
-EXEC ddbba.reporteInasistenciasAlternadas --reporte 3
+EXEC reportes.reporteInasistenciasAlternadas --reporte 3
 ------------------------------------------------
-EXEC ddbba.SociosConAlgunaInasistencia  --reporte 4
+EXEC reportes.SociosConAlgunaInasistencia  --reporte 4
 ---------------------------------------
-EXEC ddbba.GenerarCuotasMensuales
+EXEC tesoreria.GenerarCuotasMensuales
 	@mes = 3
 
-select * from ddbba.cuotaMensualActividad
-select * from ddbba.cuotaMensualCategoria
+select * from tesoreria.cuotaMensualActividad
+select * from tesoreria.cuotaMensualCategoria
 
 -----------------------------------------------------------
-EXEC ddbba.GenerarDetalleFactura
+EXEC tesoreria.GenerarDetalleFactura
 	@mes = 3
 
-select * from ddbba.detalleFactura
+select * from tesoreria.detalleFactura
 
 ---------------------------------------------------------
-EXEC ddbba.GenerarFacturasMensuales
+EXEC tesoreria.GenerarFacturasMensuales
 	@mes = 3
 
-SELECT * from ddbba.Factura
-select * from ddbba.detalleFactura
+SELECT * from tesoreria.Factura
+select * from tesoreria.detalleFactura
 
 -----------------------------------------------------------
-EXEC ddbba.Reporte_ingresos_por_actividad --reporte 2
+EXEC reportes.Reporte_ingresos_por_actividad --reporte 2
 ---------------------------------------------------------------
-EXEC ddbba.InsertarPasesPileta
+EXEC club.InsertarPasesPileta
 
-SELECT * FROM ddbba.pasePileta
+SELECT * FROM club.pasePileta
 --------------------------------------------------------
-EXEC ddbba.GenerarDetallePasePileta @mes = 2;
+EXEC tesoreria.GenerarDetallePasePileta @mes = 2;
 
-SELECT * FROM ddbba.detalleFactura WHERE concepto LIKE 'Pase pileta%'
+SELECT * FROM tesoreria.detalleFactura WHERE concepto LIKE 'Pase pileta%'
 
-EXEC ddbba.GenerarFacturasMensuales @mes = 2;
+EXEC tesoreria.GenerarFacturasMensuales @mes = 2;
 
-SELECT * FROM ddbba.factura WHERE mesFacturado = 2
-SELECT * FROM ddbba.detalleFactura WHERE concepto LIKE 'Pase pileta%'
+SELECT * FROM tesoreria.factura WHERE mesFacturado = 2
+SELECT * FROM tesoreria.detalleFactura WHERE concepto LIKE 'Pase pileta%'
 -------------------------------------------------------------------
-EXEC ddbba.InsertarLluvias
+EXEC importaciones.InsertarLluvias
 	@rutaArchivo1 = 'C:\Users\agusr\Downloads\lluvias 2024 funciona.csv',
 	@rutaArchivo2 = 'C:\Users\agusr\Downloads\lluvias 2025.csv'
 
 -------------------------------------------------------------------------------
-EXEC ddbba.GenerarReintegrosPiletaPorLluvia
+EXEC tesoreria.GenerarReintegrosPiletaPorLluvia
 
-SELECT * FROM ddbba.pagoCuenta
+SELECT * FROM tesoreria.pagoCuenta
 ----------------------------------------------------------------
 

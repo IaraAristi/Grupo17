@@ -61,17 +61,59 @@
           <AssociatedConnUserName />
           <FullPath>03_EjecucionDeImportaciones.sql</FullPath>
         </FileNode>
+        <FileNode Name="04_Seguridad&amp;roles.sql">
+          <AssociatedConnectionMoniker />
+          <AssociatedConnSrvName />
+          <AssociatedConnUserName />
+          <FullPath>04_Seguridad&amp;roles.sql</FullPath>
+        </FileNode>
         <FileNode Name="07_ImportarDatosPresentismo.sql">
           <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:LAPTOP-KOOVHGNG:True</AssociatedConnectionMoniker>
           <AssociatedConnSrvName>LAPTOP-KOOVHGNG</AssociatedConnSrvName>
           <AssociatedConnUserName />
           <FullPath>07_ImportarDatosPresentismo.sql</FullPath>
         </FileNode>
+        <FileNode Name="AGUS 00_CreacionDeTablasyBDD.sql">
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:LAPTOP-KOOVHGNG:True</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>LAPTOP-KOOVHGNG</AssociatedConnSrvName>
+          <AssociatedConnUserName />
+          <FullPath>AGUS 00_CreacionDeTablasyBDD.sql</FullPath>
+        </FileNode>
+        <FileNode Name="AGUS 01_RellenarTablas.sql">
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:LAPTOP-KOOVHGNG:True</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>LAPTOP-KOOVHGNG</AssociatedConnSrvName>
+          <AssociatedConnUserName />
+          <FullPath>AGUS 01_RellenarTablas.sql</FullPath>
+        </FileNode>
+        <FileNode Name="AGUS 02_SPImportacionDeTablas.sql">
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:LAPTOP-KOOVHGNG:True</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>LAPTOP-KOOVHGNG</AssociatedConnSrvName>
+          <AssociatedConnUserName />
+          <FullPath>AGUS 02_SPImportacionDeTablas.sql</FullPath>
+        </FileNode>
+        <FileNode Name="AGUS 03_EjecucionDeImportaciones.sql">
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:LAPTOP-KOOVHGNG:True</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>LAPTOP-KOOVHGNG</AssociatedConnSrvName>
+          <AssociatedConnUserName />
+          <FullPath>AGUS 03_EjecucionDeImportaciones.sql</FullPath>
+        </FileNode>
+        <FileNode Name="AGUS CargarTablas.sql">
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:LAPTOP-KOOVHGNG:True</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>LAPTOP-KOOVHGNG</AssociatedConnSrvName>
+          <AssociatedConnUserName />
+          <FullPath>AGUS CargarTablas.sql</FullPath>
+        </FileNode>
         <FileNode Name="CargarTablas.sql">
           <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:LAPTOP-KOOVHGNG:True</AssociatedConnectionMoniker>
           <AssociatedConnSrvName>LAPTOP-KOOVHGNG</AssociatedConnSrvName>
           <AssociatedConnUserName />
           <FullPath>CargarTablas.sql</FullPath>
+        </FileNode>
+        <FileNode Name="ReporteMorosos.sql">
+          <AssociatedConnectionMoniker />
+          <AssociatedConnSrvName />
+          <AssociatedConnUserName />
+          <FullPath>ReporteMorosos.sql</FullPath>
         </FileNode>
       </Items>
     </LogicalFolder>

@@ -2,7 +2,7 @@
 Use Com2900G17;
 GO
 
-INSERT INTO ddbba.tutor (nombre, apellido, dni, email, parentesco) VALUES
+INSERT INTO socio.tutor (nombre, apellido, dni, email, parentesco) VALUES
 ('Juan', 'Pérez', 25123456, 'juan.perez@email.com', 'padre'),
 ('María', 'Gómez', 27567890, 'maria.gomez@email.com', 'madre'),
 ('Carlos', 'López', 28444555, 'carlos.lopez@email.com', 'tutor'),
@@ -15,9 +15,9 @@ INSERT INTO ddbba.tutor (nombre, apellido, dni, email, parentesco) VALUES
 ('Andrés', 'Molina', 35511223, 'andres.molina@email.com', 'padre');
 
 
-SELECT* FROM ddbba.Tutor
+SELECT* FROM socio.Tutor
 
-INSERT INTO ddbba.inscripcion (fecha, hora) VALUES
+INSERT INTO socio.inscripcion (fecha, hora) VALUES
 ('2025-02-10', '10:00'),
 ('2025-02-11', '11:00'),
 ('2025-02-12', '12:00'),
@@ -30,33 +30,30 @@ INSERT INTO ddbba.inscripcion (fecha, hora) VALUES
 ('2025-02-19', '19:00');
 
 
-SELECT* FROM ddbba.inscripcion
+SELECT* FROM socio.inscripcion
 GO
-EXEC ddbba.AsignarInscripcionesAleatorias
+--EXEC ddbba.AsignarInscripcionesAleatorias
 
-SELECT *FROM ddbba.socio
+SELECT *FROM socio.socio
 
 
-EXEC ddbba.ActualizarCategoriaSociosPorEdad
-GO
-
-EXEC ddbba.cargarDetalleFacturaDesdeCSV
+/*EXEC ddbba.cargarDetalleFacturaDesdeCSV
 	@rutaArchivo='C:\Users\Diego\Desktop\LOS DOMINGUEZ\Luana Unlam\Bdda\Grupo17-main\Grupo17-main\Detalle De Factura.csv'
+GO*/
+
+EXEC socio.ActualizarGrupoFamiliarResponsables
 GO
 
-EXEC ddbba.ActualizarGrupoFamiliarResponsables
+EXEC reportes.Reporte_ingresos_por_actividad --Reporte 2
 GO
 
-EXEC ddbba.Reporte_ingresos_por_actividad --Reporte 2
-GO
+EXEC reportes.reporteInasistenciasAlternadas --Reporte 3
 
-EXEC ddbba.reporteInasistenciasAlternadas --Reporte 3
+EXEC reportes.SociosConAlgunaInasistencia --Reporte 4
 
-EXEC ddbba.SociosConAlgunaInasistencia --Reporte 4
+SELECT * FROM socio.socio
 
-SELECT * FROM ddbba.socio
-
-INSERT INTO ddbba.invitado (nombre, apellido, fechaNac, dni, mail) VALUES
+INSERT INTO club.invitado (nombre, apellido, fechaNac, dni, mail) VALUES
 ('Lucía', 'Pérez', '2001-05-23', '34567890', 'lucia.perez@email.com'),
 ('Mateo', 'Fernández', '1999-11-12', '32145678', 'mateo.fernandez@email.com'),
 ('Sofía', 'Gómez', '2003-02-01', '33445566', 'sofia.gomez@email.com'),
@@ -64,11 +61,11 @@ INSERT INTO ddbba.invitado (nombre, apellido, fechaNac, dni, mail) VALUES
 ('Valentina', 'López', '2000-03-09', '35678901', 'valentina.lopez@email.com');
 
 -- Nuevo invitado menor de edad
-INSERT INTO ddbba.invitado (nombre, apellido, fechaNac, dni, mail)
+INSERT INTO club.invitado (nombre, apellido, fechaNac, dni, mail)
 VALUES ('Bruno', 'Sánchez', '2010-09-15', '37890123', 'bruno.sanchez@email.com');
 
-EXEC ddbba.InsertarReembolso
+EXEC tesoreria.InsertarReembolso
 	@codPago = 1,
 	@motivo = 'error en facturacion'
 
-SELECT * FROM ddbba.reembolso
+SELECT * FROM tesoreria.reembolso
