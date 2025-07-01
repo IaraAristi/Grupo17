@@ -15,20 +15,20 @@ VALUES
 
 
 INSERT INTO club.Presentismo (fecha, presentismo, socio, act, profesor) VALUES
-('2025-01-10', 'P', 154, 1, 'Hector Alvarez'),
-('2025-02-15', 'P', 154, 1, 'Hector Alvarez'),
+('2025-03-10', 'P', 154, 1, 'Hector Alvarez'),
+('2025-03-15', 'P', 154, 1, 'Hector Alvarez'),
 ('2025-03-10', 'P', 154, 1, 'Hector Alvarez'),
 ('2025-04-12', 'P', 154, 1, 'Hector Alvarez'),
 ('2025-05-08', 'P', 154, 1, 'Hector Alvarez'),
 
-('2025-01-12', 'P', 155, 3, 'Pablo Rodrigez'),
-('2025-02-17', 'P', 155, 3, 'Pablo Rodrigez'),
+('2025-03-12', 'P', 155, 3, 'Pablo Rodrigez'),
+('2025-03-17', 'P', 155, 3, 'Pablo Rodrigez'),
 ('2025-03-14', 'P', 155, 3, 'Pablo Rodrigez'),
 ('2025-04-15', 'P', 155, 3, 'Pablo Rodrigez'),
 ('2025-05-09', 'P', 155, 3, 'Pablo Rodrigez'),
 
-('2025-01-18', 'P', 156, 4, 'Paula Quiroga'),
-('2025-02-20', 'P', 156, 4, 'Paula Quiroga'),
+('2025-03-18', 'P', 156, 4, 'Paula Quiroga'),
+('2025-03-20', 'P', 156, 4, 'Paula Quiroga'),
 ('2025-03-16', 'P', 156, 4, 'Paula Quiroga'),
 ('2025-04-18', 'P', 156, 4, 'Paula Quiroga'),
 ('2025-05-12', 'P', 156, 4, 'Paula Quiroga');
@@ -61,6 +61,23 @@ VALUES
  1133124570, 'Galeno', '0004455667', '0116000444', 'A',4),
 ('SN-4159', '47258779', 'Tomás', 'Molina', '2014-04-22',
  1133124571, 'Medife', '0005566778', '0116000555', 'A',5);
+
+ INSERT INTO club.Presentismo (fecha, presentismo, socio, act, profesor) VALUES
+('2025-03-03', 'P', 157, 1, 'Hector Alvarez'),
+('2025-03-10', 'P', 157, 1, 'Hector Alvarez'),
+('2025-03-17', 'P', 157, 1, 'Hector Alvarez'),
+('2025-04-7', 'P', 158, 1, 'Hector Alvarez'),
+('2025-04-14', 'P', 158, 1, 'Hector Alvarez'),
+('2025-04-21', 'P', 158, 1, 'Hector Alvarez'),
+('2025-03-9', 'P', 159, 3, 'Pablo Rodrigez'),
+('2025-03-16', 'P', 159, 3, 'Pablo Rodrigez'),
+('2025-03-23', 'P', 159, 3, 'Pablo Rodrigez'),
+('2025-04-13', 'P', 160, 3, 'Pablo Rodrigez'),
+('2025-04-20', 'P', 160, 3, 'Pablo Rodrigez'),
+('2025-04-27', 'P', 160, 3, 'Pablo Rodrigez'),
+('2025-03-4', 'P', 161, 4, 'Paula Quiroga'),
+('2025-03-11', 'P', 161, 4, 'Paula Quiroga'),
+('2025-03-18', 'P', 161, 4, 'Paula Quiroga');
 
 --DATOS INSCRIPCION
 INSERT INTO socio.inscripcion (fecha, hora) VALUES

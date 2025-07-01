@@ -398,7 +398,6 @@ CREATE TABLE tesoreria.detalleFactura (
     concepto VARCHAR(100),
     monto DECIMAL(8,2),
     descuento DECIMAL(7,2),
-    recargoMorosidad DECIMAL(7,2),
 	CONSTRAINT FK_detalle_factura FOREIGN KEY (codFactura) REFERENCES tesoreria.factura(codFactura),
 	CONSTRAINT FK_detalleFactura_socio FOREIGN KEY (ID_socio) REFERENCES socio.socio(ID_socio)
 );
