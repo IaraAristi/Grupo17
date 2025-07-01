@@ -282,7 +282,7 @@ INSERT INTO club.Empleado (
     dni, nombre, apellido, telContacto, fechaNac, telEmergencia
 )
 VALUES (
-    '12345678', 'Juan', 'Pérez', 1144556677, '1990-05-15', 1122334455
+    '12345678', 'Juan', 'PÃ©rez', 1144556677, '1990-05-15', 1122334455
 );
 
 INSERT INTO club.Empleado (
