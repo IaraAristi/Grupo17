@@ -1,8 +1,8 @@
-/*Entrega 6:Reportes solicitados. Creación de Stored Procedures para la generación de reportes
-Reporte 1: Reporte de los socios morosos, que hayan incumplido en más de dos oportunidades dado un
+/*Entrega 6:Reportes solicitados. CreaciÃ³n de Stored Procedures para la generaciÃ³n de reportes
+Reporte 1: Reporte de los socios morosos, que hayan incumplido en mÃ¡s de dos oportunidades dado un
 rango de fechas a ingresar. El reporte debe contener los siguientes datos:
 Nombre del reporte: Morosos Recurrentes
-Período: rango de fechas
+PerÃ­odo: rango de fechas
 Nro de socio
 Nombre y apellido.
 Mes incumplido
@@ -11,18 +11,18 @@ El mismo debe ser desarrollado utilizando Windows Function.
 Reporte 2: Reporte acumulado mensual de ingresos por actividad deportiva al momento en que se saca
 el reporte tomando como inicio enero.
 Reporte 3: Reporte de la cantidad de socios que han realizado alguna actividad de forma alternada
-(inasistencias) por categoría de socios y actividad, ordenado según cantidad de inasistencias
+(inasistencias) por categorÃ­a de socios y actividad, ordenado segÃºn cantidad de inasistencias
 ordenadas de mayor a menor.
 Reporte 4: Reporte que contenga a los socios que no han asistido a alguna clase de la actividad que realizan.
-El reporte debe contener: Nombre, Apellido, edad, categoría y la actividad
+El reporte debe contener: Nombre, Apellido, edad, categorÃ­a y la actividad
 -----------------------------------------------------------------------------------------------------------
 Fecha de entrega: 01/07/2025
-Número de comisión: 2900
-Número de grupo: 17
+NÃºmero de comisiÃ³n: 2900
+NÃºmero de grupo: 17
 Materia: Bases de datos aplicadas
-Alumnos:Aristimuño,Iara Belén DNI:45237225 
-		Domínguez,Luana Milena DNI:46362353
-		Lopardo, Tomás Matías DNI: 45495734
+Alumnos:AristimuÃ±o,Iara BelÃ©n DNI:45237225 
+		DomÃ­nguez,Luana Milena DNI:46362353
+		Lopardo, TomÃ¡s MatÃ­as DNI: 45495734
 		Rico, Agustina Micaela DNI: 46028153
 */
 USE Com2900G17
@@ -38,7 +38,7 @@ AS
 BEGIN
     SET NOCOUNT ON;
 
-    -- Paso 1: Obtener todas las morosidades del período con datos del socio
+    -- Paso 1: Obtener todas las morosidades del perÃ­odo con datos del socio
     WITH Morosidades AS (
         SELECT
             rm.socio,
@@ -108,21 +108,21 @@ BEGIN
     SELECT
         mesFacturado,
         ISNULL([Ajedrez], 0) AS Ajedrez,
-        ISNULL([Baile Artístico], 0) AS [Baile Artístico],
+        ISNULL([Baile ArtÃ­stico], 0) AS [Baile ArtÃ­stico],
         ISNULL([Futsal], 0) AS Futsal,
-        ISNULL([Natación], 0) AS Natación,
+        ISNULL([NataciÃ³n], 0) AS NataciÃ³n,
         ISNULL([Taekwondo], 0) AS Taekwondo,
-        ISNULL([Vóley], 0) AS Vóley
+        ISNULL([VÃ³ley], 0) AS VÃ³ley
     FROM MontoFacturadoPorMes
     PIVOT (
         SUM(MontoConDescuento)
         FOR Actividad IN (
             [Ajedrez], 
-            [Baile Artístico], 
+            [Baile ArtÃ­stico], 
             [Futsal], 
-            [Natación], 
+            [NataciÃ³n], 
             [Taekwondo], 
-            [Vóley]
+            [VÃ³ley]
         )
     ) AS ReporteMensual
     ORDER BY mesFacturado;
