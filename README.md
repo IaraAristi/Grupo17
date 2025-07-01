@@ -24,13 +24,13 @@ Este proyecto implementa una base de datos relacional que permite gestionar de f
 | `06_Reportes.sql`               | Creación de procedimientos almacenados para reportes estadísticos.                 |
 | `07_EjecucionesReportes.sql`    | Ejecución de los reportes generados.                           |
 | `08_Seguridad&roles.sql`        | Creación de usuarios, roles, asignación de permisos y encriptación.           |
-| `09_EjecucionesSeguridadyRoles.sql`    | Ejecución de .                           |
+| `09_EjecucionesSeguridadyRoles.sql`    | Ejecución de desencriptación.                           |
 
 ## ⚙️ Instrucciones de ejecución
 
 1. **Ejecutar en orden** los archivos del `00` al `08`.
-2. Los archivos `00`, `01`, `03`, `04`, `06` y `07` pueden ejecutarse completos.
-3. Los archivos `02`, `05` y `08` deben ejecutarse sección por sección, según delimitadores `----`.
+2. Los archivos `00`, `01`, `03`, `04`, `06` y `08` pueden ejecutarse completos.
+3. Los archivos `02`, `05`, `07` y `09` deben ejecutarse sección por sección, según delimitadores `----`.
 4. **Siempre verificar** que se esté trabajando sobre la base `Com2900G17`. En caso contrario, ejecutar:
    ```sql
    USE Com2900G17
