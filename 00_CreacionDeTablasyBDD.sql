@@ -223,10 +223,10 @@ GO
 IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE
 TABLE_SCHEMA =
 'club' AND TABLE_NAME =
-'asistenciaColonia')
+'InscripcionColonia')
 BEGIN
-CREATE TABLE club.asistenciaColonia (
-    codAsistencia INT IDENTITY(1,1) PRIMARY KEY,
+CREATE TABLE club.InscripcionColonia (
+    codInscripcionColonia INT IDENTITY(1,1) PRIMARY KEY,
     codSocio INT,
     codColonia INT,
 	CONSTRAINT FK_colonia_socio FOREIGN KEY (codSocio) REFERENCES socio.socio(ID_socio),
