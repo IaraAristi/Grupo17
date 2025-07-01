@@ -1,3 +1,14 @@
+/*Entrega 5:Conjunto de pruebas.Creación de Stored Procedures para inserción, modificación y eliminación de datos y registros de las tablas.
+Fecha de entrega: 01/07/2025
+Número de comisión: 2900
+Número de grupo: 17
+Materia: Bases de datos aplicadas
+Alumnos:Aristimuño,Iara Belén DNI:45237225 
+		Domínguez,Luana Milena DNI:46362353
+		Lopardo, Tomás Matías DNI: 45495734
+		Rico, Agustina Micaela DNI: 46028153
+*/
+
 Use Com2900G17;
 GO
 
@@ -61,7 +72,7 @@ BEGIN
         PRINT 'Socio eliminado correctamente.';
     END TRY
     BEGIN CATCH
-        PRINT 'Error al intentar eliminar el socio. Es posible que est� referenciado en otras tablas (por ejemplo facturas, presentismo, etc).';
+        PRINT 'Error al intentar eliminar el socio. Es posible que esté referenciado en otras tablas (por ejemplo facturas, presentismo, etc).';
     END CATCH
 END;
 GO
@@ -112,7 +123,7 @@ BEGIN
         SET @tipoCompleto = @tipoDato;
     END
 
-    -- Construir SQL din�mico con CAST a tipo correcto
+    -- Construir SQL dinámico con CAST a tipo correcto
     DECLARE @sql NVARCHAR(MAX);
     SET @sql = N'
         UPDATE socio.socio
@@ -183,12 +194,12 @@ AS
 BEGIN
     SET NOCOUNT ON;
 
-    --verificar si existe la categor�a
+    --verificar si existe la categoría
     IF NOT EXISTS (
         SELECT 1 FROM club.catSocio WHERE codCat = @catSocio
     )
     BEGIN
-        RAISERROR('La categor�a de socio especificada no existe.', 16, 1);
+        RAISERROR('La categoría de socio especificada no existe.', 16, 1);
         RETURN;
     END;
 
@@ -205,7 +216,7 @@ BEGIN
         @catSocio
     );
 
-    PRINT 'Tarifa de categor�a de socio agregada correctamente.';
+    PRINT 'Tarifa de categoría de socio agregada correctamente.';
 END;
 GO
 
@@ -267,7 +278,7 @@ BEGIN
         SELECT 1 FROM club.TarifarioCatSocio WHERE idCuotaCatSocio = @idCuotaCatSocio
     )
     BEGIN
-        RAISERROR('La tarifa de categor�a especificada no existe.', 16, 1);
+        RAISERROR('La tarifa de categoría especificada no existe.', 16, 1);
         RETURN;
     END;
 
@@ -276,7 +287,7 @@ BEGIN
         SELECT 1 FROM club.catSocio WHERE codCat = @catSocio
     )
     BEGIN
-        RAISERROR('La categor�a de socio especificada no existe.', 16, 1);
+        RAISERROR('La categoría de socio especificada no existe.', 16, 1);
         RETURN;
     END;
 
@@ -287,7 +298,7 @@ BEGIN
         catSocio = @catSocio
     WHERE idCuotaCatSocio = @idCuotaCatSocio;
 
-    PRINT 'Tarifa de categor�a de socio modificada correctamente.';
+    PRINT 'Tarifa de categoría de socio modificada correctamente.';
 END;
 GO
 
@@ -325,14 +336,14 @@ BEGIN
         SELECT 1 FROM club.TarifarioCatSocio WHERE idCuotaCatSocio = @idCuotaCatSocio
     )
     BEGIN
-        RAISERROR('La tarifa de categor�a especificada no existe.', 16, 1);
+        RAISERROR('La tarifa de categoría especificada no existe.', 16, 1);
         RETURN;
     END;
 
     DELETE FROM club.TarifarioCatSocio
     WHERE idCuotaCatSocio = @idCuotaCatSocio;
 
-    PRINT 'Tarifa de categor�a de socio eliminada correctamente.';
+    PRINT 'Tarifa de categoría de socio eliminada correctamente.';
 END;
 GO
 
