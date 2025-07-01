@@ -1,3 +1,14 @@
+/*Entrega 5:Conjunto de pruebas. Creación de base de datos, esquemas y tablas
+Fecha de entrega: 01/07/2025
+Número de comisión: 2900
+Número de grupo: 17
+Materia: Bases de datos aplicadas
+Alumnos:Aristimuño,Iara Belén DNI:45237225 
+		Domínguez,Luana Milena DNI:46362353
+		Lopardo, Tomás Matías DNI: 45495734
+		Rico, Agustina Micaela DNI: 46028153
+*/
+
 USE master;
 GO
 -- Cierra todas las conexiones activas a la base de datos Com2900G17
@@ -462,7 +473,7 @@ TABLE_SCHEMA =
 BEGIN
 CREATE TABLE club.pasePileta (
     codPase INT IDENTITY(1,1) PRIMARY KEY,
-    tipo VARCHAR(10) CHECK (tipo IN ('d�a', 'mes', 'temporada')),
+    tipo VARCHAR(10) CHECK (tipo IN ('día', 'mes', 'temporada')),
     fechaDesde DATE,
     fechaHasta DATE,
     idSocio INT,
@@ -538,4 +549,4 @@ BEGIN
         CONSTRAINT FK_reembolso_pago FOREIGN KEY (ID_pago) REFERENCES tesoreria.pagoFactura(codPago)
     );
 END;
-PRINT'Creaci�n de base de datos, esquemas y tablas realizado'
+PRINT'Creación de base de datos, esquemas y tablas realizado'
