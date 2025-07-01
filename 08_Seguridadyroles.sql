@@ -1,11 +1,11 @@
-/*Entrega 7: Requisitos de Seguridad. Creación de usuarios y roles, asignación de permisos y encriptación de datos.
+/*Entrega 7: Requisitos de Seguridad. CreaciÃ³n de usuarios y roles, asignaciÃ³n de permisos y encriptaciÃ³n de datos.
 Fecha de entrega: 01/07/2025
-Número de comisión: 2900
-Número de grupo: 17
+NÃºmero de comisiÃ³n: 2900
+NÃºmero de grupo: 17
 Materia: Bases de datos aplicadas
-Alumnos:Aristimuño,Iara Belén DNI:45237225 
-		Domínguez,Luana Milena DNI:46362353
-		Lopardo, Tomás Matías DNI: 45495734
+Alumnos:AristimuÃ±o,Iara BelÃ©n DNI:45237225 
+		DomÃ­nguez,Luana Milena DNI:46362353
+		Lopardo, TomÃ¡s MatÃ­as DNI: 45495734
 		Rico, Agustina Micaela DNI: 46028153
 */
 
@@ -297,7 +297,7 @@ INSERT INTO club.Empleado (
     dni, nombre, apellido, telContacto, fechaNac, telEmergencia
 )
 VALUES (
-    '12345678', 'Juan', 'Pérez', 1144556677, '1990-05-15', 1122334455
+    '12345678', 'Juan', 'PÃ©rez', 1144556677, '1990-05-15', 1122334455
 );
 
 INSERT INTO club.Empleado (
