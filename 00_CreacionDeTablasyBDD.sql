@@ -11,7 +11,7 @@ Alumnos:Aristimuño,Iara Belén DNI:45237225
 --CREACIÓN DE LA BASE DE DATOS
 USE master;
 GO
--- CierrO todas las conexiones activas a la base de datos Com2900G17
+-- Cierro todas las conexiones activas a la base de datos Com2900G17
 ALTER DATABASE Com2900G17
 SET SINGLE_USER
 WITH ROLLBACK IMMEDIATE; 
@@ -215,7 +215,7 @@ CREATE TABLE club.coloniaVerano (
     codColonia INT IDENTITY(1,1) PRIMARY KEY,
     mes INT,
 	anio INT,
-	turno VARCHAR(6) CHECK (turno IN ('mañana', 'tarde')),
+	turno VARCHAR(6) CHECK (turno IN ('mañana', 'tarde', 'doble')),
     codCostoColonia INT,
     CONSTRAINT FK_coloniaVerano_costo FOREIGN KEY (codCostoColonia) REFERENCES club.costoColonia(codCostoColonia)
 );
