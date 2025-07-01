@@ -1,3 +1,30 @@
+/*Entrega 6:Reportes solicitados. Ejecución de Stored Procedures para la generación de reportes
+Reporte 1: Reporte de los socios morosos, que hayan incumplido en más de dos oportunidades dado un
+rango de fechas a ingresar. El reporte debe contener los siguientes datos:
+Nombre del reporte: Morosos Recurrentes
+Período: rango de fechas
+Nro de socio
+Nombre y apellido.
+Mes incumplido
+Ordenados de Mayor a menor por ranking de morosidad
+El mismo debe ser desarrollado utilizando Windows Function.
+Reporte 2: Reporte acumulado mensual de ingresos por actividad deportiva al momento en que se saca
+el reporte tomando como inicio enero.
+Reporte 3: Reporte de la cantidad de socios que han realizado alguna actividad de forma alternada
+(inasistencias) por categoría de socios y actividad, ordenado según cantidad de inasistencias
+ordenadas de mayor a menor.
+Reporte 4: Reporte que contenga a los socios que no han asistido a alguna clase de la actividad que realizan.
+El reporte debe contener: Nombre, Apellido, edad, categoría y la actividad
+-----------------------------------------------------------------------------------------------------------
+Fecha de entrega: 01/07/2025
+Número de comisión: 2900
+Número de grupo: 17
+Materia: Bases de datos aplicadas
+Alumnos:Aristimuño,Iara Belén DNI:45237225 
+		Domínguez,Luana Milena DNI:46362353
+		Lopardo, Tomás Matías DNI: 45495734
+		Rico, Agustina Micaela DNI: 46028153
+*/
 USE Com2900G17
 GO
 
@@ -15,8 +42,6 @@ WHERE nombre in ('Juan', 'María', 'Pedro');
 SELECT * FROM tesoreria.factura f
 JOIN socio.socio s ON f.ID_socio = s.ID_socio
 WHERE s.nombre in ('Juan', 'María', 'Pedro')
-
-
 
 EXEC tesoreria.GenerarRegistroMoroso '2025', '1';
 EXEC tesoreria.GenerarRegistroMoroso '2025', '2';
@@ -43,18 +68,10 @@ EXEC reportes.MorososRecurrentes '2025-03-01', '2025-05-31';
 EXEC reportes.MorososRecurrentes '2025-06-01', '2025-05-30';
 -- Esperado: 0 registros (nadie con >2 morosidades en ese mes)
 
-
-
-
 --REPORTE 2
-
 EXEC reportes.Reporte_ingresos_por_actividad
-
 --REPORTE 3
-
 EXEC reportes.reporteInasistenciasAlternadas 
-
 --REPORTE 4
-
 EXEC reportes.SociosConAlgunaInasistencia
 

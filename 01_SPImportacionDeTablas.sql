@@ -1,8 +1,15 @@
---SP PARA IMPORTACION
-
+/*Entrega 5:Conjunto de pruebas.Importacion de datos a partir de archivos .CSV
+Fecha de entrega: 01/07/2025
+Número de comisión: 2900
+Número de grupo: 17
+Materia: Bases de datos aplicadas
+Alumnos:Aristimuño,Iara Belén DNI:45237225 
+		Domínguez,Luana Milena DNI:46362353
+		Lopardo, Tomás Matías DNI: 45495734
+		Rico, Agustina Micaela DNI: 46028153
+*/
 USE Com2900G17
 GO
-
 -----------------------------
 CREATE OR ALTER PROCEDURE importaciones.InsertarCatSocio
     @RutaArchivo VARCHAR(255)
@@ -12,18 +19,8 @@ BEGIN
 
     IF OBJECT_ID('tempdb..#cat_temp') IS NOT NULL
         DROP TABLE #cat_temp;
-
-	-- IMPORTANTE SOBRE COLLATE:
-	-- Las tablas temporales se crean en tempdb, y por defecto heredan el COLLATE de ese sistema (generalmente SQL_Latin1_General_CP1_CI_AS).
-	-- Nuestra base de datos usa COLLATE Modern_Spanish_CI_AS.
-	-- Esto puede generar un error al comparar columnas tipo VARCHAR entre una tabla temporal y una tabla de nuestra base:
-	-- SOLUCIÓN:
-	-- En cada tabla cuyo sp tenga comparación entre VARCHAR de tabla temporal y VARCHAR de bdd, usar:
-	-- columnaTemp COLLATE Modern_Spanish_CI_AS
-	-- Solo es necesario en campos tipo VARCHAR/CHAR.
-
     CREATE TABLE #cat_temp(
-        [Categoria socio] VARCHAR(50) COLLATE Modern_Spanish_CI_AS , --ejemplo agregacion collate
+        [Categoria socio] VARCHAR(50) COLLATE Modern_Spanish_CI_AS ,
         [Valor cuota] VARCHAR(50) COLLATE Modern_Spanish_CI_AS ,     
         [Vigente hasta] VARCHAR(50) COLLATE Modern_Spanish_CI_AS       
     );
@@ -171,7 +168,7 @@ BEGIN
           AND NOT EXISTS (SELECT 1 FROM socio.socio s WHERE s.dni = o.dni);
 
         -- Mostrar los DNI duplicados
-        --SELECT * FROM #socios_duplicados;
+        SELECT * FROM #socios_duplicados;
 
         -- Eliminar tabla auxiliar
         DROP TABLE #ordenados_temp;
@@ -416,7 +413,6 @@ BEGIN
 END;
 GO
 
-
 ----------------------------
 CREATE OR ALTER PROCEDURE importaciones.InsertarCuotasCatSocio
     @rutaArchivo NVARCHAR(260)
@@ -505,7 +501,8 @@ BEGIN
             ROWTERMINATOR = ''\n'',
             CODEPAGE = ''65001''
         );
-    ';-- Depende del csv que usemos si es , o ;
+    ';-- Si esta en inglés el Excel desde el cual descargamos el csv va FIELDTERMINATOR = '','' 
+	  --sino FIELDTERMINATOR = '';''
     EXEC (@sql);
 
     -- Insertar en la tabla Presentismo
@@ -516,8 +513,8 @@ BEGIN
 			act,
 			profesor
 		)
-		-- IMPORTANTE SOBRE EL FORMATO DE FECHAS:
-		-- El tercer parámetro de TRY_CONVERT define el formato de la fecha.
+		-- FORMATO DE FECHAS:
+		-- TRY_CONVERT para definir el formato de la fecha.
 		-- Elegir el número correcto según el formato de fecha en el archivo .CSV:
 		-- 101 = mm/dd/yyyy (ESTILO ESTADOUNIDENSE) -> USAR ESTE si el archivo se generó desde un Excel en idioma inglés.
 		-- 103 = dd/mm/yyyy (ESTILO EUROPEO/LATINO) -> USAR ESTE si el archivo se generó desde un Excel en español.
@@ -578,7 +575,7 @@ BEGIN
             CODEPAGE = ''65001''
         );';
 
-    EXEC sp_executesql @sql;-- Lo cambie a ; porque en mi maquina sino no funciona
+    EXEC sp_executesql @sql;
 
     INSERT INTO tesoreria.pagoFactura (
 		idPago,
