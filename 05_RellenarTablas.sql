@@ -91,7 +91,7 @@ EXEC socio.EliminarSocio
 INSERT INTO club.Presentismo (fecha, presentismo, socio, act, profesor) VALUES
 ('2025-03-10', 'P', 154, 1, 'Hector Alvarez'),
 ('2025-03-15', 'P', 154, 1, 'Hector Alvarez'),
-('2025-03-10', 'P', 154, 1, 'Hector Alvarez'),
+('2025-03-18', 'P', 154, 1, 'Hector Alvarez'),
 ('2025-04-12', 'P', 154, 1, 'Hector Alvarez'),
 ('2025-05-08', 'P', 154, 1, 'Hector Alvarez'),
 
