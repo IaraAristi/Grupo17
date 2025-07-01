@@ -1,3 +1,14 @@
+/*Entrega 7: Requisitos de Seguridad. Creación de usuarios y roles, asignación de permisos y encriptación de datos.
+Fecha de entrega: 01/07/2025
+Número de comisión: 2900
+Número de grupo: 17
+Materia: Bases de datos aplicadas
+Alumnos:Aristimuño,Iara Belén DNI:45237225 
+		Domínguez,Luana Milena DNI:46362353
+		Lopardo, Tomás Matías DNI: 45495734
+		Rico, Agustina Micaela DNI: 46028153
+*/
+
 USE master
 GO
 
