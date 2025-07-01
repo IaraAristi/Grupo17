@@ -1,11 +1,11 @@
-/*Entrega 5:Conjunto de pruebas.CreaciÛn de Stored Procedures para la inserciÛn ,actualizaciÛn y borrado de tablas
+/*Entrega 5:Conjunto de pruebas.Creaci√≥n de Stored Procedures para la carga y actualizaci√≥n de tablas fuera del excel.
 Fecha de entrega: 01/07/2025
-N˙mero de comisiÛn: 2900
-N˙mero de grupo: 17
+N√∫mero de comisi√≥n: 2900
+N√∫mero de grupo: 17
 Materia: Bases de datos aplicadas
-Alumnos:AristimuÒo,Iara BelÈn DNI:45237225 
-		DomÌnguez,Luana Milena DNI:46362353
-		Lopardo, Tom·s MatÌas DNI: 45495734
+Alumnos:Aristimu√±o,Iara Bel√©n DNI:45237225 
+		Dom√≠nguez,Luana Milena DNI:46362353
+		Lopardo, Tom√°s Mat√≠as DNI: 45495734
 		Rico, Agustina Micaela DNI: 46028153
 */
 USE Com2900G17
@@ -28,7 +28,7 @@ BEGIN
     FROM socio.socio s
     WHERE s.codInscripcion IS NULL;
 
-    -- Actualizar cada socio con el ID de inscripciÛn correspondiente al grupo
+    -- Actualizar cada socio con el ID de inscripci√≥n correspondiente al grupo
     UPDATE s
     SET s.codInscripcion = i.idInscripcion
     FROM socio.socio s
@@ -49,7 +49,7 @@ BEGIN
     -- Desactivar el conteo de filas afectadas para mejorar el rendimiento
     SET NOCOUNT ON;
 
-    -- Iniciar una transacciÛn para asegurar la atomicidad de la operaciÛn
+    -- Iniciar una transacci√≥n para asegurar la atomicidad de la operaci√≥n
     BEGIN TRY
         BEGIN TRANSACTION;
 
@@ -63,7 +63,7 @@ BEGIN
                 SELECT
                     ID_Socio,
                     fechaNac,
-                    -- Calcula la edad en aÒos completos (para SQL Server)
+                    -- Calcula la edad en a√±os completos (para SQL Server)
                     DATEDIFF(year, fechaNac, GETDATE()) -
                     CASE
                         WHEN MONTH(fechaNac) > MONTH(GETDATE()) OR
@@ -82,30 +82,30 @@ BEGIN
         WHERE
             s.fechaNac IS NOT NULL; -- Solo actualiza a socios con fecha de nacimiento
 
-        -- Confirmar la transacciÛn si todo fue bien
+        -- Confirmar la transacci√≥n si todo fue bien
         COMMIT TRANSACTION;
 
-        PRINT 'La actualizaciÛn de la categorÌa de socios se completÛ exitosamente.';
+        PRINT 'La actualizaci√≥n de la categor√≠a de socios se complet√≥ exitosamente.';
 
     END TRY
     BEGIN CATCH
-        -- Si ocurre un error, revertir la transacciÛn
+        -- Si ocurre un error, revertir la transacci√≥n
         IF @@TRANCOUNT > 0
             ROLLBACK TRANSACTION;
 
-        -- Capturar y mostrar informaciÛn del error
+        -- Capturar y mostrar informaci√≥n del error
         DECLARE @ErrorMessage NVARCHAR(4000) = ERROR_MESSAGE();
         DECLARE @ErrorSeverity INT = ERROR_SEVERITY();
         DECLARE @ErrorState INT = ERROR_STATE();
 
         RAISERROR (@ErrorMessage, @ErrorSeverity, @ErrorState);
 
-        PRINT 'OcurriÛ un error durante la actualizaciÛn de la categorÌa de socios. La transacciÛn fue revertida.';
+        PRINT 'Ocurri√≥ un error durante la actualizaci√≥n de la categor√≠a de socios. La transacci√≥n fue revertida.';
     END CATCH;
 END;
 GO
 --------------------------------------------------------------------------------------------------------------------------
---Actualizar el n˙mero de grupo familiar para aquellos socios que sean responsables de pago del grupo
+--Actualizar el n√∫mero de grupo familiar para aquellos socios que sean responsables de pago del grupo
 -- ================================================
 CREATE OR ALTER PROCEDURE socio.ActualizarGrupoFamiliarResponsables
 AS
@@ -257,7 +257,7 @@ BEGIN
     INSERT INTO tesoreria.detalleFactura (codFactura, concepto, monto, descuento,ID_socio)
     SELECT 
         NULL,  
-        CONCAT('MembresÌa ', cs.nombreCat, ' - ', s.nombre, ' ', s.apellido),
+        CONCAT('Membres√≠a ', cs.nombreCat, ' - ', s.nombre, ' ', s.apellido),
         cmmc.precio_bruto,
         cmmc.descuento_aplicado,
 		s.ID_socio
@@ -420,7 +420,7 @@ BEGIN
         SELECT 1 FROM socio.cuenta c WHERE c.socio = s.ID_socio
     );
 
-    -- DÌas de lluvia
+    -- D√≠as de lluvia
     IF OBJECT_ID('tempdb..#dias_lluvia') IS NOT NULL DROP TABLE #dias_lluvia;
     SELECT fecha INTO #dias_lluvia
     FROM ##lluvias_diarias
@@ -437,7 +437,7 @@ BEGIN
     JOIN socio.socio s ON s.ID_socio = p.idSocio
     JOIN club.catSocio cs ON cs.codCat = s.codCat
     JOIN club.costoPileta cp ON 
-        cp.tipo COLLATE Modern_Spanish_CI_AS = 'dÌa' COLLATE Modern_Spanish_CI_AS AND
+        cp.tipo COLLATE Modern_Spanish_CI_AS = 'd√≠a' COLLATE Modern_Spanish_CI_AS AND
         cp.categoria COLLATE Modern_Spanish_CI_AS = 
             CASE 
                 WHEN cs.nombreCat COLLATE Modern_Spanish_CI_AS LIKE '%menor%' THEN 'menor'
@@ -465,7 +465,7 @@ BEGIN
     WHERE rango.dia IN (SELECT fecha FROM #dias_lluvia)
     GROUP BY df.codDetalleFac, df.ID_socio, cd.costo_diario;
 
-    -- Reintegros por PASE DÕA
+    -- Reintegros por PASE D√çA
     IF OBJECT_ID('tempdb..#reintegros_dia') IS NOT NULL DROP TABLE #reintegros_dia;
     SELECT 
         df.codDetalleFac,
@@ -474,7 +474,7 @@ BEGIN
         ROUND(df.monto * 0.60, 2) AS reintegro
     INTO #reintegros_dia
     FROM tesoreria.detalleFactura df
-    JOIN club.pasePileta p ON p.idSocio = df.ID_socio AND df.concepto LIKE '%pileta%' AND p.tipo = 'dÌa'
+    JOIN club.pasePileta p ON p.idSocio = df.ID_socio AND df.concepto LIKE '%pileta%' AND p.tipo = 'd√≠a'
     WHERE p.fechaDesde IN (SELECT fecha FROM #dias_lluvia);
 
     -- Unificar resultados
@@ -580,7 +580,7 @@ BEGIN
 
     DECLARE @hoy DATE = GETDATE();
 
-    -- Genera una ˙nica factura por invitado, sumando los ingresos no facturados
+    -- Genera una √∫nica factura por invitado, sumando los ingresos no facturados
     INSERT INTO tesoreria.facturaInvitado (fechaEmision, codInvitado, idPago, monto)
     SELECT 
         @hoy,
