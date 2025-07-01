@@ -98,9 +98,9 @@ TABLE_SCHEMA =
 BEGIN
 CREATE TABLE socio.tutor (
     idTutor INT IDENTITY(1,1) PRIMARY KEY,
-    nombre VARCHAR(50),
-    apellido VARCHAR(50),
-    dni CHAR(8) UNIQUE,
+    nombre VARCHAR(50) CHECK (nombre NOT LIKE '%[0-9]%'),
+    apellido VARCHAR(50) CHECK (apellido NOT LIKE '%[0-9]%'),
+    dni CHAR(8) UNIQUE CHECK (dni NOT LIKE '%[^0-9]%'),
     email VARCHAR(50),
     parentesco VARCHAR(50)
 );
@@ -128,9 +128,9 @@ BEGIN
 CREATE TABLE socio.socio (
     ID_socio INT IDENTITY(1,1) PRIMARY KEY,
     nroSocio CHAR(7) UNIQUE,
-    dni CHAR(8) UNIQUE,
-    nombre VARCHAR(50),
-    apellido VARCHAR(50),
+    dni CHAR(8) UNIQUE CHECK (dni NOT LIKE '%[^0-9]%'),
+    nombre VARCHAR(50) CHECK (nombre NOT LIKE '%[0-9]%'),
+    apellido VARCHAR(50) CHECK (apellido NOT LIKE '%[0-9]%'),
     telContacto INT,
     email VARCHAR(50),
     fechaNac DATE,
@@ -224,7 +224,7 @@ CREATE TABLE club.coloniaVerano (
     codColonia INT IDENTITY(1,1) PRIMARY KEY,
     mes INT,
 	anio INT,
-	turno VARCHAR (6),
+	turno VARCHAR(6) CHECK (turno IN ('mañana', 'tarde')),
     codCostoColonia INT,
     CONSTRAINT FK_coloniaVerano_costo FOREIGN KEY (codCostoColonia) REFERENCES club.costoColonia(codCostoColonia)
 );
@@ -267,7 +267,7 @@ BEGIN
 CREATE TABLE club.alquilerSUM (
     codAlquilerSum INT IDENTITY(1,1) PRIMARY KEY,
     fecha DATE,
-    turno VARCHAR(6),
+    turno VARCHAR(6) check (turno in ('mañana','tarde','noche')),
     socio INT,
     codCostoSUM INT,
     CONSTRAINT FK_alquilerSUM_socio FOREIGN KEY (socio) REFERENCES socio.socio(ID_socio),
@@ -297,10 +297,10 @@ TABLE_SCHEMA =
 BEGIN
 CREATE TABLE club.invitado (
     codInvitado INT IDENTITY(1,1) PRIMARY KEY,
-    nombre VARCHAR(50),
-    apellido VARCHAR(50),
+    nombre VARCHAR(50) CHECK (nombre NOT LIKE '%[0-9]%'),
+    apellido VARCHAR(50) CHECK (apellido NOT LIKE '%[0-9]%'),
     fechaNac DATE,
-    dni CHAR(8) UNIQUE,
+    dni CHAR(8) UNIQUE CHECK (dni NOT LIKE '%[^0-9]%'),
     mail VARCHAR(50)
 );
 END
