@@ -133,10 +133,15 @@ INSERT INTO club.costoColonia (costo, fechaVigenciaHasta, turno) VALUES
 (3000, '2025-02-28', 'tarde'),
 (5000, '2025-02-28', 'doble');
 
-INSERT INTO club.coloniaVerano (mes, turno, socio) VALUES
-(1, 'mañana', 130),
-(1, 'tarde', 121),
-(2, 'doble', 124);
+INSERT INTO club.coloniaVerano (mes, turno, anio) VALUES
+(1, 'mañana', 2025),
+(1, 'tarde', 2025),
+(2, 'doble', 2025);
+
+INSERT INTO club.asistenciaColonia (codSocio, codColonia) VALUES
+(124,1),
+(150,2),
+(133,3);
 
 EXEC club.AsignarCostoColonia
 	@mes = 1,

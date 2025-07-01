@@ -365,34 +365,34 @@ GO
 
 
 --SP DETALLES DE FACTURA PASE PILETA SOCIOS
-CREATE OR ALTER PROCEDURE tesoreria.GenerarDetallePasePileta
+CREATE OR ALTER PROCEDURE tesoreria.GenerarDetalleFacturaColonia
     @mes INT,
-	@anio INT
+    @anio INT
 AS
 BEGIN
     SET NOCOUNT ON;
 
-    DECLARE @inicioMes DATE = DATEFROMPARTS(@anio, @mes, 1);
-    DECLARE @finMes DATE = EOMONTH(@inicioMes);
-
-    -- Elimina detalles del mes actual vinculados a Pase Pileta que no tengan codFactura todavía
-    DELETE FROM tesoreria.detalleFactura
-    WHERE codFactura IS NULL
-      AND concepto LIKE 'Pase pileta%';
-
-    INSERT INTO tesoreria.detalleFactura (codFactura, concepto, monto, descuento, ID_socio)
+    INSERT INTO tesoreria.detalleFactura (
+        ID_socio,
+        concepto,
+        monto,
+        descuento
+    )
     SELECT 
-        NULL,
-        CONCAT('Pase pileta - ', cp.tipo, ' (', FORMAT(pp.fechaDesde, 'dd/MM/yyyy'), ')'),
-        cp.costo,
-        0,
-        s.ID_socio
-    FROM club.pasePileta pp
-    JOIN club.costoPileta cp ON cp.codCostoPileta = pp.codCostoPileta
-    JOIN socio.socio s ON s.ID_socio = pp.idSocio
-    WHERE pp.fechaDesde BETWEEN @inicioMes AND @finMes;
-    
-    PRINT 'Detalles de pase pileta generados';
+        ac.codSocio,
+        CONCAT('Colonia de verano - Turno ', cv.turno),
+        cc.costo,
+        0
+    FROM club.asistenciaColonia ac
+    JOIN club.coloniaVerano cv ON ac.codColonia = cv.codColonia
+    JOIN club.costoColonia cc ON cc.turno = cv.turno AND cc.fechaVigenciaHasta >= DATEFROMPARTS(@anio, @mes, 1)
+    WHERE cv.mes = @mes AND cv.anio = @anio
+      AND NOT EXISTS (
+            SELECT 1
+            FROM tesoreria.detalleFactura df
+            WHERE df.ID_socio = ac.codSocio
+              AND df.concepto LIKE CONCAT('Colonia de verano%', cv.turno)
+        );
 END;
 GO
 
@@ -616,21 +616,23 @@ BEGIN
         ID_socio,
         concepto,
         monto,
-		descuento
+        descuento
     )
     SELECT 
-        c.socio,
-        CONCAT('Colonia de verano - Turno ', c.turno),
+        ac.codSocio,
+        CONCAT('Colonia de verano - Turno ', cv.turno),
         cc.costo,
-		0
-    FROM club.coloniaVerano c
-    JOIN club.costoColonia cc ON cc.codCostoColonia = c.codCostoColonia
-    WHERE c.mes = @mes
+        0
+    FROM club.asistenciaColonia ac
+    JOIN club.coloniaVerano cv ON ac.codColonia = cv.codColonia
+    JOIN club.costoColonia cc ON cc.turno = cv.turno 
+                              AND cc.fechaVigenciaHasta >= DATEFROMPARTS(@anio, @mes, 1)
+    WHERE cv.mes = @mes AND cv.anio = @anio
       AND NOT EXISTS (
             SELECT 1
             FROM tesoreria.detalleFactura df
-            WHERE df.ID_socio = c.socio
-              AND df.concepto LIKE CONCAT('Colonia de verano%', c.turno)
+            WHERE df.ID_socio = ac.codSocio
+              AND df.concepto LIKE CONCAT('Colonia de verano - Turno ', cv.turno)
         );
 END;
 GO
