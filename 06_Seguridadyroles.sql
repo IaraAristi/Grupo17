@@ -241,7 +241,7 @@ GRANT SELECT ON SCHEMA::socio TO rol_Vocales;
 GRANT SELECT ON SCHEMA::tesoreria TO rol_Vocales;
 
 -- creacion de tabla empleado
-DROP TABLE club.Empleado
+--DROP TABLE club.Empleado
 
 
 IF NOT EXISTS (
@@ -323,7 +323,7 @@ SELECT
     fechaNac_enc,
     telEmergencia_enc
 FROM club.Empleado;
-
+GO
 
 -- desencriptacion
 CREATE OR ALTER PROCEDURE club.DesencriptarEmpleado
