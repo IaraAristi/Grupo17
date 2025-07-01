@@ -21,9 +21,10 @@ Este proyecto implementa una base de datos relacional que permite gestionar de f
 | `03_CargarTablas.sql`           | SP para cargas o actualizaciones específicas de datos.                    |
 | `04_SPCreateAlterDelete.sql`         | SP para inserciones, modificaciones y borrado de datos.              |
 | `05_RellenarTablas.sql`         | Inserción manual de datos clave y ejecución de SP auxiliares.              |
-| `06_Seguridad&roles.sql`        | Creación de usuarios, roles, asignación de permisos y encriptación.           |
-| `07_Reportes.sql`               | Creación de procedimientos almacenados para reportes estadísticos.                 |
-| `08_EjecucionesReportes.sql`    | Ejecución de los reportes generados.                           |
+| `06_Reportes.sql`               | Creación de procedimientos almacenados para reportes estadísticos.                 |
+| `07_EjecucionesReportes.sql`    | Ejecución de los reportes generados.                           |
+| `08_Seguridad&roles.sql`        | Creación de usuarios, roles, asignación de permisos y encriptación.           |
+| `09_EjecucionesSeguridadyRoles.sql`    | Ejecución de .                           |
 
 ## ⚙️ Instrucciones de ejecución
 
