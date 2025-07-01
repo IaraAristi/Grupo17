@@ -1,4 +1,14 @@
---INSERCCION DE TABLAS FUERA DEL EXCEL
+/*Entrega 5:Conjunto de pruebas. Juegos de pruebas
+Fecha de entrega: 01/07/2025
+N√∫mero de comisi√≥n: 2900
+N√∫mero de grupo: 17
+Materia: Bases de datos aplicadas
+Alumnos:Aristimu√±o,Iara Bel√©n DNI:45237225 
+		Dom√≠nguez,Luana Milena DNI:46362353
+		Lopardo, Tom√°s Mat√≠as DNI: 45495734
+		Rico, Agustina Micaela DNI: 46028153
+*/
+
 Use Com2900G17;
 GO
 
@@ -8,7 +18,7 @@ EXEC socio.AgregarSocio
     @nroSocio = 'SN-5000',
     @dni = '33456456',
     @nombre = 'Juan',
-    @apellido = 'PÈrez',
+    @apellido = 'P√©rez',
     @telContacto = 11345678,
     @email = 'juan@mail.com',
     @fechaNac = '1990-01-01',
@@ -22,8 +32,8 @@ GO
 EXEC socio.AgregarSocio
     @nroSocio = 'SN-5011',
     @dni = '33456900',
-    @nombre = 'MarÌa',
-    @apellido = 'LÛpez',
+    @nombre = 'Mar√≠a',
+    @apellido = 'L√≥pez',
     @telContacto = 11206365,
     @email = 'maria@mail.com',
     @fechaNac = '1995-05-05',
@@ -38,7 +48,7 @@ EXEC socio.AgregarSocio
     @nroSocio = 'SN-5002',
     @dni = '39002137',
     @nombre = 'Pedro',
-    @apellido = 'GÛmez',
+    @apellido = 'G√≥mez',
     @telContacto = 11206365,
     @email = 'pedro@mail.com',
     @fechaNac = '1975-03-10',
@@ -54,8 +64,8 @@ GO
 EXEC socio.AgregarSocio
     @nroSocio = 'SN-5020',
     @dni = '40445566',
-    @nombre = 'LucÌa',
-    @apellido = 'Fern·ndez',
+    @nombre = 'Luc√≠a',
+    @apellido = 'Fern√°ndez',
     @telContacto = 1199998888,
     @email = 'lucia@mail.com',
     @fechaNac = '1992-07-15',
@@ -101,11 +111,11 @@ INSERT INTO club.Presentismo (fecha, presentismo, socio, act, profesor) VALUES
 
 --DATOS TUTOR
 INSERT INTO socio.tutor (nombre, apellido, dni, email, parentesco) VALUES
-('Juan', 'PÈrez', 25123456, 'juan.perez@email.com', 'padre'),
-('MarÌa', 'GÛmez', 27567890, 'maria.gomez@email.com', 'madre'),
-('Carlos', 'LÛpez', 28444555, 'carlos.lopez@email.com', 'tutor'),
-('Laura', 'Fern·ndez', 29555111, 'laura.fernandez@email.com', 'madre'),
-('JosÈ', 'MartÌnez', 30666222, 'jose.martinez@email.com', 'padre')
+('Juan', 'P√©rez', 25123456, 'juan.perez@email.com', 'padre'),
+('Mar√≠a', 'G√≥mez', 27567890, 'maria.gomez@email.com', 'madre'),
+('Carlos', 'L√≥pez', 28444555, 'carlos.lopez@email.com', 'tutor'),
+('Laura', 'Fern√°ndez', 29555111, 'laura.fernandez@email.com', 'madre'),
+('Jos√©', 'Mart√≠nez', 30666222, 'jose.martinez@email.com', 'padre')
 
 SELECT* FROM socio.Tutor
 
@@ -115,7 +125,7 @@ INSERT INTO socio.socio (
     telEmergencia, nombreObraSoc, numeroObraSoc, telObraSoc, estado, codTutor
 )
 VALUES
-('SN-4155', '47258775', 'BenjamÌn', 'GÛmez', '2010-05-20',
+('SN-4155', '47258775', 'Benjam√≠n', 'G√≥mez', '2010-05-20',
  1133124567, 'OSDE', '0001234567', '0116000111', 'A',1),
 ('SN-4156', '47258776', 'Emilia', 'Ponce', '2012-08-15',
  1133124568, 'Swiss Medical', '0002233445', '0116000222', 'A',2),
@@ -123,7 +133,7 @@ VALUES
  1133124569, 'IOMA', '0003344556', '0116000333', 'A',3),
 ('SN-4158', '47258778', 'Catalina', 'Luna', '2015-02-10',
  1133124570, 'Galeno', '0004455667', '0116000444', 'A',4),
-('SN-4159', '47258779', 'Tom·s', 'Molina', '2014-04-22',
+('SN-4159', '47258779', 'Tom√°s', 'Molina', '2014-04-22',
  1133124571, 'Medife', '0005566778', '0116000555', 'A',5);
 
  INSERT INTO club.Presentismo (fecha, presentismo, socio, act, profesor) VALUES
@@ -179,11 +189,11 @@ GO
 
 INSERT INTO club.pasePileta (tipo, fechaDesde, fechaHasta, idSocio)
 VALUES
-    ('dÌa', '2025-01-20', '2025-01-20', 5),
-    ('dÌa', '2025-02-28', '2025-02-28', 12),
-    ('dÌa', '2025-02-28', '2025-02-28', 50),
-    ('dÌa', '2025-01-15', '2025-01-15', 87),
-    ('dÌa', '2025-02-10', '2025-02-10', 119),
+    ('d√≠a', '2025-01-20', '2025-01-20', 5),
+    ('d√≠a', '2025-02-28', '2025-02-28', 12),
+    ('d√≠a', '2025-02-28', '2025-02-28', 50),
+    ('d√≠a', '2025-01-15', '2025-01-15', 87),
+    ('d√≠a', '2025-02-10', '2025-02-10', 119),
     ('mes', '2025-01-01', '2025-01-31', 11),
     ('mes', '2025-02-01', '2025-02-28', 17);
 
@@ -193,12 +203,12 @@ SELECT * FROM club.pasePileta
 --------------------------------------------------------
 
 INSERT INTO club.costoColonia (costo, fechaVigenciaHasta, turno) VALUES
-(3000, '2025-02-28', 'maÒana'),
+(3000, '2025-02-28', 'ma√±ana'),
 (3000, '2025-02-28', 'tarde'),
 (5000, '2025-02-28', 'doble');
 
 INSERT INTO club.coloniaVerano (mes, turno, anio) VALUES
-(1, 'maÒana', 2025),
+(1, 'ma√±ana', 2025),
 (1, 'tarde', 2025),
 (2, 'doble', 2025);
 
@@ -219,7 +229,7 @@ INSERT INTO club.costoSUM (costo, fechaVigenciaHasta) VALUES
 (1000, '2025-06-30');
 
 INSERT INTO club.alquilerSUM (fecha, turno, socio) VALUES
-('2025-03-03', 'maÒana', 100),
+('2025-03-03', 'ma√±ana', 100),
 ('2025-04-03', 'noche', 10);
 
 EXEC club.AsignarCostoSUM
@@ -260,11 +270,11 @@ SELECT * FROM socio.cuenta
 -------------------------------------------------------------
 
 INSERT INTO club.invitado (nombre, apellido, fechaNac, dni, mail) VALUES
-('LucÌa', 'PÈrez', '2001-05-23', '34567890', 'lucia.perez@email.com'),
-('Mateo', 'Fern·ndez', '1999-11-12', '32145678', 'mateo.fernandez@email.com'),
-('Juli·n', 'RodrÌguez', '1998-08-17', '31234567', 'julian.rodriguez@email.com'),
-('Valentina', 'LÛpez', '2000-03-09', '35678901', 'valentina.lopez@email.com'),
-('Bruno', 'S·nchez', '2010-09-15', '37890123', 'bruno.sanchez@email.com');
+('Luc√≠a', 'P√©rez', '2001-05-23', '34567890', 'lucia.perez@email.com'),
+('Mateo', 'Fern√°ndez', '1999-11-12', '32145678', 'mateo.fernandez@email.com'),
+('Juli√°n', 'Rodr√≠guez', '1998-08-17', '31234567', 'julian.rodriguez@email.com'),
+('Valentina', 'L√≥pez', '2000-03-09', '35678901', 'valentina.lopez@email.com'),
+('Bruno', 'S√°nchez', '2010-09-15', '37890123', 'bruno.sanchez@email.com');
 
 INSERT INTO club.ingresoPiletaInvitado (fecha, socioInvitador, codInvitado) VALUES
 ('2025-01-20',5,1),
