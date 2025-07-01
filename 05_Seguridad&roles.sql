@@ -235,7 +235,7 @@ IF NOT EXISTS (
 )
 BEGIN
     CREATE TABLE club.Empleado (
-        ID_socio INT IDENTITY(1,1) PRIMARY KEY,
+        ID_empleado INT IDENTITY(1,1) PRIMARY KEY,
         dni CHAR(8) UNIQUE,
         nombre VARCHAR(50),
         apellido VARCHAR(50),
@@ -258,7 +258,7 @@ IF EXISTS (SELECT 1 FROM sys.triggers WHERE name = 'trigger_encriptacion_emplead
     DROP TRIGGER club.trigger_encriptacion_empleado;
 GO
 
-CREATE TRIGGER club.trigger_encriptacion_empleado
+CREATE TRIGGER club.encriptacion_empleado
 ON club.Empleado
 AFTER INSERT
 AS
@@ -274,7 +274,7 @@ BEGIN
         telContacto_enc = ENCRYPTBYPASSPHRASE(@password, CAST(i.telContacto AS VARCHAR)),
         telEmergencia_enc = ENCRYPTBYPASSPHRASE(@password, CAST(i.telEmergencia AS VARCHAR))
     FROM club.Empleado emp
-    INNER JOIN inserted i ON emp.ID_socio = i.ID_socio;
+    INNER JOIN inserted i ON emp.ID_empleado = i.ID_empleado;
 END;
 GO
 -- probando que funcione
@@ -300,7 +300,7 @@ VALUES (
 );
 
 SELECT 
-    ID_socio,
+    ID_empleado,
     nombre_enc,
     apellido_enc,
     dni_enc,
@@ -311,7 +311,7 @@ FROM club.Empleado;
 
 
 -- desencriptacion
-CREATE OR ALTER PROCEDURE club.sp_DesencriptarEmpleado
+CREATE OR ALTER PROCEDURE club.DesencriptarEmpleado
     @password NVARCHAR(100)
 AS
 BEGIN
