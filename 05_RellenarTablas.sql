@@ -1,14 +1,14 @@
 /*Entrega 5:Conjunto de pruebas. Juegos de pruebas
 Fecha de entrega: 01/07/2025
-Número de comisión: 2900
-Número de grupo: 17
+NÃºmero de comisiÃ³n: 2900
+NÃºmero de grupo: 17
 Materia: Bases de datos aplicadas
-Alumnos:Aristimuño,Iara Belén DNI:45237225 
-		Domínguez,Luana Milena DNI:46362353
-		Lopardo, Tomás Matías DNI: 45495734
+Alumnos:AristimuÃ±o,Iara BelÃ©n DNI:45237225 
+		DomÃ­nguez,Luana Milena DNI:46362353
+		Lopardo, TomÃ¡s MatÃ­as DNI: 45495734
 		Rico, Agustina Micaela DNI: 46028153
 
-OBSERVACIÓN: Los lotes de prueba deben ejecutarse en el orden en el cual estan declarados
+OBSERVACIÃ“N: Los lotes de prueba deben ejecutarse en el orden en el cual estan declarados
 */
 
 Use Com2900G17;
@@ -18,7 +18,7 @@ GO
 EXEC socio.AgregarSocio
     @dni = '33456456',
     @nombre = 'Juan',
-    @apellido = 'Pérez',
+    @apellido = 'PÃ©rez',
     @telContacto = 11345678,
     @email = 'juan@mail.com',
     @fechaNac = '1990-01-01',
@@ -31,8 +31,8 @@ GO
 
 EXEC socio.AgregarSocio
     @dni = '33456900',
-    @nombre = 'María',
-    @apellido = 'López',
+    @nombre = 'MarÃ­a',
+    @apellido = 'LÃ³pez',
     @telContacto = 11206365,
     @email = 'maria@mail.com',
     @fechaNac = '1995-05-05',
@@ -46,7 +46,7 @@ GO
 EXEC socio.AgregarSocio
     @dni = '39002137',
     @nombre = 'Pedro',
-    @apellido = 'Gómez',
+    @apellido = 'GÃ³mez',
     @telContacto = 11206365,
     @email = 'pedro@mail.com',
     @fechaNac = '1975-03-10',
@@ -61,8 +61,8 @@ GO
 
 EXEC socio.AgregarSocio
     @dni = '40445566',
-    @nombre = 'Lucía',
-    @apellido = 'Fernández',
+    @nombre = 'LucÃ­a',
+    @apellido = 'FernÃ¡ndez',
     @telContacto = 1199998888,
     @email = 'lucia@mail.com',
     @fechaNac = '1992-07-15',
@@ -89,7 +89,7 @@ EXEC socio.EliminarSocio
 INSERT INTO club.Presentismo (fecha, presentismo, socio, act, profesor) VALUES
 ('2025-03-10', 'P', 154, 1, 'Hector Alvarez'),
 ('2025-03-15', 'P', 154, 1, 'Hector Alvarez'),
-('2025-03-10', 'P', 154, 1, 'Hector Alvarez'),
+('2025-03-18', 'P', 154, 1, 'Hector Alvarez'),
 ('2025-04-12', 'P', 154, 1, 'Hector Alvarez'),
 ('2025-05-08', 'P', 154, 1, 'Hector Alvarez'),
 
@@ -109,19 +109,19 @@ INSERT INTO club.Presentismo (fecha, presentismo, socio, act, profesor) VALUES
 -------------------------------------------------------------------------------
 --DATOS TUTOR
 INSERT INTO socio.tutor (nombre, apellido, dni, email, parentesco) VALUES
-('Juan', 'Pérez', 25123456, 'juan.perez@email.com', 'padre'),
-('María', 'Gómez', 27567890, 'maria.gomez@email.com', 'madre'),
-('Carlos', 'López', 28444555, 'carlos.lopez@email.com', 'tutor'),
-('Laura', 'Fernández', 29555111, 'laura.fernandez@email.com', 'madre'),
-('José', 'Martínez', 30666222, 'jose.martinez@email.com', 'padre')
+('Juan', 'PÃ©rez', 25123456, 'juan.perez@email.com', 'padre'),
+('MarÃ­a', 'GÃ³mez', 27567890, 'maria.gomez@email.com', 'madre'),
+('Carlos', 'LÃ³pez', 28444555, 'carlos.lopez@email.com', 'tutor'),
+('Laura', 'FernÃ¡ndez', 29555111, 'laura.fernandez@email.com', 'madre'),
+('JosÃ©', 'MartÃ­nez', 30666222, 'jose.martinez@email.com', 'padre')
 -------------------------------------------------------------------------------
 SELECT* FROM socio.Tutor
 -------------------------------------------------------------------------------
 --DATOS SOCIOS MENORES DE EDAD, PARA PODER ASIGNARLES UN TUTOR
 EXEC socio.AgregarSocio 
     @dni = '47258775',
-    @nombre = 'Benjamín',
-    @apellido = 'Gómez',
+    @nombre = 'BenjamÃ­n',
+    @apellido = 'GÃ³mez',
     @telContacto = NULL,
     @email = NULL,
     @fechaNac = '2010-05-20',
@@ -188,7 +188,7 @@ EXEC socio.AgregarSocio
 
 EXEC socio.AgregarSocio 
     @dni = '47258779',
-    @nombre = 'Tomás',
+    @nombre = 'TomÃ¡s',
     @apellido = 'Molina',
     @telContacto = NULL,
     @email = NULL,
@@ -242,37 +242,37 @@ EXEC socio.AsignarInscripcionesASocios
 -------------------------------------------------------------------------------
 SELECT *FROM socio.socio
 -------------------------------------------------------------------------------
---Asignación de categoria de socio al socio según su edad
+--AsignaciÃ³n de categoria de socio al socio segÃºn su edad
 EXEC socio.ActualizarCategoriaSociosPorEdad
 GO
 -------------------------------------------------------------------------------
---Actualización de grupo familiar para el socio responsable de pago del grupo
+--ActualizaciÃ³n de grupo familiar para el socio responsable de pago del grupo
 EXEC socio.ActualizarGrupoFamiliarResponsables
 GO
 -----------------------------------------------------
 INSERT INTO club.pasePileta (tipo, fechaDesde, fechaHasta, idSocio)
 VALUES
-    ('día', '2025-01-20', '2025-01-20', 5),
-    ('día', '2025-02-28', '2025-02-28', 12),
-    ('día', '2025-02-28', '2025-02-28', 50),
-    ('día', '2025-01-15', '2025-01-15', 87),
-    ('día', '2025-02-10', '2025-02-10', 119),
+    ('dÃ­a', '2025-01-20', '2025-01-20', 5),
+    ('dÃ­a', '2025-02-28', '2025-02-28', 12),
+    ('dÃ­a', '2025-02-28', '2025-02-28', 50),
+    ('dÃ­a', '2025-01-15', '2025-01-15', 87),
+    ('dÃ­a', '2025-02-10', '2025-02-10', 119),
     ('mes', '2025-01-01', '2025-01-31', 11),
     ('mes', '2025-02-01', '2025-02-28', 17);
 
---Asignación del codigo de costo del pase de pileta
+--AsignaciÃ³n del codigo de costo del pase de pileta
 EXEC club.AsignarCostoPiletaAPases 
 -------------------------------------------------------------------------------
 SELECT * FROM club.pasePileta
 --------------------------------------------------------
 
 INSERT INTO club.costoColonia (costo, fechaVigenciaHasta, turno) VALUES
-(3000, '2025-02-28', 'mañana'),
+(3000, '2025-02-28', 'maÃ±ana'),
 (3000, '2025-02-28', 'tarde'),
 (5000, '2025-02-28', 'doble');
 
 INSERT INTO club.coloniaVerano (mes, turno, anio) VALUES
-(1, 'mañana', 2025),
+(1, 'maÃ±ana', 2025),
 (1, 'tarde', 2025),
 (2, 'doble', 2025);
 
@@ -293,7 +293,7 @@ INSERT INTO club.costoSUM (costo, fechaVigenciaHasta) VALUES
 (1000, '2025-06-30');
 
 INSERT INTO club.alquilerSUM (fecha, turno, socio) VALUES
-('2025-03-03', 'mañana', 100),
+('2025-03-03', 'maÃ±ana', 100),
 ('2025-04-03', 'noche', 10);
 -------------------------------------------------------------------------------
 EXEC club.AsignarCostoSUM
@@ -338,11 +338,11 @@ SELECT * FROM socio.cuenta
 -------------------------------------------------------------
 
 INSERT INTO club.invitado (nombre, apellido, fechaNac, dni, mail) VALUES
-('Lucía', 'Pérez', '2001-05-23', '34567890', 'lucia.perez@email.com'),
-('Mateo', 'Fernández', '1999-11-12', '32145678', 'mateo.fernandez@email.com'),
-('Julián', 'Rodríguez', '1998-08-17', '31234567', 'julian.rodriguez@email.com'),
-('Valentina', 'López', '2000-03-09', '35678901', 'valentina.lopez@email.com'),
-('Bruno', 'Sánchez', '2010-09-15', '37890123', 'bruno.sanchez@email.com');
+('LucÃ­a', 'PÃ©rez', '2001-05-23', '34567890', 'lucia.perez@email.com'),
+('Mateo', 'FernÃ¡ndez', '1999-11-12', '32145678', 'mateo.fernandez@email.com'),
+('JuliÃ¡n', 'RodrÃ­guez', '1998-08-17', '31234567', 'julian.rodriguez@email.com'),
+('Valentina', 'LÃ³pez', '2000-03-09', '35678901', 'valentina.lopez@email.com'),
+('Bruno', 'SÃ¡nchez', '2010-09-15', '37890123', 'bruno.sanchez@email.com');
 -----------------------------------------------------------------
 INSERT INTO club.ingresoPiletaInvitado (fecha, socioInvitador, codInvitado) VALUES
 ('2025-01-20',5,1),
