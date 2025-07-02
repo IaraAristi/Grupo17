@@ -52,9 +52,7 @@ EXEC importaciones.InsertarPagoFactura
 
 select * from tesoreria.pagoFactura order by idPago desc
 
----------------------------------
-EXEC socio.ActualizarCategoriaSociosPorEdad
-GO
+------------------------------
 
 
 EXEC importaciones.InsertarCostoPileta
