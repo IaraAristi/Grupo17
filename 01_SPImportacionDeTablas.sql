@@ -1,4 +1,4 @@
-/*Entrega 5:Conjunto de pruebas.Importacion de datos mediante Stored Procedures a partir de archivos .CSV
+/*Entrega 5:Conjunto de pruebas.Importacion de datos a partir de archivos .CSV
 Fecha de entrega: 01/07/2025
 Número de comisión: 2900
 Número de grupo: 17
@@ -8,11 +8,9 @@ Alumnos:Aristimuño,Iara Belén DNI:45237225
 		Lopardo, Tomás Matías DNI: 45495734
 		Rico, Agustina Micaela DNI: 46028153
 */
---CREACIÓN DE STORED PROCEDURES PARA LA IMPORTACIÓN DE TABLAS
 USE Com2900G17
 GO
-
--- Levantar tabla Categoria de Socio
+-----------------------------
 CREATE OR ALTER PROCEDURE importaciones.InsertarCatSocio
     @RutaArchivo VARCHAR(255)
 AS
@@ -37,7 +35,7 @@ BEGIN
             ROWTERMINATOR = ''\n'',
             CODEPAGE = ''65001''
         );
-	'; EXEC (@sql);-- Si esta en inglés el Excel desde el cual descargamos el csv va FIELDTERMINATOR = '','' sino FIELDTERMINATOR = '';''
+	'; EXEC (@sql);
 
     INSERT INTO club.catSocio (nombreCat, edad_desde, edad_hasta)
     SELECT DISTINCT
@@ -65,7 +63,8 @@ BEGIN
 END;
 GO
 
----Levantar tabla Socio(RP)
+
+---Levantar tabla RP
 CREATE OR ALTER PROCEDURE importaciones.ImportarSociosRP
     @RutaArchivo NVARCHAR(255)
 AS
@@ -117,11 +116,11 @@ BEGIN
             FROM ''' + @RutaArchivo + '''
             WITH (
                 FIRSTROW = 2,
-                FIELDTERMINATOR = '';'',
+                FIELDTERMINATOR = '','',
                 ROWTERMINATOR = ''\n'',
                 CODEPAGE = ''65001''
             );';
-        EXEC sp_executesql @SQL;-- Si esta en inglés el Excel desde el cual descargamos el csv va FIELDTERMINATOR = '','' sino FIELDTERMINATOR = '';''
+        EXEC sp_executesql @SQL;
 
         -- Crear tabla temporal con datos ordenados y numerados
         ;WITH ordenados AS (
@@ -189,7 +188,8 @@ BEGIN
 END;
 GO
 
---Levantar tabla Socio(Grupo Familiar)
+
+------------------
 CREATE OR ALTER PROCEDURE importaciones.ImportarSociosConGrupoFamiliar
     @RutaArchivo NVARCHAR(255)
 AS
@@ -221,11 +221,11 @@ BEGIN
             FROM ''' + @RutaArchivo + '''
             WITH (
                 FIRSTROW = 2,
-                FIELDTERMINATOR = '';'',
+                FIELDTERMINATOR = '','',
                 ROWTERMINATOR = ''\n'',
                 CODEPAGE = ''65001''
             );';
-        EXEC sp_executesql @SQL;-- Si esta en inglés el Excel desde el cual descargamos el csv va FIELDTERMINATOR = '','' sino FIELDTERMINATOR = '';''
+        EXEC sp_executesql @SQL;
 
         -- Insertar titulares (primeros por Nro de socio RP)
         WITH primeros_por_rp AS (
@@ -303,8 +303,8 @@ BEGIN
     END CATCH
 END;
 GO
+---------------------------------------------------
 
---Levantar tabla Actividades
 CREATE OR ALTER PROCEDURE importaciones.InsertarActividades
     @rutaArchivo NVARCHAR(260)  
 AS
@@ -330,7 +330,7 @@ BEGIN
             CODEPAGE = ''65001''
         );';
 
-    EXEC sp_executesql @sql;-- Si esta en inglés el Excel desde el cual descargamos el csv va FIELDTERMINATOR = '','' sino FIELDTERMINATOR = '';''
+    EXEC sp_executesql @sql;
 
     INSERT INTO club.actDeportiva (nombre)
     SELECT DISTINCT
@@ -351,17 +351,18 @@ BEGIN
 END;
 GO
 
---Levantar tabla Tarifario Actividades
-CREATE OR ALTER PROCEDURE importaciones.InsertarTarifarioActividad
+
+-------------------------------------------------
+CREATE OR ALTER PROCEDURE importaciones.InsertarCuotasActividad
     @rutaArchivo NVARCHAR(260)
 AS
 BEGIN
     SET NOCOUNT ON;
 
     IF OBJECT_ID('tempdb..#cuotas_actividad_temp') IS NOT NULL
-        DROP TABLE #tarifas_actividad_temp;
+        DROP TABLE #cuotas_actividad_temp;
 
-    CREATE TABLE #tarifas_actividad_temp (
+    CREATE TABLE #cuotas_actividad_temp (
         Actividad VARCHAR(50),
         ValorMensual VARCHAR(50),
         VigenteHasta VARCHAR(50)
@@ -377,7 +378,7 @@ BEGIN
             CODEPAGE = ''65001''
         );';
 
-    EXEC sp_executesql @sql;-- Si esta en inglés el Excel desde el cual descargamos el csv va FIELDTERMINATOR = '','' sino FIELDTERMINATOR = '';''
+    EXEC sp_executesql @sql;
 
     INSERT INTO club.TarifarioActividad (
         fechaVigenciaHasta, actividad, costoActividad, codAct
@@ -390,7 +391,7 @@ BEGIN
         END,
         TRY_CAST(ValorMensual AS DECIMAL(7,2)),
         a.codAct
-    FROM #tarifas_actividad_temp t
+    FROM #cuotas_actividad_temp t
     JOIN club.actDeportiva a 
         ON a.nombre = CASE 
                          WHEN LOWER(LTRIM(RTRIM(t.Actividad))) LIKE '%jederez%' THEN 'Ajedrez'
@@ -408,23 +409,23 @@ BEGIN
 
     );
 
-    DROP TABLE #tarifas_actividad_temp;
+    DROP TABLE #cuotas_actividad_temp;
 END;
 GO
 
---Levantar tabla Tarifario Categoría de Socio
-CREATE OR ALTER PROCEDURE importaciones.InsertarTarifarioCatSocio
+----------------------------
+CREATE OR ALTER PROCEDURE importaciones.InsertarCuotasCatSocio
     @rutaArchivo NVARCHAR(260)
 AS
 BEGIN
     SET NOCOUNT ON;
 
     -- Eliminar tabla temporal si ya existe
-    IF OBJECT_ID('tempdb..#tarifas_cat_temp') IS NOT NULL
+    IF OBJECT_ID('tempdb..#cuotas_cat_temp') IS NOT NULL
         DROP TABLE #cuotas_cat_temp;
 
     -- Crear tabla temporal con los datos del archivo
-    CREATE TABLE #tarifas_cat_temp (
+    CREATE TABLE #cuotas_cat_temp (
         [Categoria socio] VARCHAR(50) COLLATE Modern_Spanish_CI_AS ,
         [Valor cuota] VARCHAR(50) COLLATE Modern_Spanish_CI_AS ,
         [Vigente hasta] VARCHAR(50) COLLATE Modern_Spanish_CI_AS 
@@ -441,9 +442,9 @@ BEGIN
             CODEPAGE = ''65001''
         );';
 
-    EXEC sp_executesql @sql;-- Si esta en inglés el Excel desde el cual descargamos el csv va FIELDTERMINATOR = '','' sino FIELDTERMINATOR = '';''
+    EXEC sp_executesql @sql;
 
-    -- Insertar datos en la tabla TarifarioCatSocio evitando duplicados
+    -- Insertar datos en la tabla CuotaCatSocio evitando duplicados
     INSERT INTO club.TarifarioCatSocio(
         fechaVigenciaHasta, categoria, costoMembresia, catSocio
     )
@@ -452,7 +453,7 @@ BEGIN
         LTRIM(RTRIM([Categoria socio])),
         TRY_CAST([Valor cuota] AS DECIMAL(7,2)),
         c.codCat
-    FROM #tarifas_cat_temp t
+    FROM #cuotas_cat_temp t
     JOIN club.catSocio c
         ON c.nombreCat = LTRIM(RTRIM(t.[Categoria socio]))
     WHERE NOT EXISTS (
@@ -463,11 +464,13 @@ BEGIN
     );
 
     -- Limpiar tabla temporal
-    DROP TABLE #tarifas_cat_temp;
+    DROP TABLE #cuotas_cat_temp;
 END;
 GO
 
---Levantar tabla Presentismo
+
+----------------------------------------------
+
 CREATE OR ALTER PROCEDURE importaciones.cargarPresentismo
     @rutaArchivo NVARCHAR(255)
 AS
@@ -498,8 +501,9 @@ BEGIN
             ROWTERMINATOR = ''\n'',
             CODEPAGE = ''65001''
         );
-    ';
-    EXEC (@sql);-- Si esta en inglés el Excel desde el cual descargamos el csv va FIELDTERMINATOR = '',''  sino FIELDTERMINATOR = '';''
+    ';-- Si esta en inglés el Excel desde el cual descargamos el csv va FIELDTERMINATOR = '','' 
+	  --sino FIELDTERMINATOR = '';''
+    EXEC (@sql);
 
     -- Insertar en la tabla Presentismo
 		   INSERT INTO club.Presentismo (
@@ -543,7 +547,7 @@ END;
 GO
 
 
---Levantar tabla pago factura
+--insercion datos pago factura
 CREATE OR ALTER PROCEDURE importaciones.InsertarPagoFactura
     @rutaArchivo NVARCHAR(255)
 AS
@@ -571,7 +575,7 @@ BEGIN
             CODEPAGE = ''65001''
         );';
 
-    EXEC sp_executesql @sql;-- Si esta en inglés el Excel desde el cual descargamos el csv va FIELDTERMINATOR = '',''  sino FIELDTERMINATOR = '';''
+    EXEC sp_executesql @sql;
 
     INSERT INTO tesoreria.pagoFactura (
 		idPago,
@@ -594,7 +598,7 @@ BEGIN
 END;
 GO
 
---Levantar tabla Costo pileta invitado
+--SP TARIFA PILETA INVITADO
 CREATE OR ALTER PROCEDURE importaciones.InsertarCostoPiletaInvitado
     @rutaArchivo NVARCHAR(260)  
 AS
@@ -623,7 +627,7 @@ BEGIN
             CODEPAGE = ''65001''
         );
     ';
-    EXEC sp_executesql @sql;-- Si esta en inglés el Excel desde el cual descargamos el csv va FIELDTERMINATOR = '',''  sino FIELDTERMINATOR = '';''
+    EXEC sp_executesql @sql;
 
     -- Insertar en la tabla final con limpieza y conversión
     INSERT INTO club.costoPiletaInvitado (edad, precio, fechaVigenteHasta)
@@ -643,23 +647,23 @@ GO
 
 
 
---Levantar costo pileta socios
+--sp costo pileta socios
 CREATE OR ALTER PROCEDURE importaciones.InsertarCostoPileta
     @rutaArchivo NVARCHAR(260)
 AS
 BEGIN
     SET NOCOUNT ON;
-
+ 
     IF OBJECT_ID('tempdb..#costoPileta_temp') IS NOT NULL
         DROP TABLE #costoPileta_temp;
-
+ 
     CREATE TABLE #costoPileta_temp (
         costo VARCHAR(50),
         tipo VARCHAR(20),
         categoria VARCHAR(20),
         fechaVigenciaHasta VARCHAR(20)
     );
-
+ 
     DECLARE @sql NVARCHAR(MAX) = N'
         BULK INSERT #costoPileta_temp
         FROM ''' + @rutaArchivo + N'''
@@ -670,32 +674,24 @@ BEGIN
             CODEPAGE = ''65001''
         );
     ';
-    EXEC sp_executesql @sql;-- Si esta en inglés el Excel desde el cual descargamos el csv va FIELDTERMINATOR = '',''  sino FIELDTERMINATOR = '';''
-
-		INSERT INTO club.costoPileta (costo, tipo, categoria, fechaVigenciaHasta)
-	SELECT
-		TRY_CAST(LTRIM(RTRIM(costo)) AS DECIMAL(9,2)),
-		LTRIM(RTRIM(tipo)),
-		LTRIM(RTRIM(categoria)),
-		TRY_CONVERT(DATE, LTRIM(RTRIM(fechaVigenciaHasta)), 103)
-	FROM #costoPileta_temp AS t
-	WHERE 
-		TRY_CAST(costo AS DECIMAL(9,2)) IS NOT NULL AND
-		TRY_CONVERT(DATE, fechaVigenciaHasta, 103) IS NOT NULL AND
-		NOT EXISTS (
-			SELECT 1 FROM club.costoPileta AS c
-			WHERE
-				c.costo = TRY_CAST(LTRIM(RTRIM(t.costo)) AS DECIMAL(9,2))
-				AND c.tipo = LTRIM(RTRIM(t.tipo))
-				AND c.categoria = LTRIM(RTRIM(t.categoria))
-				AND c.fechaVigenciaHasta = TRY_CONVERT(DATE, LTRIM(RTRIM(t.fechaVigenciaHasta)), 103)
-		)
-
+    EXEC sp_executesql @sql;
+ 
+    INSERT INTO club.costoPileta (costo, tipo, categoria, fechaVigenciaHasta)
+    SELECT
+        TRY_CAST(LTRIM(RTRIM(costo)) AS DECIMAL(10,2)),
+        LTRIM(RTRIM(tipo)),
+        LTRIM(RTRIM(categoria)),
+        TRY_CONVERT(DATE, LTRIM(RTRIM(fechaVigenciaHasta)), 101)
+    FROM #costoPileta_temp
+    WHERE 
+        TRY_CAST(costo AS DECIMAL(10,2)) IS NOT NULL AND
+        TRY_CONVERT(DATE, fechaVigenciaHasta, 101) IS NOT NULL;
+ 
     DROP TABLE #costoPileta_temp;
 END;
 GO
 
---Levantar tabla lluvias
+--SP IMPORTAR LLUVIAS
 CREATE OR ALTER PROCEDURE importaciones.InsertarLluvias
     @rutaArchivo1 NVARCHAR(260),
     @rutaArchivo2 NVARCHAR(260)
@@ -725,7 +721,7 @@ BEGIN
             CODEPAGE = ''1252''
         );
     ';
-    EXEC sp_executesql @sql1;-- Si esta en inglés el Excel desde el cual descargamos el csv va FIELDTERMINATOR = '',''  sino FIELDTERMINATOR = '';''
+    EXEC sp_executesql @sql1;
 
     DECLARE @sql2 NVARCHAR(MAX) = N'
         BULK INSERT ##lluvias_temp
@@ -737,7 +733,7 @@ BEGIN
             CODEPAGE = ''1252''
         );
     ';
-    EXEC sp_executesql @sql2;-- Si esta en inglés el Excel desde el cual descargamos el csv va FIELDTERMINATOR = '',''  sino FIELDTERMINATOR = '';''
+    EXEC sp_executesql @sql2;
 	
     IF OBJECT_ID('tempdb..##lluvias_diarias') IS NOT NULL
         DROP TABLE ##lluvias_diarias;

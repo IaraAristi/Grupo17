@@ -1,11 +1,11 @@
-/*Entrega 5:Conjunto de pruebas.CreaciÃ³n de Stored Procedures para la carga y actualizaciÃ³n de tablas fuera del excel.
+/*Entrega 5:Conjunto de pruebas.Creación de Stored Procedures para la carga y actualización de tablas fuera del excel.
 Fecha de entrega: 01/07/2025
-NÃºmero de comisiÃ³n: 2900
-NÃºmero de grupo: 17
+Número de comisión: 2900
+Número de grupo: 17
 Materia: Bases de datos aplicadas
-Alumnos:AristimuÃ±o,Iara BelÃ©n DNI:45237225 
-		DomÃ­nguez,Luana Milena DNI:46362353
-		Lopardo, TomÃ¡s MatÃ­as DNI: 45495734
+Alumnos:Aristimuño,Iara Belén DNI:45237225 
+		Domínguez,Luana Milena DNI:46362353
+		Lopardo, Tomás Matías DNI: 45495734
 		Rico, Agustina Micaela DNI: 46028153
 */
 USE Com2900G17
@@ -28,7 +28,7 @@ BEGIN
     FROM socio.socio s
     WHERE s.codInscripcion IS NULL;
 
-    -- Actualizar cada socio con el ID de inscripciÃ³n correspondiente al grupo
+    -- Actualizar cada socio con el ID de inscripción correspondiente al grupo
     UPDATE s
     SET s.codInscripcion = i.idInscripcion
     FROM socio.socio s
@@ -62,7 +62,7 @@ BEGIN
                 SELECT
                     ID_Socio,
                     fechaNac,
-                    -- Calcula la edad en aÃ±os completos 
+                    -- Calcula la edad en años completos 
                     DATEDIFF(year, fechaNac, GETDATE()) -
                     CASE
                         WHEN MONTH(fechaNac) > MONTH(GETDATE()) OR
@@ -81,30 +81,30 @@ BEGIN
         WHERE
             s.fechaNac IS NOT NULL; -- Solo actualiza a socios con fecha de nacimiento
 
-        -- Confirmar la transacciÃ³n si todo fue bien
+        -- Confirmar la transacción si todo fue bien
         COMMIT TRANSACTION;
 
-        PRINT 'La actualizaciÃ³n de la categorÃ­a de socios se completÃ³ exitosamente.';
+        PRINT 'La actualización de la categoría de socios se completó exitosamente.';
 
     END TRY
     BEGIN CATCH
-        -- Si ocurre un error, revertir la transacciÃ³n
+        -- Si ocurre un error, revertir la transacción
         IF @@TRANCOUNT > 0
             ROLLBACK TRANSACTION;
 
-        -- Capturar y mostrar informaciÃ³n del error
+        -- Capturar y mostrar información del error
         DECLARE @ErrorMessage NVARCHAR(4000) = ERROR_MESSAGE();
         DECLARE @ErrorSeverity INT = ERROR_SEVERITY();
         DECLARE @ErrorState INT = ERROR_STATE();
 
         RAISERROR (@ErrorMessage, @ErrorSeverity, @ErrorState);
 
-        PRINT 'OcurriÃ³ un error durante la actualizaciÃ³n de la categorÃ­a de socios. La transacciÃ³n fue revertida.';
+        PRINT 'Ocurrió un error durante la actualización de la categoría de socios. La transacción fue revertida.';
     END CATCH;
 END;
 GO
 
---Actualizar el nÃºmero de grupo familiar para aquellos socios que sean responsables de pago del grupo
+--Actualizar el número de grupo familiar para aquellos socios que sean responsables de pago del grupo
 CREATE OR ALTER PROCEDURE socio.ActualizarGrupoFamiliarResponsables
 AS
 BEGIN
@@ -163,7 +163,7 @@ GO
 
 
 --DETALLE DE FACTURA Y FACTURA
---GeneraciÃ³n de cuotas mensuales(Categoria+Actividad)
+--Generación de cuotas mensuales(Categoria+Actividad)
 CREATE OR ALTER PROCEDURE tesoreria.GenerarCuotasMensuales
     @mes INT,
 	@anio INT
@@ -239,7 +239,7 @@ BEGIN
 END;
 GO
 
---GeneraciÃ³n de detalle de factura
+--Generación de detalle de factura
 CREATE OR ALTER PROCEDURE tesoreria.GenerarDetalleFactura
     @mes INT,
 	@anio INT
@@ -255,7 +255,7 @@ BEGIN
     INSERT INTO tesoreria.detalleFactura (codFactura, concepto, monto, descuento,ID_socio)
     SELECT 
         NULL,  
-        CONCAT('MembresÃ­a ', cs.nombreCat, ' - ', s.nombre, ' ', s.apellido),
+        CONCAT('Membresía ', cs.nombreCat, ' - ', s.nombre, ' ', s.apellido),
         cmmc.precio_bruto,
         cmmc.descuento_aplicado,
 		s.ID_socio
@@ -280,7 +280,7 @@ BEGIN
 END;
 GO
 
---GeneraciÃ³n de facturas mensuales
+--Generación de facturas mensuales
 CREATE OR ALTER PROCEDURE tesoreria.GenerarFacturasMensuales
     @mes INT,
 	@anio INT
@@ -343,13 +343,13 @@ END;
 GO
 
 --PASES PILETA
---AsignaciÃ³n de los costos de pileta a los pases
+--Asignación de los costos de pileta a los pases
+--SP PARA LLENAR PASES PILETA
 CREATE OR ALTER PROCEDURE club.AsignarCostoPiletaAPases
 AS
 BEGIN
     SET NOCOUNT ON;
-
-    -- Asigna codCostoPileta a los pases sin asignar
+ 
     UPDATE p
     SET p.codCostoPileta = cp.codCostoPileta
     FROM club.pasePileta p
@@ -361,21 +361,23 @@ BEGIN
         WHERE cp.tipo COLLATE Modern_Spanish_CI_AS = p.tipo COLLATE Modern_Spanish_CI_AS
           AND cp.categoria COLLATE Modern_Spanish_CI_AS = 
                 CASE 
-                    WHEN cs.nombreCat COLLATE Modern_Spanish_CI_AS LIKE '%menor%' THEN 'menor'
+                    WHEN cs.nombreCat COLLATE Modern_Spanish_CI_AS LIKE '%menor%' 
+                         OR cs.nombreCat COLLATE Modern_Spanish_CI_AS LIKE '%Menor%' THEN 'menor'
                     ELSE 'adulto'
                 END
           AND cp.fechaVigenciaHasta >= p.fechaDesde
         ORDER BY cp.fechaVigenciaHasta ASC
     ) cp
     WHERE p.codCostoPileta IS NULL;
-
+ 
     PRINT 'CodCostoPileta actualizado correctamente en los pases existentes.';
 END;
 GO
+ 
 
 
 --DETALLES DE FACTURA PASE PILETA SOCIOS
---GeneraciÃ³n de los detalles de factura para la colonia
+--Generación de los detalles de factura para la colonia
 CREATE OR ALTER PROCEDURE tesoreria.GenerarDetalleFacturaColonia
     @mes INT,
     @anio INT
@@ -408,12 +410,13 @@ END;
 GO
 
 --REINTEGROS PARA PAGOS A CUENTA EN CASO DE LLUVIAS
---GeneraciÃ³n de reintegros a pagos por motivo de lluvia
+--Generación de reintegros a pagos por motivo de lluvia
+--SP PARA PAGOS A CUENTA EN CASO DE LLUVIAS
 CREATE OR ALTER PROCEDURE tesoreria.GenerarReintegrosPiletaPorLluvia
 AS
 BEGIN
     SET NOCOUNT ON;
-
+ 
     -- Crear cuentas si no existen
     INSERT INTO socio.cuenta (socio, saldoAFavor)
     SELECT s.ID_socio, 0.00
@@ -421,13 +424,13 @@ BEGIN
     WHERE NOT EXISTS (
         SELECT 1 FROM socio.cuenta c WHERE c.socio = s.ID_socio
     );
-
-    -- DÃ­as de lluvia
+ 
+    -- Días de lluvia
     IF OBJECT_ID('tempdb..#dias_lluvia') IS NOT NULL DROP TABLE #dias_lluvia;
     SELECT fecha INTO #dias_lluvia
     FROM ##lluvias_diarias
     WHERE lluvia_mm > 0;
-
+ 
     -- Costos diarios para tipo "mes"
     IF OBJECT_ID('tempdb..#costos_dia') IS NOT NULL DROP TABLE #costos_dia;
     SELECT 
@@ -439,14 +442,14 @@ BEGIN
     JOIN socio.socio s ON s.ID_socio = p.idSocio
     JOIN club.catSocio cs ON cs.codCat = s.codCat
     JOIN club.costoPileta cp ON 
-        cp.tipo COLLATE Modern_Spanish_CI_AS = 'dÃ­a' COLLATE Modern_Spanish_CI_AS AND
+        cp.tipo COLLATE Modern_Spanish_CI_AS = 'día' COLLATE Modern_Spanish_CI_AS AND
         cp.categoria COLLATE Modern_Spanish_CI_AS = 
             CASE 
                 WHEN cs.nombreCat COLLATE Modern_Spanish_CI_AS LIKE '%menor%' THEN 'menor'
                 ELSE 'adulto'
             END COLLATE Modern_Spanish_CI_AS
     WHERE p.tipo = 'mes';
-
+ 
     -- Reintegros por PASE MES
     IF OBJECT_ID('tempdb..#reintegros_mes') IS NOT NULL DROP TABLE #reintegros_mes;
     SELECT 
@@ -466,8 +469,8 @@ BEGIN
     ) AS rango
     WHERE rango.dia IN (SELECT fecha FROM #dias_lluvia)
     GROUP BY df.codDetalleFac, df.ID_socio, cd.costo_diario;
-
-    -- Reintegros por PASE DÃA
+ 
+    -- Reintegros por PASE DÍA
     IF OBJECT_ID('tempdb..#reintegros_dia') IS NOT NULL DROP TABLE #reintegros_dia;
     SELECT 
         df.codDetalleFac,
@@ -476,15 +479,15 @@ BEGIN
         ROUND(df.monto * 0.60, 2) AS reintegro
     INTO #reintegros_dia
     FROM tesoreria.detalleFactura df
-    JOIN club.pasePileta p ON p.idSocio = df.ID_socio AND df.concepto LIKE '%pileta%' AND p.tipo = 'dÃ­a'
+    JOIN club.pasePileta p ON p.idSocio = df.ID_socio AND df.concepto LIKE '%pileta%' AND p.tipo = 'día'
     WHERE p.fechaDesde IN (SELECT fecha FROM #dias_lluvia);
-
+ 
     -- Unificar resultados
     IF OBJECT_ID('tempdb..#reintegros_total') IS NOT NULL DROP TABLE #reintegros_total;
     SELECT * INTO #reintegros_total FROM #reintegros_mes
     UNION ALL
     SELECT * FROM #reintegros_dia;
-
+ 
     -- Insertar reintegros
     INSERT INTO tesoreria.pagoCuenta (monto, cuenta, detalleFactura)
     SELECT 
@@ -494,21 +497,21 @@ BEGIN
     FROM #reintegros_total r
     JOIN socio.cuenta c ON c.socio = r.ID_socio
     WHERE r.reintegro > 0;
-
+ 
     -- Actualizar saldos
     UPDATE c
     SET c.saldoAFavor = c.saldoAFavor + r.reintegro
     FROM socio.cuenta c
     JOIN #reintegros_total r ON r.ID_socio = c.socio
     WHERE r.reintegro > 0;
-
+ 
     PRINT 'Reintegros por lluvia generados correctamente.';
 END;
 GO
 
 
 --CARGAR REEMBOLSOS
---InserciÃ³n de reembolsos
+--Inserción de reembolsos
 CREATE OR ALTER PROCEDURE tesoreria.InsertarReembolso
     @codPago INT,
     @motivo VARCHAR(100)
@@ -583,7 +586,7 @@ BEGIN
 
     DECLARE @hoy DATE = GETDATE();
 
-    -- Genera una Ãºnica factura por invitado, sumando los ingresos no facturados
+    -- Genera una única factura por invitado, sumando los ingresos no facturados
     INSERT INTO tesoreria.facturaInvitado (fechaEmision, codInvitado, idPago, monto)
     SELECT 
         @hoy,
@@ -598,7 +601,7 @@ BEGIN
 END;
 GO
 
---ASIGNACIÃ“N CODICO DE COSTO DE LA COLONIA
+--ASIGNACIÓN CODICO DE COSTO DE LA COLONIA
 CREATE OR ALTER PROCEDURE club.AsignarCostoColonia
 	@mes INT,
     @anio INT
@@ -697,4 +700,34 @@ BEGIN
 END;
 GO
 
-
+--SP DETALLES DE FACTURA PASE PILETA SOCIOS
+--SP DETALLES DE FACTURA PASE PILETA SOCIOS
+CREATE OR ALTER PROCEDURE tesoreria.GenerarDetallePasePileta
+    @mes INT,
+	@anio INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+ 
+    DECLARE @inicioMes DATE = DATEFROMPARTS(@anio, @mes, 1);
+    DECLARE @finMes DATE = EOMONTH(@inicioMes);
+ 
+    -- Elimina detalles del mes actual vinculados a Pase Pileta que no tengan codFactura todavía
+    DELETE FROM tesoreria.detalleFactura
+    WHERE codFactura IS NULL
+      AND concepto LIKE 'Pase pileta%';
+ 
+    INSERT INTO tesoreria.detalleFactura (codFactura, concepto, monto, descuento, ID_socio)
+    SELECT 
+        NULL,
+        CONCAT('Pase pileta - ', cp.tipo, ' (', FORMAT(pp.fechaDesde, 'dd/MM/yyyy'), ')'),
+        cp.costo,
+        0,
+        s.ID_socio
+    FROM club.pasePileta pp
+    JOIN club.costoPileta cp ON cp.codCostoPileta = pp.codCostoPileta
+    JOIN socio.socio s ON s.ID_socio = pp.idSocio
+    WHERE pp.fechaDesde BETWEEN @inicioMes AND @finMes;
+    PRINT 'Detalles de pase pileta generados';
+END;
+GO

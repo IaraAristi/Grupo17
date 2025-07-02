@@ -1,24 +1,14 @@
-/*Entrega 5:Conjunto de pruebas. Juegos de pruebas
-Fecha de entrega: 01/07/2025
-N√∫mero de comisi√≥n: 2900
-N√∫mero de grupo: 17
-Materia: Bases de datos aplicadas
-Alumnos:Aristimu√±o,Iara Bel√©n DNI:45237225 
-		Dom√≠nguez,Luana Milena DNI:46362353
-		Lopardo, Tom√°s Mat√≠as DNI: 45495734
-		Rico, Agustina Micaela DNI: 46028153
-
-OBSERVACI√ìN: Los lotes de prueba deben ejecutarse en el orden en el cual estan declarados
-*/
-
+--INSERCCION DE TABLAS FUERA DEL EXCEL
 Use Com2900G17;
 GO
 
 --LOTE DE DATOS DE SOCIOS FICTICIOS PARA PROBAR EL REPORTE1:MOROSIDAD
+
 EXEC socio.AgregarSocio
+    @nroSocio = 'SN-5000',
     @dni = '33456456',
     @nombre = 'Juan',
-    @apellido = 'P√©rez',
+    @apellido = 'PÈrez',
     @telContacto = 11345678,
     @email = 'juan@mail.com',
     @fechaNac = '1990-01-01',
@@ -30,9 +20,10 @@ EXEC socio.AgregarSocio
 GO
 
 EXEC socio.AgregarSocio
+    @nroSocio = 'SN-5011',
     @dni = '33456900',
-    @nombre = 'Mar√≠a',
-    @apellido = 'L√≥pez',
+    @nombre = 'MarÌa',
+    @apellido = 'LÛpez',
     @telContacto = 11206365,
     @email = 'maria@mail.com',
     @fechaNac = '1995-05-05',
@@ -44,9 +35,10 @@ EXEC socio.AgregarSocio
 GO
 
 EXEC socio.AgregarSocio
+    @nroSocio = 'SN-5002',
     @dni = '39002137',
     @nombre = 'Pedro',
-    @apellido = 'G√≥mez',
+    @apellido = 'GÛmez',
     @telContacto = 11206365,
     @email = 'pedro@mail.com',
     @fechaNac = '1975-03-10',
@@ -60,9 +52,10 @@ GO
 --este socio es para probar agregar,actualizar y eliminar socio
 
 EXEC socio.AgregarSocio
+    @nroSocio = 'SN-5020',
     @dni = '40445566',
-    @nombre = 'Luc√≠a',
-    @apellido = 'Fern√°ndez',
+    @nombre = 'LucÌa',
+    @apellido = 'Fern·ndez',
     @telContacto = 1199998888,
     @email = 'lucia@mail.com',
     @fechaNac = '1992-07-15',
@@ -71,21 +64,21 @@ EXEC socio.AgregarSocio
     @numeroObraSoc = 'SS90',
     @telObraSoc = '11-3333-2222',
     @estado = 'A';
-GO 
---------------------------------------------------------------
+
 SELECT * FROM socio.socio
-WHERE nroSocio = 'SN-4158';--Buscar a cual corresponde ahora
---------------------------------------------------------------
+WHERE nroSocio = 'SN-5020';
+
 EXEC socio.ModificarAtributoSocio
     @ID_socio = 157,
     @atributo = 'telContacto',
     @nuevoValor = '1177776666';
-------------------------------------------------------------------
+
 EXEC socio.EliminarSocio
     @ID_socio = 157; 
-----------------------------------------------------------------------
 
---Insercion de prueba en la tabla presentismo
+SELECT *FROM socio.socio
+-----------------------------------------------------------------------------
+
 INSERT INTO club.Presentismo (fecha, presentismo, socio, act, profesor) VALUES
 ('2025-03-10', 'P', 154, 1, 'Hector Alvarez'),
 ('2025-03-15', 'P', 154, 1, 'Hector Alvarez'),
@@ -106,104 +99,35 @@ INSERT INTO club.Presentismo (fecha, presentismo, socio, act, profesor) VALUES
 ('2025-05-12', 'P', 156, 4, 'Paula Quiroga');
 
 --FIN LOTE DE DATOS DE SOCIOS FICTICIOS PARA PROBAR EL REPORTE1:MOROSIDAD
--------------------------------------------------------------------------------
+
 --DATOS TUTOR
 INSERT INTO socio.tutor (nombre, apellido, dni, email, parentesco) VALUES
-('Juan', 'P√©rez', 25123456, 'juan.perez@email.com', 'padre'),
-('Mar√≠a', 'G√≥mez', 27567890, 'maria.gomez@email.com', 'madre'),
-('Carlos', 'L√≥pez', 28444555, 'carlos.lopez@email.com', 'tutor'),
-('Laura', 'Fern√°ndez', 29555111, 'laura.fernandez@email.com', 'madre'),
-('Jos√©', 'Mart√≠nez', 30666222, 'jose.martinez@email.com', 'padre')
--------------------------------------------------------------------------------
+('Juan', 'PÈrez', 25123456, 'juan.perez@email.com', 'padre'),
+('MarÌa', 'GÛmez', 27567890, 'maria.gomez@email.com', 'madre'),
+('Carlos', 'LÛpez', 28444555, 'carlos.lopez@email.com', 'tutor'),
+('Laura', 'Fern·ndez', 29555111, 'laura.fernandez@email.com', 'madre'),
+('JosÈ', 'MartÌnez', 30666222, 'jose.martinez@email.com', 'padre')
+
 SELECT* FROM socio.Tutor
--------------------------------------------------------------------------------
+
 --DATOS SOCIOS MENORES DE EDAD, PARA PODER ASIGNARLES UN TUTOR
-EXEC socio.AgregarSocio 
-    @dni = '47258775',
-    @nombre = 'Benjam√≠n',
-    @apellido = 'G√≥mez',
-    @telContacto = NULL,
-    @email = NULL,
-    @fechaNac = '2010-05-20',
-    @telEmergencia = 1133124567,
-    @nombreObraSoc = 'OSDE',
-    @numeroObraSoc = '0001234567',
-    @telObraSoc = '0116000111',
-    @estado = 'A',
-    @codCat = NULL,
-    @codTutor = 1,
-    @codInscripcion = NULL,
-    @codGrupoFamiliar = NULL;
+INSERT INTO socio.socio (
+    nroSocio, dni, nombre, apellido, fechaNac,
+    telEmergencia, nombreObraSoc, numeroObraSoc, telObraSoc, estado, codTutor
+)
+VALUES
+('SN-4155', '47258775', 'BenjamÌn', 'GÛmez', '2010-05-20',
+ 1133124567, 'OSDE', '0001234567', '0116000111', 'A',1),
+('SN-4156', '47258776', 'Emilia', 'Ponce', '2012-08-15',
+ 1133124568, 'Swiss Medical', '0002233445', '0116000222', 'A',2),
+('SN-4157', '47258777', 'Franco', 'Rivas', '2013-11-03',
+ 1133124569, 'IOMA', '0003344556', '0116000333', 'A',3),
+('SN-4158', '47258778', 'Catalina', 'Luna', '2015-02-10',
+ 1133124570, 'Galeno', '0004455667', '0116000444', 'A',4),
+('SN-4159', '47258779', 'Tom·s', 'Molina', '2014-04-22',
+ 1133124571, 'Medife', '0005566778', '0116000555', 'A',5);
 
-EXEC socio.AgregarSocio 
-    @dni = '47258776',
-    @nombre = 'Emilia',
-    @apellido = 'Ponce',
-    @telContacto = NULL,
-    @email = NULL,
-    @fechaNac = '2012-08-15',
-    @telEmergencia = 1133124568,
-    @nombreObraSoc = 'Swiss Medical',
-    @numeroObraSoc = '0002233445',
-    @telObraSoc = '0116000222',
-    @estado = 'A',
-    @codCat = NULL,
-    @codTutor = 2,
-    @codInscripcion = NULL,
-    @codGrupoFamiliar = NULL;
-
-EXEC socio.AgregarSocio 
-    @dni = '47258777',
-    @nombre = 'Franco',
-    @apellido = 'Rivas',
-    @telContacto = NULL,
-    @email = NULL,
-    @fechaNac = '2013-11-03',
-    @telEmergencia = 1133124569,
-    @nombreObraSoc = 'IOMA',
-    @numeroObraSoc = '0003344556',
-    @telObraSoc = '0116000333',
-    @estado = 'A',
-    @codCat = NULL,
-    @codTutor = 3,
-    @codInscripcion = NULL,
-    @codGrupoFamiliar = NULL;
-
-EXEC socio.AgregarSocio 
-    @dni = '47258778',
-    @nombre = 'Catalina',
-    @apellido = 'Luna',
-    @telContacto = NULL,
-    @email = NULL,
-    @fechaNac = '2015-02-10',
-    @telEmergencia = 1133124570,
-    @nombreObraSoc = 'Galeno',
-    @numeroObraSoc = '0004455667',
-    @telObraSoc = '0116000444',
-    @estado = 'A',
-    @codCat = NULL,
-    @codTutor = 4,
-    @codInscripcion = NULL,
-    @codGrupoFamiliar = NULL;
-
-EXEC socio.AgregarSocio 
-    @dni = '47258779',
-    @nombre = 'Tom√°s',
-    @apellido = 'Molina',
-    @telContacto = NULL,
-    @email = NULL,
-    @fechaNac = '2014-04-22',
-    @telEmergencia = 1133124571,
-    @nombreObraSoc = 'Medife',
-    @numeroObraSoc = '0005566778',
-    @telObraSoc = '0116000555',
-    @estado = 'A',
-    @codCat = NULL,
-    @codTutor = 5,
-    @codInscripcion = NULL,
-    @codGrupoFamiliar = NULL;
--------------------------------------------------------------------------------
- INSERT INTO club.Presentismo (fecha, presentismo, socio, act, profesor) VALUES--Ajustar si hace falta
+ INSERT INTO club.Presentismo (fecha, presentismo, socio, act, profesor) VALUES
 ('2025-03-03', 'P', 157, 1, 'Hector Alvarez'),
 ('2025-03-10', 'P', 157, 1, 'Hector Alvarez'),
 ('2025-03-17', 'P', 157, 1, 'Hector Alvarez'),
@@ -219,7 +143,7 @@ EXEC socio.AgregarSocio
 ('2025-03-4', 'P', 161, 4, 'Paula Quiroga'),
 ('2025-03-11', 'P', 161, 4, 'Paula Quiroga'),
 ('2025-03-18', 'P', 161, 4, 'Paula Quiroga');
--------------------------------------------------------------------------------
+
 --DATOS INSCRIPCION
 INSERT INTO socio.inscripcion (fecha, hora) VALUES
 ('2025-02-10', '10:00'),
@@ -232,47 +156,50 @@ INSERT INTO socio.inscripcion (fecha, hora) VALUES
 ('2025-02-17', '17:00'),
 ('2025-02-18', '18:00'),
 ('2025-02-19', '19:00');
--------------------------------------------------------------------------------
+
 SELECT* FROM socio.inscripcion
 GO
 
 --------------------------------------------------
---Asignacion de inscripciones a los socios recien inscriptos
+
 EXEC socio.AsignarInscripcionesASocios
--------------------------------------------------------------------------------
+
 SELECT *FROM socio.socio
--------------------------------------------------------------------------------
---Asignaci√≥n de categoria de socio al socio seg√∫n su edad
+
+---------------------------------------------------
+
 EXEC socio.ActualizarCategoriaSociosPorEdad
 GO
--------------------------------------------------------------------------------
---Actualizaci√≥n de grupo familiar para el socio responsable de pago del grupo
+
+-------------------------------------------------
+
 EXEC socio.ActualizarGrupoFamiliarResponsables
 GO
+
 -----------------------------------------------------
+
 INSERT INTO club.pasePileta (tipo, fechaDesde, fechaHasta, idSocio)
 VALUES
-    ('d√≠a', '2025-01-20', '2025-01-20', 5),
-    ('d√≠a', '2025-02-28', '2025-02-28', 12),
-    ('d√≠a', '2025-02-28', '2025-02-28', 50),
-    ('d√≠a', '2025-01-15', '2025-01-15', 87),
-    ('d√≠a', '2025-02-10', '2025-02-10', 119),
+    ('dÌa', '2025-01-20', '2025-01-20', 5),
+    ('dÌa', '2025-02-28', '2025-02-28', 12),
+    ('dÌa', '2025-02-28', '2025-02-28', 50),
+    ('dÌa', '2025-01-15', '2025-01-15', 87),
+    ('dÌa', '2025-02-10', '2025-02-10', 119),
     ('mes', '2025-01-01', '2025-01-31', 11),
     ('mes', '2025-02-01', '2025-02-28', 17);
 
---Asignaci√≥n del codigo de costo del pase de pileta
-EXEC club.AsignarCostoPiletaAPases 
--------------------------------------------------------------------------------
+EXEC club.AsignarCostoPiletaAPases --agrega el cod del costo del pase de pileta
+
 SELECT * FROM club.pasePileta
 --------------------------------------------------------
 
 INSERT INTO club.costoColonia (costo, fechaVigenciaHasta, turno) VALUES
-(3000, '2025-02-28', 'ma√±ana'),
+(3000, '2025-02-28', 'maÒana'),
 (3000, '2025-02-28', 'tarde'),
 (5000, '2025-02-28', 'doble');
 
 INSERT INTO club.coloniaVerano (mes, turno, anio) VALUES
-(1, 'ma√±ana', 2025),
+(1, 'maÒana', 2025),
 (1, 'tarde', 2025),
 (2, 'doble', 2025);
 
@@ -280,11 +207,11 @@ INSERT INTO club.InscripcionColonia (codSocio, codColonia) VALUES
 (124,1),
 (150,2),
 (133,3);
--------------------------------------------------------------------------------
+
 EXEC club.AsignarCostoColonia
 	@mes = 1,
 	@anio = 2025
--------------------------------------------------------------------------------
+
 SELECT * FROM club.coloniaVerano
 
 ---------------------------------------------
@@ -293,13 +220,13 @@ INSERT INTO club.costoSUM (costo, fechaVigenciaHasta) VALUES
 (1000, '2025-06-30');
 
 INSERT INTO club.alquilerSUM (fecha, turno, socio) VALUES
-('2025-03-03', 'ma√±ana', 100),
+('2025-03-03', 'maÒana', 100),
 ('2025-04-03', 'noche', 10);
--------------------------------------------------------------------------------
+
 EXEC club.AsignarCostoSUM
 	@mes = 3,
 	@anio = 2025
--------------------------------------------------------------------------------
+
 SELECT * FROM club.alquilerSUM
 
 -----------------------------------------------
@@ -307,56 +234,79 @@ SELECT * FROM club.alquilerSUM
 DECLARE @mes INT = 1;
 DECLARE @anio INT = 2025;
 
-WHILE @mes <= 3
+WHILE @mes <= 4
 BEGIN
     EXEC tesoreria.GenerarCuotasMensuales @mes, @anio;
     EXEC tesoreria.GenerarDetalleFactura @mes, @anio;
-    EXEC tesoreria.GenerarFacturasMensuales @mes, @anio,
-	EXEC tesoreria.GenerarDetallePasePileta @mes, @anio,
-	EXEC tesoreria.GenerarDetalleFacturaColonia @mes, @anio,
-	EXEC tesoreria.GenerarDetalleFacturaSUM @mes, @anio
-
+	EXEC tesoreria.GenerarDetalleFacturaColonia @mes, @anio;
+	EXEC tesoreria.GenerarDetalleFacturaSUM @mes, @anio;
     SET @mes = @mes + 1;
 END;
--------------------------------------------------------------------------------
-SELECT * FROM tesoreria.cuotaMensualActividad
--------------------------------------------------------------------------------
-SELECT * FROM tesoreria.cuotaMensualCategoria
--------------------------------------------------------------------------------
-SELECT * FROM tesoreria.detalleFactura
--------------------------------------------------------------------------------
-SELECT * FROM tesoreria.Factura
 
------------------------------------------------------------------
-
+select * from tesoreria.cuotaMensualActividad
+select * from tesoreria.cuotaMensualCategoria
+-------------
+--Pase pileta
+INSERT INTO club.pasePileta (tipo, fechaDesde, fechaHasta, idSocio)
+VALUES
+    ('dÌa', '2025-01-20', '2025-01-20', 5),
+    ('dÌa', '2025-02-28', '2025-02-28', 12),
+    ('dÌa', '2025-02-28', '2025-02-28', 50),
+    ('dÌa', '2025-01-15', '2025-01-15', 87),
+    ('dÌa', '2025-02-10', '2025-02-10', 119),
+    ('mes', '2025-01-01', '2025-01-31', 11),
+    ('mes', '2025-02-01', '2025-02-28', 17);
+ 
+EXEC club.AsignarCostoPiletaAPases --agrega el cod del costo del pase de pileta
+ 
+SELECT * FROM club.pasePileta
+--------------------------------------------------------
+EXEC tesoreria.GenerarDetallePasePileta @mes = 2, @anio=2025;
+ 
+SELECT * FROM tesoreria.detalleFactura WHERE concepto LIKE 'Pase pileta%'
+ 
+EXEC tesoreria.GenerarFacturasMensuales @mes = 2,
+	@anio = 2025;
+ 
+SELECT * FROM tesoreria.factura WHERE mesFacturado = 2
+SELECT * FROM tesoreria.detalleFactura WHERE concepto LIKE 'Pase pileta%'
+-------------------------------------------------------------------------------
 EXEC tesoreria.GenerarReintegrosPiletaPorLluvia
------------------------------------------------------------------
+ 
 SELECT * FROM tesoreria.pagoCuenta
------------------------------------------------------------------
-SELECT * FROM socio.cuenta
+SELECT * FROM socio.cuenta order by saldoAFavor DESC
 
+
+------------
+EXEC tesoreria.GenerarDetallePasePileta @mes;
+EXEC tesoreria.GenerarFacturasMensuales @mes, @anio;
+----------------
+
+
+
+select * from tesoreria.detalleFactura
+SELECT * from tesoreria.Factura
 -------------------------------------------------------------
 
 INSERT INTO club.invitado (nombre, apellido, fechaNac, dni, mail) VALUES
-('Luc√≠a', 'P√©rez', '2001-05-23', '34567890', 'lucia.perez@email.com'),
-('Mateo', 'Fern√°ndez', '1999-11-12', '32145678', 'mateo.fernandez@email.com'),
-('Juli√°n', 'Rodr√≠guez', '1998-08-17', '31234567', 'julian.rodriguez@email.com'),
-('Valentina', 'L√≥pez', '2000-03-09', '35678901', 'valentina.lopez@email.com'),
-('Bruno', 'S√°nchez', '2010-09-15', '37890123', 'bruno.sanchez@email.com');
------------------------------------------------------------------
+('LucÌa', 'PÈrez', '2001-05-23', '34567890', 'lucia.perez@email.com'),
+('Mateo', 'Fern·ndez', '1999-11-12', '32145678', 'mateo.fernandez@email.com'),
+('Juli·n', 'RodrÌguez', '1998-08-17', '31234567', 'julian.rodriguez@email.com'),
+('Valentina', 'LÛpez', '2000-03-09', '35678901', 'valentina.lopez@email.com'),
+('Bruno', 'S·nchez', '2010-09-15', '37890123', 'bruno.sanchez@email.com');
+
 INSERT INTO club.ingresoPiletaInvitado (fecha, socioInvitador, codInvitado) VALUES
 ('2025-01-20',5,1),
 ('2025-01-20',5,2),
 ('2025-01-15',87,3),
 ('2025-02-28',50,4),
 ('2025-02-28',50,5);
------------------------------------------------------------------
+
 EXEC club.AsignarCostoIngresoInvitados
------------------------------------------------------------------
+
 SELECT * FROM club.ingresoPiletaInvitado
------------------------------------------------------------------
+
 EXEC tesoreria.GenerarFacturasInvitados
------------------------------------------------------------------
 SELECT * FROM tesoreria.facturaInvitado
 
 ---------------------------------------
@@ -364,22 +314,5 @@ SELECT * FROM tesoreria.facturaInvitado
 EXEC tesoreria.InsertarReembolso
 	@codPago = 1,
 	@motivo = 'error en facturacion'
-	-----------------------------------------------------------------
 
 SELECT * FROM tesoreria.reembolso
-
-----------------------------------------
---Prueba 
-EXEC socio.VerPagosYEstado @nroSocio = 'SN-4045';
-----------------------------------------------------
-EXEC socio.QuitarSocioDeGrupoFamiliar 
-    @nroSocioResponsabledePago = 'SN-4045',
-    @nroSocioAQuitar = 'SN-4154';
-----------------------------------------------------
-EXEC socio.AgregarSocioAGrupoFamiliar 
-    @nroSocioResponsabledePago = 'SN-4045',
-    @nroSocioAAgregar = 'SN-4154';
-
-
-
-	

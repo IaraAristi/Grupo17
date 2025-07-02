@@ -1,56 +1,77 @@
-/*Entrega 5:Conjunto de pruebas.Ejecución de Stored Procedures de importación de datos
-Fecha de entrega: 01/07/2025
-Número de comisión: 2900
-Número de grupo: 17
-Materia: Bases de datos aplicadas
-Alumnos:Aristimuño,Iara Belén DNI:45237225 
-		Domínguez,Luana Milena DNI:46362353
-		Lopardo, Tomás Matías DNI: 45495734
-		Rico, Agustina Micaela DNI: 46028153
+--EJECUCION DE SP DE EXPORTACION DE TABLAS
 
-Ubicación de los archivos de importación: consideramos que el lugar más accesible y con una ruta menos compleja
-para localizar los archivos de importación es en la carpeta de descargas, por lo cual estarán accesible para la
-demostración desde allí.
-*/
 USE Com2900G17;
 GO
 
 EXEC  importaciones.ImportarSociosRP
-    @rutaArchivo = 'C:\Users\iaraa\Downloads\Datos socios-Responsables de Pago.csv';
--- verificamos inserción de responsables de pago
-SELECT * FROM socio.socio
+    @rutaArchivo = 'C:\Users\Diego\Desktop\excel tp bdda\Datos socios.csv';
+
 -------------------------
 EXEC  importaciones.ImportarSociosConGrupoFamiliar
-    @rutaArchivo = 'C:\Users\iaraa\Downloads\Datos socios-Grupo Familiar.csv';
---verificamos inserción de socios que se encuentran en grupos familiares
-SELECT * FROM socio.socio
+    @rutaArchivo = 'C:\Users\Diego\Desktop\excel tp bdda\Datos socios GF.csv';
+
+SELECT * FROM socio.Socio order by nroSocio 
+
 -----------------------------------------
+
 EXEC  importaciones.InsertarActividades
-    @rutaArchivo = 'C:\Users\iaraa\Downloads\Actividad deportiva.csv';
-SELECT * FROM club.
+    @rutaArchivo = 'C:\Users\Diego\Desktop\excel tp bdda\Actividad deportiva.csv';
+
+SELECT * FROM club.actDeportiva
+
 -----------------------------------------
+
 EXEC importaciones.InsertarCuotasActividad
-	@rutaArchivo = 'C:\Users\iaraa\Downloads\Actividad deportiva.csv'
+	@rutaArchivo = 'C:\Users\Diego\Desktop\excel tp bdda\Actividad deportiva.csv'
+
+SELECT * FROM club.TarifarioActividad
+
 -----------------------------
-EXEC importaciones.InsertarCuotasCatSocio
-	@rutaArchivo = 'C:\Users\iaraa\Downloads\Categoria de socio.csv'
-------------------------------------------
+
 EXEC importaciones.InsertarCatSocio
-    @rutaArchivo = 'C:\Users\iaraa\Downloads\Categoria de socio.csv';
+    @rutaArchivo = 'C:\Users\Diego\Desktop\excel tp bdda\Categoria de socio.csv';
+
+SELECT * FROM club.catSocio
+
 ------------------------------------------------
+
+EXEC importaciones.InsertarCuotasCatSocio
+	@rutaArchivo = 'C:\Users\Diego\Desktop\excel tp bdda\Categoria de socio.csv'
+
+SELECT * FROM club.TarifarioCatSocio
+
+------------------------------------------
 EXEC importaciones.cargarPresentismo
-	@rutaArchivo = 'C:\Users\iaraa\Downloads\presentismo.csv'
+	@rutaArchivo = 'C:\Users\Diego\Desktop\excel tp bdda\Presentismo.csv'
+
+select * from club.Presentismo order by fecha desc--Revisar ,,, del final
+
 -------------------------------
 EXEC importaciones.InsertarPagoFactura
-	@rutaArchivo = 'C:\Users\iaraa\Downloads\pago cuotas.csv'
+	@rutaArchivo = 'C:\Users\Diego\Desktop\excel tp bdda\Pago Cuotas.csv'
+
+select * from tesoreria.pagoFactura order by idPago desc
+
 ---------------------------------
-EXEC importaciones.InsertarCostoPileta 
-	@rutaArchivo = 'C:\Users\iaraa\Downloads\Costo Pase Pileta.csv'
+EXEC socio.ActualizarCategoriaSociosPorEdad
+GO
+
+
+EXEC importaciones.InsertarCostoPileta
+	@rutaArchivo = 'C:\Users\Diego\Desktop\excel tp bdda\Costo Pase Pileta.csv'
+
+select * from club.costoPileta
+
 ---------------------------------
+
 EXEC importaciones.InsertarCostoPiletaInvitado 
-	@rutaArchivo = 'C:\Users\iaraa\Downloads\Costo Pileta Invitado.csv'
-----------------------------------------------------
+	@rutaArchivo = 'C:\Users\Diego\Desktop\excel tp bdda\Costo Pileta Invitado.csv'
+
+select * from club.costoPiletaInvitado
+
+-----------------------------------------------------
+
 EXEC importaciones.InsertarLluvias
-	@rutaArchivo1 = 'C:\Users\iaraa\Downloads\lluvias 2024.csv',
-	@rutaArchivo2 = 'C:\Users\iaraa\Downloads\lluvias 2025.csv'
+	@rutaArchivo1 = 'C:\Users\Diego\Desktop\excel tp bdda\lluvias 2024 funciona.csv',
+	@rutaArchivo2 = 'C:\Users\Diego\Desktop\excel tp bdda\lluvias 2025.csv'
 

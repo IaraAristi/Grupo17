@@ -3,7 +3,7 @@
   <Items>
     <LogicalFolder Name="Connections" Type="2" Sorted="true">
       <Items>
-        <ConnectionNode Name="DESKTOP-V1R6NVL\SQLEXPRESS01:LAPTOP-KOOVHGNG\iaraa">
+        <ConnectionNode Name="DESKTOP-V1R6NVL\SQLEXPRESS01:DESKTOP-V1R6NVL\Diego">
           <Created>2025-06-14T12:53:51.1747736-03:00</Created>
           <Type>SQL</Type>
           <Server>DESKTOP-V1R6NVL\SQLEXPRESS01</Server>
@@ -18,7 +18,7 @@
           <ConnectionProtocol>NotSpecified</ConnectionProtocol>
           <ApplicationName>Microsoft SQL Server Management Studio - Query</ApplicationName>
         </ConnectionNode>
-        <ConnectionNode Name="LAPTOP-KOOVHGNG:LAPTOP-KOOVHGNG\iaraa">
+        <ConnectionNode Name="LAPTOP-KOOVHGNG:DESKTOP-V1R6NVL\Diego">
           <Created>2025-06-16T00:34:32.9026112-03:00</Created>
           <Type>SQL</Type>
           <Server>LAPTOP-KOOVHGNG</Server>
@@ -38,58 +38,64 @@
     <LogicalFolder Name="Queries" Type="0" Sorted="true">
       <Items>
         <FileNode Name="00_CreacionDeTablasyBDD.sql">
-          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:LAPTOP-KOOVHGNG:True</AssociatedConnectionMoniker>
-          <AssociatedConnSrvName>LAPTOP-KOOVHGNG</AssociatedConnSrvName>
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:DESKTOP-V1R6NVL\SQLEXPRESS01:True</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>DESKTOP-V1R6NVL\SQLEXPRESS01</AssociatedConnSrvName>
           <AssociatedConnUserName />
           <FullPath>00_CreacionDeTablasyBDD.sql</FullPath>
         </FileNode>
         <FileNode Name="01_SPImportacionDeTablas.sql">
-          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:LAPTOP-KOOVHGNG:True</AssociatedConnectionMoniker>
-          <AssociatedConnSrvName>LAPTOP-KOOVHGNG</AssociatedConnSrvName>
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:DESKTOP-V1R6NVL\SQLEXPRESS01:True</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>DESKTOP-V1R6NVL\SQLEXPRESS01</AssociatedConnSrvName>
           <AssociatedConnUserName />
           <FullPath>01_SPImportacionDeTablas.sql</FullPath>
         </FileNode>
         <FileNode Name="02_EjecucionDeImportaciones.sql">
-          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:LAPTOP-KOOVHGNG:True</AssociatedConnectionMoniker>
-          <AssociatedConnSrvName>LAPTOP-KOOVHGNG</AssociatedConnSrvName>
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:DESKTOP-V1R6NVL\SQLEXPRESS01:True</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>DESKTOP-V1R6NVL\SQLEXPRESS01</AssociatedConnSrvName>
           <AssociatedConnUserName />
           <FullPath>02_EjecucionDeImportaciones.sql</FullPath>
         </FileNode>
         <FileNode Name="03_CargarTablas.sql">
-          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:LAPTOP-KOOVHGNG:True</AssociatedConnectionMoniker>
-          <AssociatedConnSrvName>LAPTOP-KOOVHGNG</AssociatedConnSrvName>
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:DESKTOP-V1R6NVL\SQLEXPRESS01:True</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>DESKTOP-V1R6NVL\SQLEXPRESS01</AssociatedConnSrvName>
           <AssociatedConnUserName />
           <FullPath>03_CargarTablas.sql</FullPath>
         </FileNode>
         <FileNode Name="04_SpCreateAlterDelete.sql">
-          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:LAPTOP-KOOVHGNG:True</AssociatedConnectionMoniker>
-          <AssociatedConnSrvName>LAPTOP-KOOVHGNG</AssociatedConnSrvName>
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:DESKTOP-V1R6NVL\SQLEXPRESS01:True</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>DESKTOP-V1R6NVL\SQLEXPRESS01</AssociatedConnSrvName>
           <AssociatedConnUserName />
           <FullPath>04_SpCreateAlterDelete.sql</FullPath>
         </FileNode>
         <FileNode Name="05_RellenarTablas.sql">
-          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:LAPTOP-KOOVHGNG:True</AssociatedConnectionMoniker>
-          <AssociatedConnSrvName>LAPTOP-KOOVHGNG</AssociatedConnSrvName>
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:DESKTOP-V1R6NVL\SQLEXPRESS01:True</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>DESKTOP-V1R6NVL\SQLEXPRESS01</AssociatedConnSrvName>
           <AssociatedConnUserName />
           <FullPath>05_RellenarTablas.sql</FullPath>
         </FileNode>
-        <FileNode Name="06_Seguridadyroles.sql">
-          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:LAPTOP-KOOVHGNG:True</AssociatedConnectionMoniker>
-          <AssociatedConnSrvName>LAPTOP-KOOVHGNG</AssociatedConnSrvName>
+        <FileNode Name="06_SeguridadYroles.sql">
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:DESKTOP-V1R6NVL\SQLEXPRESS01:True</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>DESKTOP-V1R6NVL\SQLEXPRESS01</AssociatedConnSrvName>
           <AssociatedConnUserName />
-          <FullPath>06_Seguridadyroles.sql</FullPath>
+          <FullPath>06_SeguridadYroles.sql</FullPath>
         </FileNode>
-        <FileNode Name="07_Reportes.sql">
-          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:LAPTOP-KOOVHGNG:True</AssociatedConnectionMoniker>
-          <AssociatedConnSrvName>LAPTOP-KOOVHGNG</AssociatedConnSrvName>
+        <FileNode Name="07_EjecucionesReportes.sql">
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:DESKTOP-V1R6NVL\SQLEXPRESS01:True</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>DESKTOP-V1R6NVL\SQLEXPRESS01</AssociatedConnSrvName>
           <AssociatedConnUserName />
-          <FullPath>07_Reportes.sql</FullPath>
+          <FullPath>07_EjecucionesReportes.sql</FullPath>
         </FileNode>
-        <FileNode Name="08_EjecucionesReportes.sql">
-          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:LAPTOP-KOOVHGNG:True</AssociatedConnectionMoniker>
-          <AssociatedConnSrvName>LAPTOP-KOOVHGNG</AssociatedConnSrvName>
+        <FileNode Name="08_Reportes.sql">
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:DESKTOP-V1R6NVL\SQLEXPRESS01:True</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>DESKTOP-V1R6NVL\SQLEXPRESS01</AssociatedConnSrvName>
           <AssociatedConnUserName />
-          <FullPath>08_EjecucionesReportes.sql</FullPath>
+          <FullPath>08_Reportes.sql</FullPath>
+        </FileNode>
+        <FileNode Name="09_EjecucionesSeguridad&amp;Roles.sql">
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:DESKTOP-V1R6NVL\SQLEXPRESS01:True</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>DESKTOP-V1R6NVL\SQLEXPRESS01</AssociatedConnSrvName>
+          <AssociatedConnUserName />
+          <FullPath>09_EjecucionesSeguridad&amp;Roles.sql</FullPath>
         </FileNode>
       </Items>
     </LogicalFolder>

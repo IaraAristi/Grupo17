@@ -1,14 +1,14 @@
-/*Entrega 5:Conjunto de pruebas. CreaciÃ³n de base de datos, esquemas y tablas
+/*Entrega 5:Conjunto de pruebas. Creación de base de datos, esquemas y tablas
 Fecha de entrega: 01/07/2025
-NÃºmero de comisiÃ³n: 2900
-NÃºmero de grupo: 17
+Número de comisión: 2900
+Número de grupo: 17
 Materia: Bases de datos aplicadas
-Alumnos:AristimuÃ±o,Iara BelÃ©n DNI:45237225 
-		DomÃ­nguez,Luana Milena DNI:46362353
-		Lopardo, TomÃ¡s MatÃ­as DNI: 45495734
+Alumnos:Aristimuño,Iara Belén DNI:45237225 
+		Domínguez,Luana Milena DNI:46362353
+		Lopardo, Tomás Matías DNI: 45495734
 		Rico, Agustina Micaela DNI: 46028153
 */
---CREACIÃ“N DE LA BASE DE DATOS
+--CREACIÓN DE LA BASE DE DATOS
 USE master;
 GO
 -- Cierro todas las conexiones activas a la base de datos Com2900G17
@@ -29,7 +29,7 @@ GO
 
 USE Com2900G17;
 GO
---CREACIÃ“N DE ESQUEMAS
+--CREACIÓN DE ESQUEMAS
 IF NOT EXISTS (SELECT * FROM sys.schemas WHERE name = 'tesoreria')
 BEGIN
     EXEC('CREATE SCHEMA tesoreria');
@@ -55,7 +55,7 @@ BEGIN
     EXEC('CREATE SCHEMA club');
 END
 GO
---CREACIÃ“N DE TABLAS
+--CREACIÓN DE TABLAS
 IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE
 TABLE_SCHEMA =
 'club' AND TABLE_NAME =
@@ -215,7 +215,7 @@ CREATE TABLE club.coloniaVerano (
     codColonia INT IDENTITY(1,1) PRIMARY KEY,
     mes INT,
 	anio INT,
-	turno VARCHAR(6) CHECK (turno IN ('maÃ±ana', 'tarde', 'doble')),
+	turno VARCHAR(6) CHECK (turno IN ('mañana', 'tarde', 'doble')),
     codCostoColonia INT,
     CONSTRAINT FK_coloniaVerano_costo FOREIGN KEY (codCostoColonia) REFERENCES club.costoColonia(codCostoColonia)
 );
@@ -258,7 +258,7 @@ BEGIN
 CREATE TABLE club.alquilerSUM (
     codAlquilerSum INT IDENTITY(1,1) PRIMARY KEY,
     fecha DATE,
-    turno VARCHAR(6) check (turno in ('maÃ±ana','tarde','noche')),
+    turno VARCHAR(6) check (turno in ('mañana','tarde','noche')),
     socio INT,
     codCostoSUM INT,
     CONSTRAINT FK_alquilerSUM_socio FOREIGN KEY (socio) REFERENCES socio.socio(ID_socio),
@@ -464,7 +464,7 @@ TABLE_SCHEMA =
 BEGIN
 CREATE TABLE club.pasePileta (
     codPase INT IDENTITY(1,1) PRIMARY KEY,
-    tipo VARCHAR(10) CHECK (tipo IN ('dÃ­a', 'mes', 'temporada')),
+    tipo VARCHAR(10) CHECK (tipo IN ('día', 'mes', 'temporada')),
     fechaDesde DATE,
     fechaHasta DATE,
     idSocio INT,
@@ -549,4 +549,4 @@ CREATE TABLE socio.invitacionPileta (
     FOREIGN KEY (nroSocioInvitado) REFERENCES socio.socio(nroSocio)
 );
 
-PRINT'CreaciÃ³n de base de datos, esquemas y tablas realizado'
+PRINT'Creación de base de datos, esquemas y tablas realizado'
