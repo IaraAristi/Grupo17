@@ -86,22 +86,23 @@ END;
 GO
 
 --Reporte 2: ingresos mensuales por actividad
+
 CREATE OR ALTER PROCEDURE reportes.Reporte_ingresos_por_actividad
 AS
 BEGIN
     SET NOCOUNT ON;
-
-    WITH MontoFacturadoPorMes AS (
-        SELECT 
-            f.mesFacturado,
+ 
+    -- Base: toma datos de cuota mensual por actividad, vinculando actividad y mes
+    WITH Base AS (
+        SELECT
+            MONTH(cma.fechaGeneracion) AS mesFacturado,
             ad.nombre AS Actividad,
-            df.monto - df.descuento AS MontoConDescuento
-        FROM tesoreria.detalleFactura df
-        JOIN tesoreria.factura f ON f.codFactura = df.codFactura
-        JOIN tesoreria.cuotaMensualActividad cma ON cma.ID_socio = df.ID_socio
+            cma.precio_bruto - cma.descuento_aplicado AS MontoConDescuento
+        FROM tesoreria.cuotaMensualActividad cma
         JOIN club.actDeportiva ad ON ad.codAct = cma.codAct
-        WHERE MONTH(cma.fechaGeneracion) = f.mesFacturado
     )
+ 
+    -- Pivot para transponer actividades por mes
     SELECT
         mesFacturado,
         ISNULL([Ajedrez], 0) AS Ajedrez,
@@ -110,7 +111,7 @@ BEGIN
         ISNULL([Natación], 0) AS Natación,
         ISNULL([Taekwondo], 0) AS Taekwondo,
         ISNULL([Vóley], 0) AS Vóley
-    FROM MontoFacturadoPorMes
+    FROM Base
     PIVOT (
         SUM(MontoConDescuento)
         FOR Actividad IN (
